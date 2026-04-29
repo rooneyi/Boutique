@@ -9,7 +9,7 @@ class EnsureAdmin
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
+        if (!auth()->check() || auth()->user()->role !== 'ADMIN') {
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => 'Accès réservé aux administrateurs',

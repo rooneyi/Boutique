@@ -13,7 +13,7 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $dashboard = $this->dashboardService->getVendorDashboard(auth()->user());
+        $dashboard = $this->dashboardService->getVendorDashboard(auth()->user()->vendor);
 
         return response()->json([
             'data' => $dashboard,
@@ -22,7 +22,7 @@ class DashboardController extends Controller
 
     public function salesAnalysis(string $period = 'month')
     {
-        $analysis = $this->dashboardService->getSalesAnalysis(auth()->user(), $period);
+        $analysis = $this->dashboardService->getSalesAnalysis(auth()->user()->vendor, $period);
 
         return response()->json([
             'data' => $analysis,

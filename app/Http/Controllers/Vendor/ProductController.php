@@ -17,7 +17,7 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = $this->productService->getVendorProducts(auth()->user());
+        $products = $this->productService->getVendorProducts(auth()->user()->vendor);
 
         return response()->json([
             'data' => $products,
@@ -28,7 +28,7 @@ class ProductController extends Controller
     {
         $data = ProductData::from($request->validated());
         $product = $this->productService->createProduct(
-            auth()->user(),
+            auth()->user()->vendor,
             $data,
             $request->file('image')
         );

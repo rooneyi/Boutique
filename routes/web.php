@@ -1,6 +1,10 @@
 <?php
 
 use App\Services\AdminService;
+use App\Data\CustomerRegisterData;
+use App\Data\VendorRegisterData;
+use App\Services\CustomerService;
+use App\Services\VendorService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,11 +20,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         $user = request()->user();
 
-        if ($user?->is_admin) {
+        if ($user?->role === 'ADMIN') {
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user?->is_vendor) {
+        if ($user?->role === 'VENDOR') {
             return redirect()->route('vendor.dashboard');
         }
 
@@ -69,21 +73,14 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     ]))->name('reset-password');
 
     Route::post('vendor/register', function (Request $request) {
-        $data = $request->validate([
+        $data = VendorRegisterData::from($request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'shop_name' => ['required', 'string', 'max:255'],
+            'shop_name' => ['required', 'string', 'max:150'],
             'password' => ['required', 'confirmed', 'min:8'],
-        ]);
+        ]));
 
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'shop_name' => $data['shop_name'],
-            'is_vendor' => true,
-            'is_admin' => false,
-            'password' => Hash::make($data['password']),
-        ]);
+        $user = app(VendorService::class)->register($data);
 
         auth()->login($user);
         $request->session()->regenerate();
@@ -92,19 +89,13 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     })->name('vendor.register.store');
 
     Route::post('customer/register', function (Request $request) {
-        $data = $request->validate([
+        $data = CustomerRegisterData::from($request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', 'min:8'],
-        ]);
+        ]));
 
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'is_vendor' => false,
-            'is_admin' => false,
-            'password' => Hash::make($data['password']),
-        ]);
+        $user = app(CustomerService::class)->register($data);
 
         auth()->login($user);
         $request->session()->regenerate();

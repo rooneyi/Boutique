@@ -8,7 +8,7 @@ class CreateOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check() && !auth()->user()->is_vendor;
+        return auth()->check() && auth()->user()->role === 'CUSTOMER';
     }
 
     public function rules(): array

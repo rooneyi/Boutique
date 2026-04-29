@@ -9,16 +9,20 @@ class OrderData
      */
     public function __construct(
         public int $customer_id,
+        public int $vendor_id,
         public array $items,
-        public float $total_amount,
+        public float $total,
+        public ?string $status = 'PENDING',
     ) {}
 
     public static function from(array $data): self
     {
         return new self(
             customer_id: $data['customer_id'],
+            vendor_id: $data['vendor_id'],
             items: $data['items'],
-            total_amount: (float) $data['total_amount'],
+            total: (float) $data['total'],
+            status: $data['status'] ?? 'PENDING',
         );
     }
 
@@ -26,8 +30,10 @@ class OrderData
     {
         return [
             'customer_id' => $this->customer_id,
+            'vendor_id' => $this->vendor_id,
             'items' => $this->items,
-            'total_amount' => $this->total_amount,
+            'total' => $this->total,
+            'status' => $this->status,
         ];
     }
 }

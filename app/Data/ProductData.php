@@ -8,9 +8,10 @@ class ProductData
         public string $name,
         public string $description,
         public float $price,
-        public int $quantity,
-        public ?string $image_path = null,
-        public ?string $category = null,
+        public int $stock,
+        public ?string $image = null,
+        public ?int $category_id = null,
+        public ?string $status = 'IN_STOCK',
         public ?int $id = null,
     ) {}
 
@@ -20,9 +21,10 @@ class ProductData
             name: $data['name'],
             description: $data['description'],
             price: (float) $data['price'],
-            quantity: (int) $data['quantity'],
-            image_path: $data['image_path'] ?? null,
-            category: $data['category'] ?? null,
+            stock: (int) $data['stock'],
+            image: $data['image'] ?? null,
+            category_id: $data['category_id'] ?? null,
+            status: $data['status'] ?? 'IN_STOCK',
             id: $data['id'] ?? null,
         );
     }
@@ -33,9 +35,10 @@ class ProductData
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
-            'quantity' => $this->quantity,
-            'image_path' => $this->image_path,
-            'category' => $this->category,
+            'stock' => $this->stock,
+            'image' => $this->image,
+            'category_id' => $this->category_id,
+            'status' => $this->status,
         ];
     }
 }

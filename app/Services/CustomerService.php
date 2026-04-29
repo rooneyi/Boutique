@@ -3,31 +3,41 @@
 namespace App\Services;
 
 use App\Data\CustomerRegisterData;
+use App\Models\Customer;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class CustomerService
 {
     public function register(CustomerRegisterData $data): User
     {
-        return User::create([
-            'name' => $data->name,
-            'email' => $data->email,
-            'password' => bcrypt($data->password),
-            'is_vendor' => false,
-        ]);
+        return DB::transaction(function () use ($data) {
+            $user = User::create([
+                'name' => $data->name,
+                'email' => $data->email,
+                'password' => bcrypt($data->password),
+                'role' => 'CUSTOMER',
+            ]);
+
+            Customer::create([
+                'user_id' => $user->id,
+            ]);
+
+            return $user;
+        });
     }
 
-    public function getCustomerStats(User $customer): array
+    public function getCustomerStats(Customer $customer): array
     {
         return [
             'total_orders' => $customer->orders()->count(),
-            'total_spent' => $customer->orders()->sum('total_amount'),
-            'average_order_value' => $customer->orders()->avg('total_amount') ?? 0,
+            'total_spent' => $customer->orders()->sum('total'),
+            'average_order_value' => $customer->orders()->avg('total') ?? 0,
         ];
     }
 
-    public function getCustomerHistory(User $customer)
+    public function getCustomerHistory(Customer $customer)
     {
-        return $customer->orders()->with('items')->latest()->paginate(20);
+        return $customer->orders()->with('items.product')->latest()->paginate(20);
     }
 }

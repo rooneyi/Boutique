@@ -16,7 +16,7 @@ class OrderController extends Controller
     public function store(CreateOrderRequest $request)
     {
         $data = OrderData::from($request->validated());
-        $order = $this->orderService->createOrder(auth()->user(), $data);
+        $order = $this->orderService->createOrder(auth()->user()->customer, $data);
 
         return response()->json([
             'message' => 'Commande créée avec succès',
@@ -26,7 +26,7 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = $this->orderService->getCustomerOrders(auth()->user());
+        $orders = $this->orderService->getCustomerOrders(auth()->user()->customer);
 
         return response()->json([
             'data' => $orders,
@@ -35,7 +35,7 @@ class OrderController extends Controller
 
     public function show($orderId)
     {
-        $order = auth()->user()->orders()->findOrFail($orderId);
+        $order = auth()->user()->customer->orders()->findOrFail($orderId);
         $details = $this->orderService->getOrderDetails($order);
 
         return response()->json([

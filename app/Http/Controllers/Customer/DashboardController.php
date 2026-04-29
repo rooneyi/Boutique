@@ -13,7 +13,7 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $dashboard = $this->dashboardService->getCustomerDashboard(auth()->user());
+        $dashboard = $this->dashboardService->getCustomerDashboard(auth()->user()->customer);
 
         return response()->json([
             'data' => $dashboard,

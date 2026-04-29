@@ -4,13 +4,13 @@ namespace App\Services;
 
 use App\Data\ProductData;
 use App\Models\Product;
-use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
-    public function createProduct(User $vendor, ProductData $data, ?UploadedFile $image = null): Product
+    public function createProduct(Vendor $vendor, ProductData $data, ?UploadedFile $image = null): Product
     {
         $imagePath = null;
         if ($image) {
@@ -22,9 +22,10 @@ class ProductService
             'name' => $data->name,
             'description' => $data->description,
             'price' => $data->price,
-            'quantity' => $data->quantity,
-            'category' => $data->category,
-            'image_path' => $imagePath,
+            'stock' => $data->stock,
+            'category_id' => $data->category_id,
+            'status' => $data->status,
+            'image' => $imagePath,
         ]);
     }
 
@@ -34,10 +35,10 @@ class ProductService
 
         if ($image) {
             // Supprimer l'ancienne image
-            if ($product->image_path) {
-                Storage::disk('public')->delete($product->image_path);
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
             }
-            $updateData['image_path'] = $image->store('products', 'public');
+            $updateData['image'] = $image->store('products', 'public');
         }
 
         $product->update($updateData);
@@ -47,14 +48,14 @@ class ProductService
 
     public function deleteProduct(Product $product): bool
     {
-        if ($product->image_path) {
-            Storage::disk('public')->delete($product->image_path);
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
         }
 
         return $product->delete();
     }
 
-    public function getVendorProducts(User $vendor)
+    public function getVendorProducts(Vendor $vendor)
     {
         return Product::where('vendor_id', $vendor->id)->paginate(20);
     }
@@ -62,19 +63,19 @@ class ProductService
     public function decreaseStock(Product $product, int $quantity): bool
     {
         return $product->update([
-            'quantity' => $product->quantity - $quantity,
+            'stock' => $product->stock - $quantity,
         ]);
     }
 
     public function getStockStatus(Product $product): string
     {
-        if ($product->quantity == 0) {
-            return 'out_of_stock';
+        if ($product->stock == 0) {
+            return 'OUT_OF_STOCK';
         }
-        if ($product->quantity < 10) {
-            return 'low_stock';
+        if ($product->stock < 10) {
+            return 'LOW_STOCK';
         }
 
-        return 'in_stock';
+        return 'IN_STOCK';
     }
 }
