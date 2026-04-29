@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\Data\ProductData;
-use App\Models\User;
 use App\Models\Product;
-use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
@@ -41,6 +41,7 @@ class ProductService
         }
 
         $product->update($updateData);
+
         return $product;
     }
 
@@ -49,6 +50,7 @@ class ProductService
         if ($product->image_path) {
             Storage::disk('public')->delete($product->image_path);
         }
+
         return $product->delete();
     }
 
@@ -72,6 +74,7 @@ class ProductService
         if ($product->quantity < 10) {
             return 'low_stock';
         }
+
         return 'in_stock';
     }
 }

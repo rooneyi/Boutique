@@ -5,31 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+#[Fillable(['customer_id', 'vendor_id', 'total', 'status'])]
 
 class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'customer_id',
-        'total_amount',
-        'status',
-    ];
-
-    protected $casts = [
-        'total_amount' => 'float',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'total' => 'decimal:2',
+        ];
+    }
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'customer_id');
+        return $this->belongsTo(Customer::class);
     }
 
-    public function items(): BelongsToMany
+    public function vendor(): BelongsTo
     {
-        return $this->belongsToMany(Product::class, 'order_items')
-            ->withPivot('quantity', 'price')
-            ->withTimestamps();
+        return $this->belongsTo(Vendor::class);
     }
-}
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
