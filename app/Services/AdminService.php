@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Vendor;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class AdminService
@@ -21,7 +22,10 @@ class AdminService
             'total_products' => Product::count(),
             'total_sales' => (float) Order::sum('total'),
             'total_orders' => Order::count(),
-            'avg_order_value' => Order::avg('total') ?? 0,
+            'avg_order_value' => (float) (Order::avg('total') ?? 0),
+            'new_customers' => Customer::where('created_at', '>=', Carbon::now()->subDays(7))->count(),
+            'top_products' => $this->getTopProducts(),
+            'recent_orders' => $this->getRecentOrders(),
         ];
     }
 
@@ -72,31 +76,48 @@ class AdminService
         return Customer::with('user')->paginate(20);
     }
 
-    private function getTopProducts(string $period): array
+    private function getTopProducts(): array
     {
-        $startDate = match ($period) {
-            'week' => Carbon::now()->subWeek(),
-            'month' => Carbon::now()->subMonth(),
-            'year' => Carbon::now()->subYear(),
-            default => Carbon::now()->subMonth(),
-        };
+        return OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+            ->groupBy('product_id')
+            ->with('product')
+            ->orderByDesc('total_sold')
+            ->limit(5)
+            ->get()
+            ->map(function ($item) {
+                if (!$item->product) {
+                    return null;
+                }
 
-        return OrderItem::whereHas('order', function ($query) use ($startDate) {
-            $query->where('created_at', '>=', $startDate);
-        })
-        ->select('product_id', \DB::raw('SUM(quantity) as total_sold'))
-        ->groupBy('product_id')
-        ->with('product')
-        ->orderByDesc('total_sold')
-        ->limit(10)
-        ->get()
-        ->map(function ($item) {
-            return [
-                'product' => $item->product,
-                'total_sold' => $item->total_sold,
-            ];
-        })
-        ->toArray();
+                return [
+                    'id' => $item->product->id,
+                    'name' => $item->product->name,
+                    'price' => $item->product->price,
+                    'stock' => $item->product->stock,
+                    'total_sold' => (int) $item->total_sold,
+                ];
+            })
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
+    private function getRecentOrders(): array
+    {
+        return Order::with(['customer.user'])
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'customer_name' => $order->customer?->user?->name ?? 'Inconnu',
+                    'total' => $order->total,
+                    'status' => $order->status,
+                    'created_at' => $order->created_at?->format('d/m/Y H:i') ?? '',
+                ];
+            })
+            ->toArray();
     }
 
     private function getTopVendors(string $period): array

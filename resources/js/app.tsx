@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import AdminLayout from '@/layouts/admin-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import '@/lib/route'; // Initialize global route function
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

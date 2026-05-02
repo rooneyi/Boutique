@@ -4,6 +4,7 @@ use App\Services\AdminService;
 use App\Data\CustomerRegisterData;
 use App\Data\VendorRegisterData;
 use App\Services\CustomerService;
+use App\Services\DashboardService;
 use App\Services\VendorService;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,14 +22,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $user = request()->user();
 
         if ($user?->role === 'ADMIN') {
-            return redirect()->route('admin.dashboard');
+            return Inertia::location(route('admin.dashboard'));
         }
 
         if ($user?->role === 'VENDOR') {
-            return redirect()->route('vendor.dashboard');
+            return Inertia::location(route('vendor.dashboard'));
         }
 
-        return redirect()->route('customer.products.index');
+        return Inertia::location(route('customer.products.index'));
     })->name('dashboard');
 });
 
@@ -115,18 +116,11 @@ Route::middleware('auth')->prefix('auth')->name('auth.')->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'vendor'])->prefix('vendor')->name('vendor.')->group(function () {
-    Route::get('dashboard', fn() => Inertia::render('vendor/dashboard', [
-        'stats' => [
-            'total_sales' => 0,
-            'total_orders' => 0,
-            'total_products' => 0,
-            'total_customers' => 0,
-            'avg_order_value' => 0,
-            'low_stock_products' => [],
-            'top_products' => [],
-            'recent_orders' => [],
-        ],
-    ]))->name('dashboard');
+    Route::get('dashboard', function (DashboardService $dashboardService) {
+        return Inertia::render('vendor/dashboard', [
+            'stats' => $dashboardService->getVendorDashboard(auth()->user()->vendor),
+        ]);
+    })->name('dashboard');
 
     Route::get('products', fn() => Inertia::render('vendor/products/index', [
         'products' => [
@@ -163,7 +157,7 @@ Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('c
         ],
     ]))->name('orders.index');
 
-    Route::get('products/{product}', fn() => redirect()->route('customer.products.index'))->name('products.show');
+    Route::get('products/{product}', [\App\Http\Controllers\Customer\ProductController::class, 'show'])->name('products.show');
 
     Route::get('orders/{order}', fn() => redirect()->route('customer.orders.index'))->name('orders.show');
 

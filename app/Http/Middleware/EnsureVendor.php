@@ -10,9 +10,7 @@ class EnsureVendor
     public function handle(Request $request, Closure $next)
     {
         if (!auth()->check() || auth()->user()->role !== 'VENDOR') {
-            return response()->json([
-                'message' => 'Accès réservé aux vendeurs',
-            ], 403);
+            return redirect('/')->with('error', 'Accès réservé aux vendeurs');
         }
 
         return $next($request);

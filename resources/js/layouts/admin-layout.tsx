@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, Settings, BarChart3, Menu, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { route } from '@/lib/route';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
     const { auth } = usePage().props;

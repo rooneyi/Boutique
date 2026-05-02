@@ -10,9 +10,7 @@ class EnsureCustomer
     public function handle(Request $request, Closure $next)
     {
         if (!auth()->check() || auth()->user()->role !== 'CUSTOMER') {
-            return response()->json([
-                'message' => 'Accès réservé aux clients',
-            ], 403);
+            return redirect('/')->with('error', 'Accès réservé aux clients');
         }
 
         return $next($request);

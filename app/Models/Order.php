@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['customer_id', 'vendor_id', 'total', 'status'])]
-
 class Order extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['customer_id', 'vendor_id', 'total', 'status'];
 
     protected function casts(): array
     {
@@ -34,3 +34,4 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+}
