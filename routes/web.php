@@ -1,19 +1,17 @@
 <?php
 
+use App\Data\CustomerRegisterData;
+use App\Data\VendorRegisterData;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\Vendor\CustomerController as VendorCustomerController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController as VendorProductController;
 use App\Services\AdminService;
-use App\Data\CustomerRegisterData;
-use App\Data\VendorRegisterData;
 use App\Services\CustomerService;
 use App\Services\DashboardService;
 use App\Services\VendorService;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -44,36 +42,36 @@ Route::middleware('guest')->get('admin/login', function () {
 
 // Auth routes using existing pages
 Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
-    Route::get('login', fn() => Inertia::render('auth/login', [
+    Route::get('login', fn () => Inertia::render('auth/login', [
         'canResetPassword' => Features::enabled(Features::resetPasswords()),
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('login');
 
-    Route::get('vendor/register', fn() => Inertia::render('auth/register-vendor', [
+    Route::get('vendor/register', fn () => Inertia::render('auth/register-vendor', [
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('vendor.register');
 
-    Route::get('customer/register', fn() => Inertia::render('auth/register-customer', [
+    Route::get('customer/register', fn () => Inertia::render('auth/register-customer', [
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('customer.register');
 
-    Route::get('register', fn() => Inertia::render('auth/register', [
+    Route::get('register', fn () => Inertia::render('auth/register', [
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('register');
 
-    Route::get('register-vendor', fn() => Inertia::render('auth/register-vendor', [
+    Route::get('register-vendor', fn () => Inertia::render('auth/register-vendor', [
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('register-vendor');
 
-    Route::get('register-customer', fn() => Inertia::render('auth/register-customer', [
+    Route::get('register-customer', fn () => Inertia::render('auth/register-customer', [
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('register-customer');
 
-    Route::get('forgot-password', fn() => Inertia::render('auth/forgot-password', [
+    Route::get('forgot-password', fn () => Inertia::render('auth/forgot-password', [
         'status' => session('status'),
     ]))->name('forgot-password');
 
-    Route::get('reset-password/{token}', fn($token) => Inertia::render('auth/reset-password', [
+    Route::get('reset-password/{token}', fn ($token) => Inertia::render('auth/reset-password', [
         'email' => request('email'),
         'token' => $token,
     ]))->name('reset-password');
@@ -111,13 +109,13 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
 });
 
 Route::middleware('auth')->prefix('auth')->name('auth.')->group(function () {
-    Route::get('verify-email', fn() => Inertia::render('auth/verify-email', [
+    Route::get('verify-email', fn () => Inertia::render('auth/verify-email', [
         'status' => session('status'),
     ]))->name('verify-email');
 
-    Route::get('confirm-password', fn() => Inertia::render('auth/confirm-password'))->name('confirm-password');
+    Route::get('confirm-password', fn () => Inertia::render('auth/confirm-password'))->name('confirm-password');
 
-    Route::get('two-factor-challenge', fn() => Inertia::render('auth/two-factor-challenge'))->name('two-factor-challenge');
+    Route::get('two-factor-challenge', fn () => Inertia::render('auth/two-factor-challenge'))->name('two-factor-challenge');
 });
 
 Route::middleware(['auth', 'verified', 'vendor'])->prefix('vendor')->name('vendor.')->group(function () {
@@ -136,8 +134,9 @@ Route::middleware(['auth', 'verified', 'vendor'])->prefix('vendor')->name('vendo
 
     Route::get('orders', [VendorOrderController::class, 'index'])->name('orders.index');
     Route::get('customers', [VendorCustomerController::class, 'index'])->name('customers.index');
+    Route::get('customers/{customer}', [VendorCustomerController::class, 'show'])->name('customers.show');
 
-    Route::get('settings', fn() => redirect()->route('settings.profile'))->name('settings');
+    Route::get('settings', fn () => redirect()->route('settings.profile'))->name('settings');
 });
 
 Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('customer.')->group(function () {
@@ -148,7 +147,7 @@ Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('c
     Route::post('orders', [CustomerOrderController::class, 'store'])->name('orders.store');
     Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
 
-    Route::get('cart', fn() => redirect()->route('customer.products.index'))->name('cart');
+    Route::get('cart', fn () => redirect()->route('customer.products.index'))->name('cart');
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -158,37 +157,63 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         ]);
     })->name('dashboard');
 
+    Route::get('analytics/sales', function (Request $request, AdminService $adminService) {
+        $period = $request->query('period', 'month');
+        if (! in_array($period, ['day', 'week', 'month', 'year'], true)) {
+            $period = 'month';
+        }
+
+        return Inertia::render('admin/analytics', [
+            'period' => $period,
+            'analytics' => $adminService->getSalesAnalyticsPayload($period),
+        ]);
+    })->name('analytics.sales');
+
     Route::get('products', function (AdminService $adminService) {
         return Inertia::render('admin/products/index', [
-            'products' => $adminService->getAllProducts(),
+            'products' => $adminService->paginateAdminProducts('all'),
             'filter' => 'all',
         ]);
     })->name('products.index');
 
+    Route::get('products/in-stock', function (AdminService $adminService) {
+        return Inertia::render('admin/products/index', [
+            'products' => $adminService->paginateAdminProducts('in-stock'),
+            'filter' => 'in-stock',
+        ]);
+    })->name('products.in-stock');
+
     Route::get('products/low-stock', function (AdminService $adminService) {
         return Inertia::render('admin/products/index', [
-            'products' => $adminService->getLowStockProducts(),
+            'products' => $adminService->paginateAdminProducts('low-stock'),
             'filter' => 'low-stock',
         ]);
     })->name('products.low-stock');
 
     Route::get('products/out-of-stock', function (AdminService $adminService) {
         return Inertia::render('admin/products/index', [
-            'products' => $adminService->getOutOfStockProducts(),
+            'products' => $adminService->paginateAdminProducts('out-of-stock'),
             'filter' => 'out-of-stock',
         ]);
     })->name('products.out-of-stock');
 
+    Route::get('products/discontinued', function (AdminService $adminService) {
+        return Inertia::render('admin/products/index', [
+            'products' => $adminService->paginateAdminProducts('discontinued'),
+            'filter' => 'discontinued',
+        ]);
+    })->name('products.discontinued');
+
     Route::get('users/vendors', function (AdminService $adminService) {
         return Inertia::render('admin/users/index', [
-            'users' => $adminService->getAllVendors(),
+            'users' => $adminService->paginateAdminVendors(),
             'role' => 'vendor',
         ]);
     })->name('vendors.index');
 
     Route::get('users/customers', function (AdminService $adminService) {
         return Inertia::render('admin/users/index', [
-            'users' => $adminService->getAllCustomers(),
+            'users' => $adminService->paginateAdminCustomers(),
             'role' => 'customer',
         ]);
     })->name('customers.index');

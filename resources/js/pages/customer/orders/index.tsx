@@ -11,6 +11,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Eye } from 'lucide-react';
+import { route } from '@/lib/route';
 
 type Order = {
     id: number;
@@ -25,6 +26,16 @@ type Props = {
         data: Order[];
     };
 };
+
+function statusVariant(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
+    if (status === 'PAID') {
+        return 'default';
+    }
+    if (status === 'CANCELLED') {
+        return 'destructive';
+    }
+    return 'secondary';
+}
 
 export default function Orders({ orders }: Props) {
     const formatDate = (date: string) => {
@@ -80,7 +91,7 @@ export default function Orders({ orders }: Props) {
                                                     #{order.id}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    €{order.total_amount.toFixed(2)}
+                                                    €{Number(order.total_amount).toFixed(2)}
                                                 </TableCell>
                                                 <TableCell>
                                                     {formatDate(order.created_at)}

@@ -22,6 +22,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
+import { route } from '@/lib/route';
 
 type Product = {
     id: number;

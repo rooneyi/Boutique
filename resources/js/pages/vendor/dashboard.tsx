@@ -1,10 +1,13 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
 import { Plus, TrendingUp, Package, Users, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { route } from '@/lib/route';
+
+type LowStockRow = { id: number; name: string; stock: number; price: number; status: string };
+type LoyalCustomer = { id: number; name: string; orders_count: number; total_spent: number };
 
 type DashboardStats = {
     total_sales: number;
@@ -12,9 +15,16 @@ type DashboardStats = {
     total_products: number;
     total_customers: number;
     avg_order_value: number;
-    low_stock_products: any[];
-    top_products: any[];
-    recent_orders: any[];
+    low_stock_products: LowStockRow[];
+    top_products: { id: number; name: string; price: number; orders_count: number }[];
+    loyal_customers?: LoyalCustomer[];
+    recent_orders: {
+        id: number;
+        customer: { name: string };
+        total_amount: number;
+        status: string;
+        created_at: string;
+    }[];
 };
 
 export default function VendorDashboard({ stats }: { stats: DashboardStats }) {
@@ -105,7 +115,8 @@ export default function VendorDashboard({ stats }: { stats: DashboardStats }) {
                     <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertDescription>
-                            {stats.low_stock_products.length} produit(s) en faible stock. Consultez votre inventaire.
+                            {stats.low_stock_products.length} produit(s) en faible stock (
+                            {stats.low_stock_products.map((p) => p.name).join(', ')}). Consultez votre inventaire.
                         </AlertDescription>
                     </Alert>
                 )}
@@ -129,7 +140,7 @@ export default function VendorDashboard({ stats }: { stats: DashboardStats }) {
                                             <div className="flex-1">
                                                 <p className="font-medium">{product.name}</p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    €{product.price}
+                                                    €{Number(product.price).toFixed(2)}
                                                 </p>
                                             </div>
                                             <Badge variant="outline">
@@ -177,6 +188,35 @@ export default function VendorDashboard({ stats }: { stats: DashboardStats }) {
                     </Card>
                 </div>
 
+                {stats.loyal_customers && stats.loyal_customers.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Clients fidèles</CardTitle>
+                            <CardDescription>Top acheteurs par montant chez vous</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                {stats.loyal_customers.map((c) => (
+                                    <div key={c.id} className="flex items-center justify-between border-b pb-3 last:border-0">
+                                        <div>
+                                            <p className="font-medium">{c.name}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {c.orders_count} commande(s)
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-semibold">€{Number(c.total_spent).toFixed(2)}</p>
+                                            <Button variant="link" className="h-auto p-0 text-xs" asChild>
+                                                <Link href={route('vendor.customers.show', c.id)}>Détails</Link>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Commandes Récentes */}
                 <Card>
                     <CardHeader>
@@ -194,7 +234,7 @@ export default function VendorDashboard({ stats }: { stats: DashboardStats }) {
                                         <div className="flex-1">
                                             <p className="font-medium">Commande #{order.id}</p>
                                             <p className="text-sm text-muted-foreground">
-                                                {order.customer?.name} · €{order.total_amount}
+                                                {order.customer?.name} · €{Number(order.total_amount).toFixed(2)}
                                             </p>
                                         </div>
                                         <Badge>{order.status}</Badge>

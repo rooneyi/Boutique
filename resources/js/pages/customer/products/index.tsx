@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Search, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
+import { route } from '@/lib/route';
 
 type Product = {
     id: number;

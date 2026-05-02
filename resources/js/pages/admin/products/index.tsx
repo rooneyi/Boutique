@@ -18,6 +18,7 @@ type Product = {
     name: string;
     price: number;
     quantity: number;
+    status?: string;
     category: string | { id: number; name: string } | null;
     vendor: {
         shop_name: string;
@@ -38,7 +39,7 @@ type Props = {
     products: {
         data: Product[];
     };
-    filter?: 'low-stock' | 'out-of-stock' | 'all';
+    filter?: 'all' | 'in-stock' | 'low-stock' | 'out-of-stock' | 'discontinued';
 };
 
 export default function AdminProducts() {
@@ -46,13 +47,30 @@ export default function AdminProducts() {
 
     const getFilterLabel = () => {
         switch (filter) {
+            case 'in-stock':
+                return 'En stock';
             case 'low-stock':
-                return 'Stocks Faibles';
+                return 'Stocks faibles';
             case 'out-of-stock':
                 return 'Ruptures';
+            case 'discontinued':
+                return 'Produits terminés';
             default:
-                return 'Tous les Produits';
+                return 'Tous les produits';
         }
+    };
+
+    const stockBadge = (product: Product) => {
+        if (product.status === 'DISCONTINUED') {
+            return <Badge variant="outline">Terminé</Badge>;
+        }
+        if (product.quantity === 0) {
+            return <Badge variant="destructive">Rupture</Badge>;
+        }
+        if (product.quantity < 10) {
+            return <Badge variant="secondary">Faible</Badge>;
+        }
+        return <Badge variant="outline">En stock</Badge>;
     };
 
     return (
@@ -70,30 +88,21 @@ export default function AdminProducts() {
                             Supervision de l'inventaire
                         </p>
                     </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant={filter === 'all' ? 'default' : 'outline'}
-                            asChild
-                        >
-                            <Link href={route('admin.products.index')}>
-                                Tous
-                            </Link>
+                    <div className="flex flex-wrap gap-2">
+                        <Button variant={filter === 'all' || !filter ? 'default' : 'outline'} asChild>
+                            <Link href={route('admin.products.index')}>Tous</Link>
                         </Button>
-                        <Button
-                            variant={filter === 'low-stock' ? 'default' : 'outline'}
-                            asChild
-                        >
-                            <Link href={route('admin.products.low-stock')}>
-                                Faible stock
-                            </Link>
+                        <Button variant={filter === 'in-stock' ? 'default' : 'outline'} asChild>
+                            <Link href={route('admin.products.in-stock')}>En stock</Link>
                         </Button>
-                        <Button
-                            variant={filter === 'out-of-stock' ? 'default' : 'outline'}
-                            asChild
-                        >
-                            <Link href={route('admin.products.out-of-stock')}>
-                                Ruptures
-                            </Link>
+                        <Button variant={filter === 'low-stock' ? 'default' : 'outline'} asChild>
+                            <Link href={route('admin.products.low-stock')}>Faible stock</Link>
+                        </Button>
+                        <Button variant={filter === 'out-of-stock' ? 'default' : 'outline'} asChild>
+                            <Link href={route('admin.products.out-of-stock')}>Ruptures</Link>
+                        </Button>
+                        <Button variant={filter === 'discontinued' ? 'default' : 'outline'} asChild>
+                            <Link href={route('admin.products.discontinued')}>Terminés</Link>
                         </Button>
                     </div>
                 </div>
@@ -138,21 +147,7 @@ export default function AdminProducts() {
                                                     {product.quantity}
                                                 </TableCell>
                                                 <TableCell>{categoryLabel(product.category)}</TableCell>
-                                                <TableCell>
-                                                    {product.quantity === 0 ? (
-                                                        <Badge variant="destructive">
-                                                            Rupture
-                                                        </Badge>
-                                                    ) : product.quantity < 10 ? (
-                                                        <Badge variant="secondary">
-                                                            Faible
-                                                        </Badge>
-                                                    ) : (
-                                                        <Badge variant="outline">
-                                                            OK
-                                                        </Badge>
-                                                    )}
-                                                </TableCell>
+                                                <TableCell>{stockBadge(product)}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>

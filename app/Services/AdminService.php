@@ -12,6 +12,17 @@ use Illuminate\Support\Facades\DB;
 
 class AdminService
 {
+    public function analysisWindowStart(string $period): Carbon
+    {
+        return match ($period) {
+            'day' => Carbon::now()->subDay(),
+            'week' => Carbon::now()->subWeek(),
+            'month' => Carbon::now()->subMonth(),
+            'year' => Carbon::now()->subYear(),
+            default => Carbon::now()->subMonth(),
+        };
+    }
+
     public function getAdminDashboard(): array
     {
         return [
@@ -29,49 +40,145 @@ class AdminService
 
     public function getGlobalSalesAnalysis(string $period = 'month'): array
     {
-        $startDate = match ($period) {
-            'week' => Carbon::now()->subWeek(),
-            'month' => Carbon::now()->subMonth(),
-            'year' => Carbon::now()->subYear(),
-            default => Carbon::now()->subMonth(),
-        };
+        $startDate = $this->analysisWindowStart($period);
 
         $orders = Order::where('created_at', '>=', $startDate)->get();
 
         return [
             'period' => $period,
-            'total_sales' => $orders->sum('total'),
+            'total_sales' => (float) $orders->sum(fn (Order $o) => (float) $o->total),
             'total_orders' => $orders->count(),
-            'average_order' => $orders->avg('total') ?? 0,
+            'average_order' => (float) ($orders->avg('total') ?? 0),
             'top_products' => $this->getTopProductsForPeriod($period),
             'top_vendors' => $this->getTopVendors($period),
             'top_customers' => $this->getTopCustomers($period),
         ];
     }
 
-    public function getOutOfStockProducts()
+    /**
+     * Analyse complète (cahier des charges) : indicateurs + journée la plus forte + ruptures à forte demande.
+     */
+    public function getSalesAnalyticsPayload(string $period): array
     {
-        return Product::where('stock', 0)->with('vendor.user')->paginate(20);
+        $period = in_array($period, ['day', 'week', 'month', 'year'], true) ? $period : 'month';
+        $base = $this->getGlobalSalesAnalysis($period);
+        $start = $this->analysisWindowStart($period);
+
+        $ordersInRange = Order::where('created_at', '>=', $start)->get();
+        $byDay = $ordersInRange->groupBy(fn (Order $o) => $o->created_at->format('Y-m-d'));
+        $bestSalesDay = $byDay
+            ->map(fn ($group, string $day) => [
+                'date' => $day,
+                'revenue' => (float) $group->sum(fn (Order $o) => (float) $o->total),
+                'orders' => $group->count(),
+            ])
+            ->values()
+            ->sortByDesc('revenue')
+            ->first();
+
+        $highDemandOutOfStock = Product::query()
+            ->where('stock', 0)
+            ->where('status', 'OUT_OF_STOCK')
+            ->with('vendor')
+            ->withCount([
+                'orderItems as units_sold_window' => function ($q) use ($start) {
+                    $q->whereHas('order', fn ($oq) => $oq->where('created_at', '>=', $start));
+                },
+            ])
+            ->orderByDesc('units_sold_window')
+            ->limit(8)
+            ->get()
+            ->map(fn (Product $p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'units_sold' => (int) ($p->units_sold_window ?? 0),
+                'vendor' => $p->vendor?->shop_name ?? '—',
+            ])
+            ->values()
+            ->all();
+
+        return array_merge($base, [
+            'best_sales_day' => $bestSalesDay,
+            'high_demand_out_of_stock' => $highDemandOutOfStock,
+        ]);
     }
 
-    public function getLowStockProducts()
+    public function paginateAdminProducts(string $filter = 'all')
     {
-        return Product::where('stock', '>', 0)->where('stock', '<', 10)->with('vendor.user')->paginate(20);
+        $query = Product::query()
+            ->with(['vendor.user', 'category'])
+            ->latest('id');
+
+        match ($filter) {
+            'in-stock' => $query->where('stock', '>', 0)->where('status', '!=', 'DISCONTINUED'),
+            'low-stock' => $query->where('stock', '>', 0)->where('stock', '<', 10),
+            'out-of-stock' => $query->where('stock', 0),
+            'discontinued' => $query->where('status', 'DISCONTINUED'),
+            default => null,
+        };
+
+        return $query->paginate(20)->through(function (Product $p) {
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'price' => (float) $p->price,
+                'quantity' => $p->stock,
+                'status' => $p->status,
+                'category' => $p->category?->name,
+                'vendor' => ['shop_name' => $p->vendor?->shop_name ?? '—'],
+            ];
+        });
     }
 
-    public function getAllProducts()
+    public function paginateAdminVendors()
     {
-        return Product::with('vendor.user')->paginate(20);
+        return Vendor::with('user')
+            ->latest('id')
+            ->paginate(20)
+            ->through(function (Vendor $v) {
+                return [
+                    'id' => $v->id,
+                    'name' => $v->user?->name ?? '—',
+                    'email' => $v->user?->email ?? '',
+                    'shop_name' => $v->shop_name,
+                    'created_at' => $v->created_at?->toIso8601String() ?? '',
+                ];
+            });
     }
 
-    public function getAllVendors()
+    public function paginateAdminCustomers()
     {
-        return Vendor::with('user')->paginate(20);
-    }
+        return Customer::query()
+            ->with('user')
+            ->withCount('orders')
+            ->withSum('orders as total_spent', 'total')
+            ->withMax('orders as last_order_at', 'created_at')
+            ->latest('id')
+            ->paginate(20)
+            ->through(function (Customer $c) {
+                $ordersCount = (int) ($c->orders_count ?? 0);
+                $lastAt = $c->last_order_at ? Carbon::parse($c->last_order_at) : null;
+                if ($ordersCount >= 3) {
+                    $segment = 'frequent';
+                } elseif ($ordersCount === 0) {
+                    $segment = 'never_ordered';
+                } elseif ($lastAt && $lastAt->lt(Carbon::now()->subDays(180))) {
+                    $segment = 'inactive';
+                } else {
+                    $segment = 'active';
+                }
 
-    public function getAllCustomers()
-    {
-        return Customer::with('user')->paginate(20);
+                return [
+                    'id' => $c->id,
+                    'name' => $c->user?->name ?? '—',
+                    'email' => $c->user?->email ?? '',
+                    'orders_count' => $ordersCount,
+                    'total_spent' => (float) ($c->total_spent ?? 0),
+                    'last_order_at' => $c->last_order_at,
+                    'segment' => $segment,
+                    'created_at' => $c->created_at?->toIso8601String() ?? '',
+                ];
+            });
     }
 
     private function getTopProducts(): array
@@ -81,12 +188,7 @@ class AdminService
 
     private function getTopProductsForPeriod(?string $period): array
     {
-        $startDate = $period ? match ($period) {
-            'week' => Carbon::now()->subWeek(),
-            'month' => Carbon::now()->subMonth(),
-            'year' => Carbon::now()->subYear(),
-            default => Carbon::now()->subMonth(),
-        } : null;
+        $startDate = $period !== null ? $this->analysisWindowStart($period) : null;
 
         $query = OrderItem::query()
             ->select('order_items.product_id', DB::raw('SUM(order_items.quantity) as total_sold'))
@@ -103,7 +205,7 @@ class AdminService
             ->limit(5)
             ->get()
             ->map(function ($item) {
-                if (!$item->product) {
+                if (! $item->product) {
                     return null;
                 }
 
@@ -140,12 +242,7 @@ class AdminService
 
     private function getTopVendors(string $period): array
     {
-        $startDate = match ($period) {
-            'week' => Carbon::now()->subWeek(),
-            'month' => Carbon::now()->subMonth(),
-            'year' => Carbon::now()->subYear(),
-            default => Carbon::now()->subMonth(),
-        };
+        $startDate = $this->analysisWindowStart($period);
 
         return Vendor::with('user')
             ->withCount(['orders' => function ($query) use ($startDate) {
@@ -154,17 +251,19 @@ class AdminService
             ->orderByDesc('orders_count')
             ->limit(10)
             ->get()
-            ->toArray();
+            ->map(fn (Vendor $v) => [
+                'id' => $v->id,
+                'shop_name' => $v->shop_name,
+                'owner_name' => $v->user?->name ?? '—',
+                'orders_count' => (int) ($v->orders_count ?? 0),
+            ])
+            ->values()
+            ->all();
     }
 
     private function getTopCustomers(string $period): array
     {
-        $startDate = match ($period) {
-            'week' => Carbon::now()->subWeek(),
-            'month' => Carbon::now()->subMonth(),
-            'year' => Carbon::now()->subYear(),
-            default => Carbon::now()->subMonth(),
-        };
+        $startDate = $this->analysisWindowStart($period);
 
         return Customer::with('user')
             ->withCount(['orders' => function ($query) use ($startDate) {
@@ -173,7 +272,13 @@ class AdminService
             ->orderByDesc('orders_count')
             ->limit(10)
             ->get()
-            ->toArray();
+            ->map(fn (Customer $c) => [
+                'id' => $c->id,
+                'name' => $c->user?->name ?? '—',
+                'email' => $c->user?->email ?? '',
+                'orders_count' => (int) ($c->orders_count ?? 0),
+            ])
+            ->values()
+            ->all();
     }
-
 }

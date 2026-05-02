@@ -63,6 +63,7 @@ class ProductController extends Controller
                 'price' => (float) $product->price,
                 'stock' => $product->stock,
                 'category_id' => $product->category_id,
+                'status' => $product->status,
                 'image_path' => $product->image ? Storage::disk('public')->url($product->image) : null,
             ],
         ]);

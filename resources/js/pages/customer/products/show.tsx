@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, ShoppingCart, Heart, Truck, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
+import { route } from '@/lib/route';
 
 type Product = {
     id: number;

@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { route } from '@/lib/route';
 
 type Category = { id: number; name: string };
 
@@ -20,6 +21,7 @@ type Product = {
     stock: number;
     category_id: number | null;
     image_path: string | null;
+    status?: string;
 };
 
 type Props = {
@@ -33,6 +35,9 @@ export default function CreateProduct({ categories, product }: Props) {
         product?.category_id != null ? String(product.category_id) : ''
     );
     const [imagePreview, setImagePreview] = useState<string | null>(product?.image_path || null);
+    const [lifecycleStatus, setLifecycleStatus] = useState<'IN_STOCK' | 'DISCONTINUED'>(() =>
+        product?.status === 'DISCONTINUED' ? 'DISCONTINUED' : 'IN_STOCK'
+    );
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.currentTarget.files?.[0];
@@ -75,6 +80,7 @@ export default function CreateProduct({ categories, product }: Props) {
                             {({ processing, errors }) => (
                                 <>
                                     <input type="hidden" name="category_id" value={categoryId || ''} />
+                                    <input type="hidden" name="status" value={lifecycleStatus} />
 
                                     <div className="grid gap-2">
                                         <Label htmlFor="name">Nom du Produit</Label>
@@ -149,6 +155,27 @@ export default function CreateProduct({ categories, product }: Props) {
                                             </SelectContent>
                                         </Select>
                                         <InputError message={errors.category_id} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label>Visibilité catalogue</Label>
+                                        <Select
+                                            value={lifecycleStatus}
+                                            onValueChange={(v) =>
+                                                setLifecycleStatus(v as 'IN_STOCK' | 'DISCONTINUED')
+                                            }
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Statut" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="IN_STOCK">
+                                                    En vente (statut auto selon le stock)
+                                                </SelectItem>
+                                                <SelectItem value="DISCONTINUED">Produit terminé (retiré)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.status} />
                                     </div>
 
                                     <div className="grid gap-2">

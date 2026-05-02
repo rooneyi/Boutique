@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { route } from '@/lib/route';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Table,
@@ -8,6 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 
 type CustomerRow = {
     id: number;
@@ -53,6 +55,7 @@ export default function VendorCustomers({ customers }: Props) {
                                             <TableHead className="text-right">Commandes</TableHead>
                                             <TableHead className="text-right">Total dépensé</TableHead>
                                             <TableHead>Dernière commande</TableHead>
+                                            <TableHead className="text-right">Détails</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -62,12 +65,19 @@ export default function VendorCustomers({ customers }: Props) {
                                                 <TableCell className="text-muted-foreground text-sm">{c.email}</TableCell>
                                                 <TableCell className="text-right">{c.orders_count}</TableCell>
                                                 <TableCell className="text-right">
-                                                    €{c.total_spent.toFixed(2)}
+                                                    €{Number(c.total_spent).toFixed(2)}
                                                 </TableCell>
                                                 <TableCell className="text-sm text-muted-foreground">
                                                     {c.last_order_at
                                                         ? new Date(c.last_order_at).toLocaleDateString('fr-FR')
                                                         : '—'}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button variant="outline" size="sm" asChild>
+                                                        <Link href={route('vendor.customers.show', c.id)}>
+                                                            Historique
+                                                        </Link>
+                                                    </Button>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

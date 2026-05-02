@@ -42,12 +42,17 @@ export default function AdminDashboard({ stats }: { stats: AdminStats }) {
                             Bienvenue, Admin ! Vue d'ensemble de votre boutique.
                         </p>
                     </div>
-                    <Button asChild>
-                        <Link href={route('admin.products.index')}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Nouveau Produit
-                        </Link>
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" asChild>
+                            <Link href={route('admin.analytics.sales')}>Analyse des ventes</Link>
+                        </Button>
+                        <Button asChild>
+                            <Link href={route('admin.products.index')}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Catalogue produits
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -8,8 +8,9 @@ import {
     DropdownMenuTrigger,
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, Store, Home, ShoppingBag, Menu, ChevronDown } from 'lucide-react';
+import { LogOut, Store, ShoppingBag, Menu, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { route } from '@/lib/route';
 
 export default function CustomerLayout({ children }: { children: ReactNode }) {
     const { auth } = usePage().props;

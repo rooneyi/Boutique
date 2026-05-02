@@ -11,6 +11,7 @@ import {
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from '@/components/ui/sidebar';
 import { Package, ShoppingCart, Settings, LogOut, BarChart3, Menu } from 'lucide-react';
 import { useState } from 'react';
+import { route } from '@/lib/route';
 
 export default function VendorLayout({ children }: { children: ReactNode }) {
     const { auth } = usePage().props;

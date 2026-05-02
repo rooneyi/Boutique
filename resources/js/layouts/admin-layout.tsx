@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, Settings, BarChart3, Menu, ChevronDown } from 'lucide-react';
+import { LogOut, Settings, BarChart3, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { route } from '@/lib/route';
 
@@ -71,12 +71,26 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                                 Clients
                             </Link>
                         </Button>
+                        <Button
+                            variant="ghost"
+                            className="w-full justify-start text-sm"
+                            asChild
+                        >
+                            <Link href={route('admin.analytics.sales')}>Analyse des ventes</Link>
+                        </Button>
                     </div>
 
                     <div className="space-y-2 border-t pt-4">
                         <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
                             Stocks
                         </p>
+                        <Button
+                            variant="ghost"
+                            className="w-full justify-start text-sm"
+                            asChild
+                        >
+                            <Link href={route('admin.products.in-stock')}>En stock</Link>
+                        </Button>
                         <Button
                             variant="ghost"
                             className="w-full justify-start text-sm"
@@ -94,6 +108,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                             <Link href={route('admin.products.out-of-stock')}>
                                 Ruptures
                             </Link>
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            className="w-full justify-start text-sm"
+                            asChild
+                        >
+                            <Link href={route('admin.products.discontinued')}>Produits terminés</Link>
                         </Button>
                     </div>
                 </nav>

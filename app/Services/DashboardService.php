@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Vendor;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
@@ -26,6 +27,21 @@ class DashboardService
             ])
             ->all();
 
+        $lowStockRows = $vendor->products()
+            ->where('stock', '<', 10)
+            ->where('stock', '>', 0)
+            ->orderBy('stock')
+            ->limit(20)
+            ->get()
+            ->map(fn (Product $p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'stock' => $p->stock,
+                'price' => (float) $p->price,
+                'status' => $p->status,
+            ])
+            ->all();
+
         return [
             'total_sales' => (float) $vendor->orders()->sum('total'),
             'total_orders' => $vendor->orders()->count(),
@@ -34,10 +50,39 @@ class DashboardService
                 ->distinct('customer_id')
                 ->count('customer_id'),
             'avg_order_value' => (float) ($vendor->orders()->avg('total') ?? 0),
-            'low_stock_products' => $vendor->products()->where('stock', '<', 10)->where('stock', '>', 0)->get(),
+            'low_stock_products' => $lowStockRows,
             'top_products' => $this->getTopProductsForVendor($vendor),
+            'loyal_customers' => $this->getLoyalCustomersForVendor($vendor),
             'recent_orders' => $recentOrders,
         ];
+    }
+
+    /**
+     * @return list<array{id: int, name: string, orders_count: int, total_spent: float}>
+     */
+    private function getLoyalCustomersForVendor(Vendor $vendor, int $limit = 5): array
+    {
+        $rows = Order::query()
+            ->where('vendor_id', $vendor->id)
+            ->select('customer_id', DB::raw('COUNT(*) as orders_count'), DB::raw('SUM(total) as total_spent'))
+            ->groupBy('customer_id')
+            ->orderByDesc('total_spent')
+            ->limit($limit)
+            ->get();
+
+        $customerIds = $rows->pluck('customer_id')->all();
+        $customers = Customer::query()->whereIn('id', $customerIds)->with('user')->get()->keyBy('id');
+
+        return $rows->map(function ($row) use ($customers) {
+            $c = $customers->get($row->customer_id);
+
+            return [
+                'id' => (int) $row->customer_id,
+                'name' => $c?->user?->name ?? '—',
+                'orders_count' => (int) $row->orders_count,
+                'total_spent' => (float) $row->total_spent,
+            ];
+        })->values()->all();
     }
 
     public function getCustomerDashboard(Customer $customer): array
