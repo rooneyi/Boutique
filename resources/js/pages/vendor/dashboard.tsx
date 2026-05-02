@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@inertiajs/react';
 import { Plus, TrendingUp, Package, Users, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 type DashboardStats = {
     total_sales: number;
@@ -211,5 +212,3 @@ export default function VendorDashboard({ stats }: { stats: DashboardStats }) {
         </>
     );
 }
-
-import { Badge } from '@/components/ui/badge';

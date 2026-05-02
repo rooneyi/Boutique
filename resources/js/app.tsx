@@ -5,6 +5,8 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AdminLayout from '@/layouts/admin-layout';
 import AuthLayout from '@/layouts/auth-layout';
+import VendorLayout from '@/layouts/vendor-layout';
+import CustomerLayout from '@/layouts/customer-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import '@/lib/route'; // Initialize global route function
 
@@ -20,6 +22,10 @@ createInertiaApp({
                 return AuthLayout;
             case name.startsWith('admin/'):
                 return AdminLayout;
+            case name.startsWith('vendor/'):
+                return VendorLayout;
+            case name.startsWith('customer/'):
+                return CustomerLayout;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
             default:
