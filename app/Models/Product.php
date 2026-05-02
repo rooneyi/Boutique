@@ -35,5 +35,11 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    /** Alias pour les vues (stock) */
+    public function getQuantityAttribute(): int
+    {
+        return (int) $this->stock;
+    }
 }
 

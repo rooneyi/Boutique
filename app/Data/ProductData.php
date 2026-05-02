@@ -6,7 +6,7 @@ class ProductData
 {
     public function __construct(
         public string $name,
-        public string $description,
+        public ?string $description,
         public float $price,
         public int $stock,
         public ?string $image = null,
@@ -19,7 +19,7 @@ class ProductData
     {
         return new self(
             name: $data['name'],
-            description: $data['description'],
+            description: $data['description'] ?? null,
             price: (float) $data['price'],
             stock: (int) $data['stock'],
             image: $data['image'] ?? null,
@@ -33,7 +33,7 @@ class ProductData
     {
         return [
             'name' => $this->name,
-            'description' => $this->description,
+            'description' => $this->description ?? '',
             'price' => $this->price,
             'stock' => $this->stock,
             'image' => $this->image,

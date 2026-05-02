@@ -10,8 +10,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Separator } from '@/components/ui/separator';
-import { Trash2, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 type Order = {
     id: number;

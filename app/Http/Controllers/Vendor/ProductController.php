@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers\Vendor;
 
+use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
-use App\Services\ProductService;
-use App\Data\ProductData;
+use App\Models\Category;
 use App\Models\Product;
+use App\Services\ProductService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ProductController extends Controller
 {
@@ -15,75 +20,108 @@ class ProductController extends Controller
         private ProductService $productService,
     ) {}
 
-    public function index()
+    public function index(): Response
     {
-        $products = $this->productService->getVendorProducts(auth()->user()->vendor);
+        $vendor = auth()->user()->vendor;
+        $paginator = $this->productService->getVendorProducts($vendor);
 
-        return response()->json([
-            'data' => $products,
+        $paginator->through(function (Product $product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => (float) $product->price,
+                'quantity' => $product->stock,
+                'category' => $product->category?->name,
+                'status' => $product->status,
+                'created_at' => $product->created_at?->toIso8601String() ?? '',
+            ];
+        });
+
+        return Inertia::render('vendor/products/index', [
+            'products' => $paginator,
         ]);
     }
 
-    public function store(CreateProductRequest $request)
+    public function create(): Response
     {
-        $data = ProductData::from($request->validated());
-        $product = $this->productService->createProduct(
+        return Inertia::render('vendor/products/create', [
+            'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'product' => null,
+        ]);
+    }
+
+    public function edit(Product $product): Response
+    {
+        $this->authorize('update', $product);
+
+        return Inertia::render('vendor/products/create', [
+            'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => (string) ($product->description ?? ''),
+                'price' => (float) $product->price,
+                'stock' => $product->stock,
+                'category_id' => $product->category_id,
+                'image_path' => $product->image ? Storage::disk('public')->url($product->image) : null,
+            ],
+        ]);
+    }
+
+    public function store(CreateProductRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+        $data = ProductData::from([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'price' => $validated['price'],
+            'stock' => $validated['stock'],
+            'category_id' => $validated['category_id'] ?? null,
+            'status' => $validated['status'] ?? null,
+        ]);
+
+        $this->productService->createProduct(
             auth()->user()->vendor,
             $data,
             $request->file('image')
         );
 
-        return response()->json([
-            'message' => 'Produit créé avec succès',
-            'data' => $product,
-        ], 201);
+        return redirect()->route('vendor.products.index')->with('success', 'Produit créé.');
     }
 
-    public function show(Product $product)
-    {
-        $this->authorize('view', $product);
-
-        return response()->json([
-            'data' => $product,
-        ]);
-    }
-
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
         $this->authorize('update', $product);
 
-        $data = ProductData::from($request->validated());
-        $product = $this->productService->updateProduct(
+        $validated = $request->validated();
+        $data = ProductData::from([
+            'name' => $validated['name'] ?? $product->name,
+            'description' => array_key_exists('description', $validated)
+                ? $validated['description']
+                : $product->description,
+            'price' => $validated['price'] ?? (float) $product->price,
+            'stock' => $validated['stock'] ?? $product->stock,
+            'category_id' => array_key_exists('category_id', $validated)
+                ? $validated['category_id']
+                : $product->category_id,
+            'status' => $validated['status'] ?? $product->status,
+        ]);
+
+        $this->productService->updateProduct(
             $product,
             $data,
             $request->file('image')
         );
 
-        return response()->json([
-            'message' => 'Produit mis à jour avec succès',
-            'data' => $product,
-        ]);
+        return redirect()->route('vendor.products.index')->with('success', 'Produit mis à jour.');
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product): RedirectResponse
     {
         $this->authorize('delete', $product);
 
         $this->productService->deleteProduct($product);
 
-        return response()->json([
-            'message' => 'Produit supprimé avec succès',
-        ]);
-    }
-
-    public function getStockStatus(Product $product)
-    {
-        $this->authorize('view', $product);
-
-        $status = $this->productService->getStockStatus($product);
-
-        return response()->json([
-            'status' => $status,
-        ]);
+        return redirect()->route('vendor.products.index')->with('success', 'Produit supprimé.');
     }
 }

@@ -8,9 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Vendor;
 use Carbon\Carbon;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class AdminService
 {
@@ -45,7 +43,7 @@ class AdminService
             'total_sales' => $orders->sum('total'),
             'total_orders' => $orders->count(),
             'average_order' => $orders->avg('total') ?? 0,
-            'top_products' => $this->getTopProducts($period),
+            'top_products' => $this->getTopProductsForPeriod($period),
             'top_vendors' => $this->getTopVendors($period),
             'top_customers' => $this->getTopCustomers($period),
         ];
@@ -78,8 +76,28 @@ class AdminService
 
     private function getTopProducts(): array
     {
-        return OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
-            ->groupBy('product_id')
+        return $this->getTopProductsForPeriod(null);
+    }
+
+    private function getTopProductsForPeriod(?string $period): array
+    {
+        $startDate = $period ? match ($period) {
+            'week' => Carbon::now()->subWeek(),
+            'month' => Carbon::now()->subMonth(),
+            'year' => Carbon::now()->subYear(),
+            default => Carbon::now()->subMonth(),
+        } : null;
+
+        $query = OrderItem::query()
+            ->select('order_items.product_id', DB::raw('SUM(order_items.quantity) as total_sold'))
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->groupBy('order_items.product_id');
+
+        if ($startDate) {
+            $query->where('orders.created_at', '>=', $startDate);
+        }
+
+        return $query
             ->with('product')
             ->orderByDesc('total_sold')
             ->limit(5)
@@ -158,17 +176,4 @@ class AdminService
             ->toArray();
     }
 
-    private function emptyPaginator(): LengthAwarePaginator
-    {
-        return new LengthAwarePaginator(
-            items: [],
-            total: 0,
-            perPage: 20,
-            currentPage: 1,
-            options: [
-                'path' => request()?->url() ?? '/',
-                'pageName' => 'page',
-            ]
-        );
-    }
 }

@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Vendor;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -54,7 +55,7 @@ class OrderService
     public function getCustomerOrders(Customer $customer)
     {
         return Order::where('customer_id', $customer->id)
-            ->with('items')
+            ->with(['items.product'])
             ->latest()
             ->paginate(20);
     }
@@ -62,7 +63,7 @@ class OrderService
     public function getVendorOrders(Vendor $vendor)
     {
         return Order::where('vendor_id', $vendor->id)
-            ->with('items')
+            ->with(['items.product', 'customer.user'])
             ->latest()
             ->paginate(20);
     }

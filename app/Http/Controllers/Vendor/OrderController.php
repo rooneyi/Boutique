@@ -4,48 +4,38 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Services\OrderService;
-use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class OrderController extends Controller
 {
-    public function __construct(
-        private OrderService $orderService,
-    ) {}
-
-    public function index()
+    public function index(): Response
     {
-        $orders = $this->orderService->getVendorOrders(auth()->user()->vendor);
+        $vendor = auth()->user()->vendor;
 
-        return response()->json([
-            'data' => $orders,
-        ]);
-    }
+        $orders = Order::query()
+            ->where('vendor_id', $vendor->id)
+            ->with(['customer.user', 'items.product'])
+            ->latest()
+            ->paginate(15);
 
-    public function show(Order $order)
-    {
-        $this->authorize('view', $order);
+        $orders->through(function (Order $order) {
+            return [
+                'id' => $order->id,
+                'customer_name' => $order->customer?->user?->name ?? '—',
+                'total' => (float) $order->total,
+                'status' => $order->status,
+                'created_at' => $order->created_at?->toIso8601String() ?? '',
+                'items' => $order->items->map(fn ($item) => [
+                    'product_name' => $item->product?->name ?? '—',
+                    'quantity' => $item->quantity,
+                    'line_total' => (float) ($item->price * $item->quantity),
+                ])->all(),
+            ];
+        });
 
-        $details = $this->orderService->getOrderDetails($order);
-
-        return response()->json([
-            'data' => $details,
-        ]);
-    }
-
-    public function updateStatus(Request $request, Order $order)
-    {
-        $this->authorize('update', $order);
-
-        $request->validate([
-            'status' => 'required|in:PENDING,PAID,CANCELLED',
-        ]);
-
-        $order = $this->orderService->updateOrderStatus($order, $request->status);
-
-        return response()->json([
-            'message' => 'Statut de la commande mis à jour',
-            'data' => $order,
+        return Inertia::render('vendor/orders/index', [
+            'orders' => $orders,
         ]);
     }
 }

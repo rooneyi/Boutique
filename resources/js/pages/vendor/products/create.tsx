@@ -10,25 +10,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
-const CATEGORIES = ['Vêtements', 'Shoes', 'Accessoires', 'Autres'];
+type Category = { id: number; name: string };
 
-type Props = {
-    product?: {
-        id: number;
-        name: string;
-        description: string;
-        price: number;
-        quantity: number;
-        category: string;
-        image_path: string;
-    };
+type Product = {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    category_id: number | null;
+    image_path: string | null;
 };
 
-export default function CreateProduct({ product }: Props) {
+type Props = {
+    categories: Category[];
+    product?: Product | null;
+};
+
+export default function CreateProduct({ categories, product }: Props) {
     const isEditing = !!product;
-    const [imagePreview, setImagePreview] = useState<string | null>(
-        product?.image_path || null
+    const [categoryId, setCategoryId] = useState<string>(
+        product?.category_id != null ? String(product.category_id) : ''
     );
+    const [imagePreview, setImagePreview] = useState<string | null>(product?.image_path || null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.currentTarget.files?.[0];
@@ -65,11 +69,13 @@ export default function CreateProduct({ product }: Props) {
                                     ? route('vendor.products.update', product.id)
                                     : route('vendor.products.store')
                             }
+                            encType="multipart/form-data"
                             className="space-y-6"
                         >
                             {({ processing, errors }) => (
                                 <>
-                                    {/* Nom */}
+                                    <input type="hidden" name="category_id" value={categoryId || ''} />
+
                                     <div className="grid gap-2">
                                         <Label htmlFor="name">Nom du Produit</Label>
                                         <Input
@@ -84,22 +90,19 @@ export default function CreateProduct({ product }: Props) {
                                         <InputError message={errors.name} />
                                     </div>
 
-                                    {/* Description */}
                                     <div className="grid gap-2">
                                         <Label htmlFor="description">Description</Label>
                                         <Textarea
                                             id="description"
                                             name="description"
                                             placeholder="Décrivez votre produit..."
-                                            defaultValue={product?.description}
-                                            required
+                                            defaultValue={product?.description ?? ''}
                                             disabled={processing}
                                             rows={4}
                                         />
                                         <InputError message={errors.description} />
                                     </div>
 
-                                    {/* Prix */}
                                     <div className="grid gap-2">
                                         <Label htmlFor="price">Prix (€)</Label>
                                         <Input
@@ -116,46 +119,38 @@ export default function CreateProduct({ product }: Props) {
                                         <InputError message={errors.price} />
                                     </div>
 
-                                    {/* Quantité */}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="quantity">
-                                            Quantité en Stock
-                                        </Label>
+                                        <Label htmlFor="stock">Quantité en stock</Label>
                                         <Input
-                                            id="quantity"
-                                            name="quantity"
+                                            id="stock"
+                                            name="stock"
                                             type="number"
                                             placeholder="50"
                                             min="0"
-                                            defaultValue={product?.quantity}
+                                            defaultValue={product?.stock}
                                             required
                                             disabled={processing}
                                         />
-                                        <InputError message={errors.quantity} />
+                                        <InputError message={errors.stock} />
                                     </div>
 
-                                    {/* Catégorie */}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="category">Catégorie</Label>
-                                        <Select
-                                            name="category"
-                                            defaultValue={product?.category || ''}
-                                        >
+                                        <Label>Catégorie</Label>
+                                        <Select value={categoryId} onValueChange={setCategoryId}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Sélectionner une catégorie" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {CATEGORIES.map((cat) => (
-                                                    <SelectItem key={cat} value={cat}>
-                                                        {cat}
+                                                {categories.map((cat) => (
+                                                    <SelectItem key={cat.id} value={String(cat.id)}>
+                                                        {cat.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        <InputError message={errors.category} />
+                                        <InputError message={errors.category_id} />
                                     </div>
 
-                                    {/* Image */}
                                     <div className="grid gap-2">
                                         <Label htmlFor="image">Image du Produit</Label>
                                         <Input
@@ -176,12 +171,8 @@ export default function CreateProduct({ product }: Props) {
                                         <InputError message={errors.image} />
                                     </div>
 
-                                    {/* Boutons */}
                                     <div className="flex gap-3">
-                                        <Button
-                                            type="submit"
-                                            disabled={processing}
-                                        >
+                                        <Button type="submit" disabled={processing}>
                                             {processing ? (
                                                 <>
                                                     <Spinner className="mr-2 h-4 w-4" />

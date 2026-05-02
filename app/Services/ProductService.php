@@ -17,16 +17,24 @@ class ProductService
             $imagePath = $image->store('products', 'public');
         }
 
-        return Product::create([
+        $status = $data->status === 'DISCONTINUED'
+            ? 'DISCONTINUED'
+            : $this->stockToStatus($data->stock);
+
+        $product = Product::create([
             'vendor_id' => $vendor->id,
             'name' => $data->name,
             'description' => $data->description,
             'price' => $data->price,
             'stock' => $data->stock,
             'category_id' => $data->category_id,
-            'status' => $data->status,
+            'status' => $status,
             'image' => $imagePath,
         ]);
+
+        $this->syncProductStockStatus($product);
+
+        return $product->fresh();
     }
 
     public function updateProduct(Product $product, ProductData $data, ?UploadedFile $image = null): Product
@@ -42,6 +50,8 @@ class ProductService
         }
 
         $product->update($updateData);
+        $product->refresh();
+        $this->syncProductStockStatus($product);
 
         return $product;
     }
@@ -62,17 +72,37 @@ class ProductService
 
     public function decreaseStock(Product $product, int $quantity): bool
     {
-        return $product->update([
-            'stock' => $product->stock - $quantity,
+        $ok = $product->update([
+            'stock' => max(0, $product->stock - $quantity),
         ]);
+        $product->refresh();
+        $this->syncProductStockStatus($product);
+
+        return $ok;
     }
 
     public function getStockStatus(Product $product): string
     {
-        if ($product->stock == 0) {
+        return $this->stockToStatus($product->stock);
+    }
+
+    public function syncProductStockStatus(Product $product): void
+    {
+        if ($product->status === 'DISCONTINUED') {
+            return;
+        }
+
+        $product->updateQuietly([
+            'status' => $this->stockToStatus($product->stock),
+        ]);
+    }
+
+    private function stockToStatus(int $stock): string
+    {
+        if ($stock <= 0) {
             return 'OUT_OF_STOCK';
         }
-        if ($product->stock < 10) {
+        if ($stock < 10) {
             return 'LOW_STOCK';
         }
 

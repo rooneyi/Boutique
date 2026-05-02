@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
+use App\Http\Controllers\Customer\ProductController as CustomerProductController;
+use App\Http\Controllers\Vendor\CustomerController as VendorCustomerController;
+use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
+use App\Http\Controllers\Vendor\ProductController as VendorProductController;
 use App\Services\AdminService;
 use App\Data\CustomerRegisterData;
 use App\Data\VendorRegisterData;
@@ -122,44 +127,26 @@ Route::middleware(['auth', 'verified', 'vendor'])->prefix('vendor')->name('vendo
         ]);
     })->name('dashboard');
 
-    Route::get('products', fn() => Inertia::render('vendor/products/index', [
-        'products' => [
-            'data' => [],
-            'meta' => [],
-        ],
-    ]))->name('products.index');
+    Route::get('products', [VendorProductController::class, 'index'])->name('products.index');
+    Route::get('products/create', [VendorProductController::class, 'create'])->name('products.create');
+    Route::post('products', [VendorProductController::class, 'store'])->name('products.store');
+    Route::get('products/{product}/edit', [VendorProductController::class, 'edit'])->name('products.edit');
+    Route::put('products/{product}', [VendorProductController::class, 'update'])->name('products.update');
+    Route::delete('products/{product}', [VendorProductController::class, 'destroy'])->name('products.destroy');
 
-    Route::get('products/create', fn() => Inertia::render('vendor/products/create'))->name('products.create');
-
-    Route::get('products/{product}/edit', fn() => Inertia::render('vendor/products/create'))->name('products.edit');
-
-    Route::post('products', fn() => redirect()->route('vendor.products.index'))->name('products.store');
-
-    Route::put('products/{product}', fn() => redirect()->route('vendor.products.index'))->name('products.update');
-
-    Route::delete('products/{product}', fn() => redirect()->route('vendor.products.index'))->name('products.destroy');
-
-    Route::get('orders', fn() => redirect()->route('vendor.products.index'))->name('orders.index');
-
-    Route::get('customers', fn() => redirect()->route('vendor.products.index'))->name('customers.index');
+    Route::get('orders', [VendorOrderController::class, 'index'])->name('orders.index');
+    Route::get('customers', [VendorCustomerController::class, 'index'])->name('customers.index');
 
     Route::get('settings', fn() => redirect()->route('settings.profile'))->name('settings');
 });
 
 Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('customer.')->group(function () {
-    Route::get('products', fn() => Inertia::render('customer/products/index', [
-        'products' => [],
-    ]))->name('products.index');
+    Route::get('products', [CustomerProductController::class, 'index'])->name('products.index');
+    Route::get('products/{product}', [CustomerProductController::class, 'show'])->name('products.show');
 
-    Route::get('orders', fn() => Inertia::render('customer/orders/index', [
-        'orders' => [
-            'data' => [],
-        ],
-    ]))->name('orders.index');
-
-    Route::get('products/{product}', [\App\Http\Controllers\Customer\ProductController::class, 'show'])->name('products.show');
-
-    Route::get('orders/{order}', fn() => redirect()->route('customer.orders.index'))->name('orders.show');
+    Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
+    Route::post('orders', [CustomerOrderController::class, 'store'])->name('orders.store');
+    Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
 
     Route::get('cart', fn() => redirect()->route('customer.products.index'))->name('cart');
 });

@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -26,28 +26,35 @@ type Product = {
     };
 };
 
+type PaginatedProducts = {
+    data: Product[];
+    links?: { url: string | null; label: string; active: boolean }[];
+    meta?: { current_page: number; last_page: number; total: number };
+};
+
 type Props = {
-    products: Product[];
+    products: PaginatedProducts;
 };
 
 export default function BrowseProducts({ products }: Props) {
     const [search, setSearch] = useState('');
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState('all');
 
-    const filtered = products.filter((p) => {
+    const items = products.data ?? [];
+
+    const filtered = items.filter((p) => {
         const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = !category || p.category === category;
+        const matchesCategory = category === 'all' || p.category === category;
         return matchesSearch && matchesCategory;
     });
 
-    const categories = [...new Set(products.map((p) => p.category))].filter(Boolean);
+    const categories = [...new Set(items.map((p) => p.category))].filter(Boolean);
 
     return (
         <>
             <Head title="Parcourir les Produits" />
 
             <div className="space-y-8">
-                {/* Header */}
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Nos Produits</h1>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -55,7 +62,6 @@ export default function BrowseProducts({ products }: Props) {
                     </p>
                 </div>
 
-                {/* Recherche et Filtres */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -72,7 +78,7 @@ export default function BrowseProducts({ products }: Props) {
                             <SelectValue placeholder="Catégorie" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">Toutes les catégories</SelectItem>
+                            <SelectItem value="all">Toutes les catégories</SelectItem>
                             {categories.map((cat) => (
                                 <SelectItem key={cat} value={cat}>
                                     {cat}
@@ -81,20 +87,18 @@ export default function BrowseProducts({ products }: Props) {
                         </SelectContent>
                     </Select>
 
-                    <div>
+                    <div className="flex items-center gap-2">
                         <Badge variant="secondary">
-                            {filtered.length} produit
-                            {filtered.length > 1 ? 's' : ''}
+                            {filtered.length} affiché{filtered.length > 1 ? 's' : ''}
+                            {products.meta?.total != null ? ` / ${products.meta.total} au total` : ''}
                         </Badge>
                     </div>
                 </div>
 
-                {/* Grille de Produits */}
                 {filtered.length > 0 ? (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {filtered.map((product) => (
                             <Card key={product.id} className="overflow-hidden">
-                                {/* Image */}
                                 {product.image_path ? (
                                     <img
                                         src={product.image_path}
@@ -102,34 +106,25 @@ export default function BrowseProducts({ products }: Props) {
                                         className="h-48 w-full object-cover"
                                     />
                                 ) : (
-                                    <div className="h-48 w-full bg-muted flex items-center justify-center">
+                                    <div className="flex h-48 w-full items-center justify-center bg-muted">
                                         <ShoppingCart className="h-8 w-8 text-muted-foreground" />
                                     </div>
                                 )}
 
-                                {/* Contenu */}
                                 <CardContent className="p-4">
                                     <div className="space-y-3">
-                                        {/* Boutique */}
                                         <p className="text-xs font-medium text-muted-foreground">
                                             {product.vendor?.shop_name}
                                         </p>
 
-                                        {/* Nom */}
-                                        <h3 className="font-semibold leading-tight line-clamp-2">
-                                            {product.name}
-                                        </h3>
+                                        <h3 className="line-clamp-2 font-semibold leading-tight">{product.name}</h3>
 
-                                        {/* Description */}
-                                        <p className="text-sm text-muted-foreground line-clamp-2">
+                                        <p className="line-clamp-2 text-sm text-muted-foreground">
                                             {product.description}
                                         </p>
 
-                                        {/* Prix et Statut */}
                                         <div className="flex items-center justify-between pt-2">
-                                            <span className="text-lg font-bold">
-                                                €{product.price.toFixed(2)}
-                                            </span>
+                                            <span className="text-lg font-bold">€{product.price.toFixed(2)}</span>
                                             {product.quantity > 0 ? (
                                                 <Badge variant="outline">En stock</Badge>
                                             ) : (
@@ -137,7 +132,6 @@ export default function BrowseProducts({ products }: Props) {
                                             )}
                                         </div>
 
-                                        {/* Button */}
                                         <Button
                                             className="w-full"
                                             disabled={product.quantity === 0}
@@ -160,6 +154,24 @@ export default function BrowseProducts({ products }: Props) {
                             </p>
                         </CardContent>
                     </Card>
+                )}
+
+                {products.links && products.links.length > 3 && (
+                    <nav className="flex flex-wrap justify-center gap-2">
+                        {products.links.map((link, i) =>
+                            link.url ? (
+                                <Button key={i} variant={link.active ? 'default' : 'outline'} size="sm" asChild>
+                                    <Link href={link.url} preserveScroll>
+                                        <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                    </Link>
+                                </Button>
+                            ) : (
+                                <Button key={i} variant="outline" size="sm" disabled>
+                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                </Button>
+                            )
+                        )}
+                    </nav>
                 )}
             </div>
         </>
