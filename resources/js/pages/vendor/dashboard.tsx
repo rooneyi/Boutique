@@ -103,9 +103,7 @@ export default function VendorDashboard({ stats }: { stats: DashboardStats }) {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.total_customers}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Clients fidèles
-                            </p>
+                            <p className="text-xs text-muted-foreground">Clients uniques (ayant commandé)</p>
                         </CardContent>
                     </Card>
                 </div>
