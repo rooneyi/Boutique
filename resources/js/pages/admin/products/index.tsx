@@ -11,17 +11,28 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Eye } from 'lucide-react';
+import { route } from '@/lib/route';
 
 type Product = {
     id: number;
     name: string;
     price: number;
     quantity: number;
-    category: string;
+    category: string | { id: number; name: string } | null;
     vendor: {
         shop_name: string;
     };
 };
+
+function categoryLabel(category: Product['category']): string {
+    if (category == null) {
+        return '—';
+    }
+    if (typeof category === 'string') {
+        return category;
+    }
+    return category.name ?? '—';
+}
 
 type Props = {
     products: {
@@ -121,12 +132,12 @@ export default function AdminProducts() {
                                                     {product.vendor?.shop_name}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    €{product.price.toFixed(2)}
+                                                    €{Number(product.price).toFixed(2)}
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     {product.quantity}
                                                 </TableCell>
-                                                <TableCell>{product.category}</TableCell>
+                                                <TableCell>{categoryLabel(product.category)}</TableCell>
                                                 <TableCell>
                                                     {product.quantity === 0 ? (
                                                         <Badge variant="destructive">

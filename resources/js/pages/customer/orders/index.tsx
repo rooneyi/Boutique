@@ -86,13 +86,7 @@ export default function Orders({ orders }: Props) {
                                                     {formatDate(order.created_at)}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge
-                                                        variant={
-                                                            order.status === 'completed'
-                                                                ? 'default'
-                                                                : 'secondary'
-                                                        }
-                                                    >
+                                                    <Badge variant={statusVariant(order.status)}>
                                                         {order.status}
                                                     </Badge>
                                                 </TableCell>

@@ -110,7 +110,7 @@ class AdminService
                 return [
                     'id' => $item->product->id,
                     'name' => $item->product->name,
-                    'price' => $item->product->price,
+                    'price' => (float) $item->product->price,
                     'stock' => $item->product->stock,
                     'total_sold' => (int) $item->total_sold,
                 ];
@@ -130,7 +130,7 @@ class AdminService
                 return [
                     'id' => $order->id,
                     'customer_name' => $order->customer?->user?->name ?? 'Inconnu',
-                    'total' => $order->total,
+                    'total' => (float) $order->total,
                     'status' => $order->status,
                     'created_at' => $order->created_at?->format('d/m/Y H:i') ?? '',
                 ];

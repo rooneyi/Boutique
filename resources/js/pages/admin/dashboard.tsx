@@ -1,10 +1,9 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
-import { TrendingUp, Package, Users, AlertTriangle, ShoppingCart, Plus } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { TrendingUp, Package, Users, ShoppingCart, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { route } from '@/lib/route';
 
 type AdminStats = {
     total_vendors: number;

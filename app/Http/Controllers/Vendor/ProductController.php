@@ -73,7 +73,7 @@ class ProductController extends Controller
         $validated = $request->validated();
         $data = ProductData::from([
             'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
+            'description' => $validated['description'] ?? '',
             'price' => $validated['price'],
             'stock' => $validated['stock'],
             'category_id' => $validated['category_id'] ?? null,
@@ -97,10 +97,10 @@ class ProductController extends Controller
         $data = ProductData::from([
             'name' => $validated['name'] ?? $product->name,
             'description' => array_key_exists('description', $validated)
-                ? $validated['description']
-                : $product->description,
-            'price' => $validated['price'] ?? (float) $product->price,
-            'stock' => $validated['stock'] ?? $product->stock,
+                ? ($validated['description'] ?? '')
+                : (string) ($product->description ?? ''),
+            'price' => isset($validated['price']) ? (float) $validated['price'] : (float) $product->price,
+            'stock' => isset($validated['stock']) ? (int) $validated['stock'] : (int) $product->stock,
             'category_id' => array_key_exists('category_id', $validated)
                 ? $validated['category_id']
                 : $product->category_id,

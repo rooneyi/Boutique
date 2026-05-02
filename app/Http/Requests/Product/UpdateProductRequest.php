@@ -6,6 +6,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProductRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('category_id') && ($this->input('category_id') === '' || $this->input('category_id') === null)) {
+            $this->merge(['category_id' => null]);
+        }
+    }
+
     public function authorize(): bool
     {
         return auth()->check() && auth()->user()->role === 'VENDOR';

@@ -156,21 +156,32 @@ export default function BrowseProducts({ products }: Props) {
                     </Card>
                 )}
 
-                {products.links && products.links.length > 3 && (
-                    <nav className="flex flex-wrap justify-center gap-2">
-                        {products.links.map((link, i) =>
-                            link.url ? (
+                {products.meta && products.meta.last_page > 1 && (
+                    <nav className="flex flex-wrap items-center justify-center gap-2">
+                        {products.links?.map((link, i) => {
+                            if (link.label.includes('...')) {
+                                return (
+                                    <span key={i} className="px-2 text-muted-foreground">
+                                        …
+                                    </span>
+                                );
+                            }
+                            const label = link.label.replace(/<[^>]+>/g, '').trim();
+                            if (!link.url) {
+                                return (
+                                    <Button key={i} variant="outline" size="sm" disabled>
+                                        {label}
+                                    </Button>
+                                );
+                            }
+                            return (
                                 <Button key={i} variant={link.active ? 'default' : 'outline'} size="sm" asChild>
                                     <Link href={link.url} preserveScroll>
-                                        <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                        {label}
                                     </Link>
                                 </Button>
-                            ) : (
-                                <Button key={i} variant="outline" size="sm" disabled>
-                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                </Button>
-                            )
-                        )}
+                            );
+                        })}
                     </nav>
                 )}
             </div>
