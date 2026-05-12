@@ -1,5 +1,9 @@
 # Architecture de l'Application - Séparation des Responsabilités
 
+**Documentation fonctionnelle modulaire :** voir [SPEC-00.md](./SPEC-00.md) (index du cahier des charges `SPEC-01` … `SPEC-06`). Ce fichier décrit l’architecture **technique** ; les besoins métier sont dans les SPEC.
+
+---
+
 ## 📋 Structure Global
 
 ```

@@ -60,16 +60,16 @@ class User extends Authenticatable
      */
     public function isVendor(): bool
     {
-        return $this->is_vendor;
+        return $this->role === 'VENDOR';
     }
 
     public function isCustomer(): bool
     {
-        return !$this->is_vendor;
+        return $this->role === 'CUSTOMER';
     }
 
     public function isAdmin(): bool
     {
-        return $this->is_admin;
+        return $this->role === 'ADMIN';
     }
 }

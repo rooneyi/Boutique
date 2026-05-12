@@ -11,11 +11,11 @@ class LoginResponse implements LoginResponseContract
     {
         $user = $request->user();
 
-        if ($user?->is_admin) {
+        if ($user?->role === 'ADMIN') {
             return redirect()->intended('/admin/dashboard');
         }
 
-        if ($user?->is_vendor) {
+        if ($user?->role === 'VENDOR') {
             return redirect()->intended('/vendor/dashboard');
         }
 
