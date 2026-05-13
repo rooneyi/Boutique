@@ -11,8 +11,11 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Search, ShoppingCart } from 'lucide-react';
+import { AddToCartButton } from '@/components/storefront/add-to-cart-button';
+import { SF_CARD } from '@/lib/storefront-ui-styles';
 import { useState } from 'react';
 import { route } from '@/lib/route';
+import { cn } from '@/lib/utils';
 
 type Product = {
     id: number;
@@ -99,7 +102,7 @@ export default function BrowseProducts({ products }: Props) {
                 {filtered.length > 0 ? (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {filtered.map((product) => (
-                            <Card key={product.id} className="overflow-hidden">
+                            <Card key={product.id} className={cn(SF_CARD, 'overflow-hidden')}>
                                 {product.image_path ? (
                                     <img
                                         src={product.image_path}
@@ -133,15 +136,19 @@ export default function BrowseProducts({ products }: Props) {
                                             )}
                                         </div>
 
-                                        <Button
-                                            className="w-full"
-                                            disabled={product.quantity === 0}
-                                            asChild
-                                        >
-                                            <Link href={route('customer.products.show', product.id)}>
-                                                Voir détail
-                                            </Link>
-                                        </Button>
+                                        <div className="flex flex-col gap-2">
+                                            <Button variant="outline" className="w-full rounded-sm font-poppins" asChild>
+                                                <Link href={route('customer.products.show', product.id)}>
+                                                    Voir détail
+                                                </Link>
+                                            </Button>
+                                            <AddToCartButton
+                                                productId={product.id}
+                                                disabled={product.quantity === 0}
+                                                className="w-full justify-center text-base"
+                                                label="Ajouter au panier"
+                                            />
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>

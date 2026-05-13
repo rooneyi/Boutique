@@ -1,7 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import {
     Table,
     TableBody,
@@ -23,6 +22,16 @@ import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { route } from '@/lib/route';
+import {
+    VENDOR_BADGE,
+    VENDOR_BTN_PRIMARY,
+    VENDOR_CARD,
+    VENDOR_H1,
+    VENDOR_H3,
+    VENDOR_H4,
+    VENDOR_MUTED,
+} from '@/lib/vendor-ui-styles';
+import { cn } from '@/lib/utils';
 
 type Product = {
     id: number;
@@ -37,11 +46,12 @@ type Product = {
 type Props = {
     products: {
         data: Product[];
-        meta: any;
+        meta: unknown;
     };
 };
 
 export default function ProductsList() {
+    const { products } = usePage<Props>().props;
     const [deleteId, setDeleteId] = useState<number | null>(null);
 
     const handleDelete = (id: number) => {
@@ -53,93 +63,92 @@ export default function ProductsList() {
         <>
             <Head title="Mes Produits" />
 
-            <div className="space-y-8">
-                {/* Header */}
-                <div className="flex items-center justify-between">
+            <div className="space-y-10">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Mes Produits</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Gérez votre catalogue de produits
-                        </p>
+                        <h1 className={VENDOR_H1}>Collection</h1>
+                        <p className={cn(VENDOR_MUTED, 'mt-3 max-w-xl')}>Gérez votre catalogue de produits.</p>
                     </div>
-                    <Button asChild>
-                        <Link href={route('vendor.products.create')}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Ajouter un Produit
-                        </Link>
-                    </Button>
+                    <Link href={route('vendor.products.create')} className={cn(VENDOR_BTN_PRIMARY, 'shrink-0')}>
+                        <Plus className="h-5 w-5" />
+                        Ajouter un produit
+                    </Link>
                 </div>
 
-                {/* Tableau */}
-                <Card>
+                <Card className={VENDOR_CARD}>
                     <CardHeader>
-                        <CardTitle>Produits en Vente</CardTitle>
-                        <CardDescription>Liste complète de vos produits</CardDescription>
+                        <h3 className={VENDOR_H3}>Produits en vente</h3>
+                        <CardDescription className={cn(VENDOR_MUTED, 'text-base')}>Liste complète de vos produits</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="rounded-md border">
+                        <div className="overflow-x-auto rounded-sm border border-neutral-200">
                             <Table>
                                 <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Produit</TableHead>
-                                        <TableHead className="text-right">Prix</TableHead>
-                                        <TableHead className="text-right">Stock</TableHead>
-                                        <TableHead>Catégorie</TableHead>
-                                        <TableHead>Statut</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                    <TableRow className="border-neutral-200 bg-neutral-50 hover:bg-neutral-50">
+                                        <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Produit</TableHead>
+                                        <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>Prix</TableHead>
+                                        <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>Stock</TableHead>
+                                        <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Catégorie</TableHead>
+                                        <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Statut</TableHead>
+                                        <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {usePage<Props>().props.products.data.map((product) => (
-                                        <TableRow key={product.id}>
-                                            <TableCell className="font-medium">
-                                                {product.name}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                €{product.price.toFixed(2)}
+                                    {products.data.map((product) => (
+                                        <TableRow key={product.id} className="border-neutral-100">
+                                            <TableCell className="font-poppins font-semibold text-black">{product.name}</TableCell>
+                                            <TableCell className="text-right font-poppins text-black">
+                                                €{Number(product.price).toFixed(2)}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 {product.quantity > 10 ? (
-                                                    <Badge variant="outline">
+                                                    <Badge
+                                                        className={cn(
+                                                            VENDOR_BADGE,
+                                                            'border border-neutral-300 bg-white font-poppins text-xs font-normal text-black',
+                                                        )}
+                                                    >
                                                         {product.quantity} en stock
                                                     </Badge>
                                                 ) : product.quantity > 0 ? (
-                                                    <Badge variant="secondary">
+                                                    <Badge
+                                                        className={cn(
+                                                            VENDOR_BADGE,
+                                                            'bg-neutral-200 font-poppins text-xs font-semibold text-black',
+                                                        )}
+                                                    >
                                                         {product.quantity} faible
                                                     </Badge>
                                                 ) : (
-                                                    <Badge variant="destructive">
+                                                    <Badge
+                                                        className={cn(
+                                                            VENDOR_BADGE,
+                                                            'bg-black font-poppins text-xs font-semibold text-white',
+                                                        )}
+                                                    >
                                                         Rupture
                                                     </Badge>
                                                 )}
                                             </TableCell>
-                                            <TableCell>{product.category || '-'}</TableCell>
+                                            <TableCell className={VENDOR_MUTED}>{product.category || '—'}</TableCell>
                                             <TableCell>
-                                                <Badge>{product.status}</Badge>
+                                                <span className="font-poppins text-sm font-normal text-[#747474]">{product.status}</span>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        asChild
+                                                    <Link
+                                                        href={route('vendor.products.edit', product.id)}
+                                                        className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-neutral-300 text-black hover:border-[#0059DD] hover:text-[#0059DD]"
                                                     >
-                                                        <Link
-                                                            href={route(
-                                                                'vendor.products.edit',
-                                                                product.id
-                                                            )}
-                                                        >
-                                                            <Edit className="h-4 w-4" />
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="destructive"
+                                                        <Edit className="h-4 w-4" />
+                                                    </Link>
+                                                    <button
+                                                        type="button"
+                                                        className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-neutral-300 text-black hover:bg-neutral-100"
                                                         onClick={() => setDeleteId(product.id)}
                                                     >
                                                         <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                                    </button>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -151,21 +160,17 @@ export default function ProductsList() {
                 </Card>
             </div>
 
-            {/* Delete Dialog */}
-            <AlertDialog
-                open={deleteId !== null}
-                onOpenChange={(open) => !open && setDeleteId(null)}
-            >
-                <AlertDialogContent>
+            <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
+                <AlertDialogContent className="font-poppins">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Supprimer le produit?</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        <AlertDialogTitle className="text-black">Supprimer le produit ?</AlertDialogTitle>
+                        <AlertDialogDescription className={VENDOR_MUTED}>
                             Cette action est irréversible. Le produit sera supprimé définitivement.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogCancel className="font-poppins">Annuler</AlertDialogCancel>
                     <AlertDialogAction
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="bg-black font-poppins text-white hover:bg-neutral-800"
                         onClick={() => deleteId && handleDelete(deleteId)}
                     >
                         Supprimer

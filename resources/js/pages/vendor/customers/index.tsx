@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { route } from '@/lib/route';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -9,7 +9,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+import { VENDOR_BTN_PRIMARY, VENDOR_CARD, VENDOR_H1, VENDOR_H3, VENDOR_H4, VENDOR_MUTED } from '@/lib/vendor-ui-styles';
+import { cn } from '@/lib/utils';
 
 type CustomerRow = {
     id: number;
@@ -29,55 +30,66 @@ export default function VendorCustomers({ customers }: Props) {
         <>
             <Head title="Mes clients" />
 
-            <div className="space-y-8">
+            <div className="space-y-10">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Mes clients</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Clients ayant commandé chez vous — fréquence et montant total
+                    <h1 className={VENDOR_H1}>Clients</h1>
+                    <p className={cn(VENDOR_MUTED, 'mt-3 max-w-xl')}>
+                        Clients ayant commandé chez vous — fréquence et montant total.
                     </p>
                 </div>
 
-                <Card>
+                <Card className={VENDOR_CARD}>
                     <CardHeader>
-                        <CardTitle>Liste des clients</CardTitle>
-                        <CardDescription>Basée sur l’historique des commandes</CardDescription>
+                        <h3 className={VENDOR_H3}>Liste des clients</h3>
+                        <CardDescription className={cn(VENDOR_MUTED, 'text-base')}>
+                            Basée sur l’historique des commandes
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {customers.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">Aucun client pour le moment.</p>
+                            <p className={VENDOR_MUTED}>Aucun client pour le moment.</p>
                         ) : (
-                            <div className="rounded-md border">
+                            <div className="overflow-x-auto rounded-sm border border-neutral-200">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Client</TableHead>
-                                            <TableHead>Email</TableHead>
-                                            <TableHead className="text-right">Commandes</TableHead>
-                                            <TableHead className="text-right">Total dépensé</TableHead>
-                                            <TableHead>Dernière commande</TableHead>
-                                            <TableHead className="text-right">Détails</TableHead>
+                                        <TableRow className="border-neutral-200 bg-neutral-50 hover:bg-neutral-50">
+                                            <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Client</TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Email</TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>
+                                                Commandes
+                                            </TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>
+                                                Total dépensé
+                                            </TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>
+                                                Dernière commande
+                                            </TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>
+                                                Détails
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {customers.map((c) => (
-                                            <TableRow key={c.id}>
-                                                <TableCell className="font-medium">{c.name}</TableCell>
-                                                <TableCell className="text-muted-foreground text-sm">{c.email}</TableCell>
-                                                <TableCell className="text-right">{c.orders_count}</TableCell>
-                                                <TableCell className="text-right">
+                                            <TableRow key={c.id} className="border-neutral-100">
+                                                <TableCell className="font-poppins font-semibold text-black">{c.name}</TableCell>
+                                                <TableCell className={cn(VENDOR_MUTED, 'text-sm')}>{c.email}</TableCell>
+                                                <TableCell className="text-right font-poppins text-black">{c.orders_count}</TableCell>
+                                                <TableCell className="text-right font-poppins font-semibold text-black">
                                                     €{Number(c.total_spent).toFixed(2)}
                                                 </TableCell>
-                                                <TableCell className="text-sm text-muted-foreground">
+                                                <TableCell className={cn(VENDOR_MUTED, 'text-sm')}>
                                                     {c.last_order_at
                                                         ? new Date(c.last_order_at).toLocaleDateString('fr-FR')
                                                         : '—'}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button variant="outline" size="sm" asChild>
-                                                        <Link href={route('vendor.customers.show', c.id)}>
-                                                            Historique
-                                                        </Link>
-                                                    </Button>
+                                                    <Link
+                                                        href={route('vendor.customers.show', c.id)}
+                                                        className={cn(VENDOR_BTN_PRIMARY, 'py-2 pl-4 pr-4')}
+                                                    >
+                                                        Historique
+                                                    </Link>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -88,9 +100,9 @@ export default function VendorCustomers({ customers }: Props) {
                     </CardContent>
                 </Card>
 
-                <p className="text-sm text-muted-foreground">
-                    <Link href={route('vendor.dashboard')} className="underline">
-                        Retour au tableau de bord
+                <p className="font-poppins text-base font-normal">
+                    <Link href={route('vendor.dashboard')} className="font-semibold text-[#0059DD] hover:underline">
+                        ← Tableau de bord
                     </Link>
                 </p>
             </div>

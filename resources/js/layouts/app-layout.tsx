@@ -1,3 +1,4 @@
+import { FlashToaster } from '@/components/flash-toaster';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -11,6 +12,7 @@ export default function AppLayout({
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs}>
             {children}
+            <FlashToaster />
         </AppLayoutTemplate>
     );
 }

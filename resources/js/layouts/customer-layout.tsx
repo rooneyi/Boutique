@@ -1,6 +1,8 @@
-import { ReactNode } from 'react';
+import { FlashToaster } from '@/components/flash-toaster';
+import { ReactNode, useMemo } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,56 +10,102 @@ import {
     DropdownMenuTrigger,
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, Store, ShoppingBag, Menu, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { LogOut, Store, ShoppingBag, ChevronDown, ShoppingCart } from 'lucide-react';
 import { route } from '@/lib/route';
+import { SF_BRAND, SF_BRAND_SHORT, SF_NAV_LINK } from '@/lib/storefront-ui-styles';
+import { cn } from '@/lib/utils';
+
+type AuthUser = {
+    id: number;
+    name: string;
+    email: string;
+    role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
+};
 
 export default function CustomerLayout({ children }: { children: ReactNode }) {
-    const { auth } = usePage().props;
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const page = usePage<{
+        auth: { user?: AuthUser | null };
+        cartCount?: number;
+    }>();
+    const { auth, cartCount = 0 } = page.props;
+    const user = auth?.user;
+    const isCustomer = user?.role === 'CUSTOMER';
+
+    const headerBrand = useMemo(
+        () => (
+            <Link href={route('home')} className="flex flex-col leading-tight">
+                <span className="font-poppins text-lg font-semibold tracking-tight text-black">{SF_BRAND}</span>
+                <span className="font-poppins text-xs text-[#747474]">{SF_BRAND_SHORT}</span>
+            </Link>
+        ),
+        [],
+    );
 
     return (
-        <div className="flex flex-col min-h-screen">
-            {/* Navigation */}
-            <header className="border-b bg-background sticky top-0 z-40">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        {/* Logo */}
-                        <Link href={route('home')} className="font-bold text-xl">
-                            👗 Boutique
-                        </Link>
+        <div className="flex min-h-screen flex-col bg-white font-poppins text-black antialiased">
+            <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white">
+                <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+                    {headerBrand}
 
-                        {/* Desktop Menu */}
-                        <nav className="hidden md:flex items-center gap-8">
-                            <Button variant="ghost" size="sm" asChild>
-                                <Link href={route('customer.products.index')}>
-                                    <Store className="mr-2 h-4 w-4" />
-                                    Boutique
+                    <nav className="flex max-w-[55%] flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm sm:max-w-none sm:flex-1 sm:justify-center md:gap-8 md:text-base">
+                        <Link href={route('customer.products.index')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
+                            <Store className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
+                            Catalogue
+                        </Link>
+                        {isCustomer && (
+                            <>
+                                <Link href={route('customer.cart')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
+                                    <ShoppingCart className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
+                                    Panier
+                                    {cartCount > 0 && (
+                                        <Badge className="rounded-sm border-0 bg-[#0059DD] px-2 py-0 text-xs font-semibold text-white">
+                                            {cartCount}
+                                        </Badge>
+                                    )}
                                 </Link>
-                            </Button>
-                            <Button variant="ghost" size="sm" asChild>
-                                <Link href={route('customer.orders.index')}>
-                                    <ShoppingBag className="mr-2 h-4 w-4" />
+                                <Link href={route('customer.orders.index')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
+                                    <ShoppingBag className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
                                     Commandes
                                 </Link>
-                            </Button>
-                        </nav>
+                            </>
+                        )}
+                    </nav>
 
-                        {/* User Menu */}
-                        <div className="flex items-center gap-4">
-                            <span className="text-sm hidden sm:inline">
-                                {auth.user?.name}
-                            </span>
+                    <div className="flex items-center gap-2">
+                        {!user && (
+                            <>
+                                <Button variant="outline" size="sm" className="rounded-sm font-poppins" asChild>
+                                    <Link href={route('login')}>Connexion</Link>
+                                </Button>
+                                <Button size="sm" className="hidden rounded-sm bg-[#0059DD] font-poppins hover:bg-[#0047b0] sm:inline-flex" asChild>
+                                    <Link href={route('auth.customer.register')}>Inscription</Link>
+                                </Button>
+                            </>
+                        )}
 
+                        {user && isCustomer && (
+                            <Link href={route('customer.cart')} className="relative inline-flex md:hidden">
+                                <ShoppingCart className="h-6 w-6" />
+                                {cartCount > 0 && (
+                                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-sm bg-[#0059DD] px-1 text-[10px] font-bold text-white">
+                                        {cartCount > 99 ? '99+' : cartCount}
+                                    </span>
+                                )}
+                            </Link>
+                        )}
+
+                        {user && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                        <ChevronDown className="h-4 w-4" />
+                                    <Button variant="ghost" size="sm" className="font-poppins">
+                                        <span className="hidden max-w-[140px] truncate sm:inline">{user.name}</span>
+                                        <ChevronDown className="ml-1 h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem disabled>
-                                        {auth.user?.email}
+                                <DropdownMenuContent align="end" className="font-poppins">
+                                    <DropdownMenuItem disabled className="flex flex-col items-start gap-0.5">
+                                        <span className="font-medium">{user.name}</span>
+                                        <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
@@ -68,39 +116,32 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
-
-                            <Button size="icon" variant="ghost" className="md:hidden">
-                                <Menu className="h-5 w-5" />
-                            </Button>
-                        </div>
+                        )}
                     </div>
                 </div>
             </header>
 
-            {/* Main Content */}
-            <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {children}
-            </main>
+            <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">{children}</main>
 
-            {/* Footer */}
-            <footer className="border-t bg-muted/30 mt-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="grid gap-4 md:grid-cols-3 text-center text-sm text-muted-foreground">
+            <footer className="mt-auto border-t border-neutral-100 bg-neutral-50">
+                <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+                    <div className="grid gap-4 text-center text-sm text-[#747474] md:grid-cols-3 md:text-left">
                         <div>
-                            <p className="font-medium text-foreground mb-1">À propos</p>
-                            <p>Boutique de vêtements en ligne</p>
+                            <p className="mb-1 font-medium text-black">{SF_BRAND_SHORT}</p>
+                            <p>Mode en ligne</p>
                         </div>
                         <div>
-                            <p className="font-medium text-foreground mb-1">Contact</p>
-                            <p>support@boutique.com</p>
+                            <p className="mb-1 font-medium text-black">Contact</p>
+                            <p>support@posercommejamais.com</p>
                         </div>
                         <div>
-                            <p className="font-medium text-foreground mb-1">Légal</p>
-                            <p>© 2025 Boutique. Tous droits réservés.</p>
+                            <p className="mb-1 font-medium text-black">Légal</p>
+                            <p>© {new Date().getFullYear()} {SF_BRAND}</p>
                         </div>
                     </div>
                 </div>
             </footer>
+            <FlashToaster />
         </div>
     );
 }

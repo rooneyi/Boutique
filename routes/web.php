@@ -2,23 +2,66 @@
 
 use App\Data\CustomerRegisterData;
 use App\Data\VendorRegisterData;
+use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\Vendor\CustomerController as VendorCustomerController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController as VendorProductController;
+use App\Models\Category;
+use App\Models\Product;
 use App\Services\AdminService;
 use App\Services\CustomerService;
 use App\Services\DashboardService;
 use App\Services\VendorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', function () {
+    $featured = Product::query()
+        ->where('status', '!=', 'DISCONTINUED')
+        ->with(['category', 'vendor'])
+        ->latest()
+        ->limit(4)
+        ->get()
+        ->map(function (Product $p) {
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'price' => (float) $p->price,
+                'image_path' => $p->image
+                    ? Storage::disk('public')->url($p->image)
+                    : null,
+                'vendor_shop' => $p->vendor->shop_name,
+                'category' => $p->category?->name ?? '',
+            ];
+        });
+
+    $highlightCategories = Category::query()
+        ->withCount([
+            'products as active_count' => fn ($q) => $q->where('status', '!=', 'DISCONTINUED'),
+        ])
+        ->orderBy('name')
+        ->limit(6)
+        ->get()
+        ->map(fn (Category $c) => [
+            'id' => $c->id,
+            'name' => $c->name,
+            'count' => (int) $c->active_count,
+        ]);
+
+    return Inertia::render('welcome', [
+        'canRegister' => Features::enabled(Features::registration()),
+        'featuredProducts' => $featured,
+        'highlightCategories' => $highlightCategories,
+    ]);
+})->name('home');
+
+Route::get('customer/products', [CustomerProductController::class, 'index'])->name('customer.products.index');
+Route::get('customer/products/{product}', [CustomerProductController::class, 'show'])->name('customer.products.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -140,14 +183,13 @@ Route::middleware(['auth', 'verified', 'vendor'])->prefix('vendor')->name('vendo
 });
 
 Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('customer.')->group(function () {
-    Route::get('products', [CustomerProductController::class, 'index'])->name('products.index');
-    Route::get('products/{product}', [CustomerProductController::class, 'show'])->name('products.show');
+    Route::get('cart', [CartController::class, 'index'])->name('cart');
+    Route::post('cart/items', [CartController::class, 'store'])->name('cart.items.store');
+    Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
 
     Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
     Route::post('orders', [CustomerOrderController::class, 'store'])->name('orders.store');
     Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
-
-    Route::get('cart', fn () => redirect()->route('customer.products.index'))->name('cart');
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {

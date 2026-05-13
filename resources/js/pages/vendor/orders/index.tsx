@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -10,6 +10,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { route } from '@/lib/route';
+import { VENDOR_BADGE, VENDOR_CARD, VENDOR_H1, VENDOR_H3, VENDOR_H4, VENDOR_MUTED } from '@/lib/vendor-ui-styles';
+import { cn } from '@/lib/utils';
 
 type OrderItem = {
     product_name: string;
@@ -32,16 +34,16 @@ type Props = {
     };
 };
 
-function statusVariant(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
+function statusBadgeClass(status: string): string {
     switch (status) {
         case 'PAID':
-            return 'default';
+            return 'bg-[#0059DD] text-white';
         case 'PENDING':
-            return 'secondary';
+            return 'bg-neutral-200 text-black';
         case 'CANCELLED':
-            return 'destructive';
+            return 'bg-black text-white';
         default:
-            return 'outline';
+            return 'bg-neutral-100 text-[#747474]';
     }
 }
 
@@ -50,50 +52,58 @@ export default function VendorOrders({ orders }: Props) {
         <>
             <Head title="Commandes" />
 
-            <div className="space-y-8">
+            <div className="space-y-10">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Commandes</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Commandes passées sur votre boutique
-                    </p>
+                    <h1 className={VENDOR_H1}>Commandes</h1>
+                    <p className={cn(VENDOR_MUTED, 'mt-3 max-w-xl')}>Commandes passées sur votre boutique.</p>
                 </div>
 
-                <Card>
+                <Card className={VENDOR_CARD}>
                     <CardHeader>
-                        <CardTitle>Historique</CardTitle>
-                        <CardDescription>Produits vendus et statuts de paiement</CardDescription>
+                        <h3 className={VENDOR_H3}>Historique</h3>
+                        <CardDescription className={cn(VENDOR_MUTED, 'text-base')}>
+                            Produits vendus et statuts
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {orders.data.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">Aucune commande pour le moment.</p>
+                            <p className={VENDOR_MUTED}>Aucune commande pour le moment.</p>
                         ) : (
-                            <div className="rounded-md border">
+                            <div className="overflow-x-auto rounded-sm border border-neutral-200">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
-                                            <TableHead>#</TableHead>
-                                            <TableHead>Client</TableHead>
-                                            <TableHead className="text-right">Total</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Statut</TableHead>
-                                            <TableHead>Articles</TableHead>
+                                        <TableRow className="border-neutral-200 bg-neutral-50 hover:bg-neutral-50">
+                                            <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>#</TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Client</TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>Total</TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Date</TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Statut</TableHead>
+                                            <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Articles</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {orders.data.map((order) => (
-                                            <TableRow key={order.id}>
-                                                <TableCell className="font-medium">#{order.id}</TableCell>
-                                                <TableCell>{order.customer_name}</TableCell>
-                                                <TableCell className="text-right">
-                                                    €{order.total.toFixed(2)}
+                                            <TableRow key={order.id} className="border-neutral-100">
+                                                <TableCell className="font-poppins font-semibold text-black">#{order.id}</TableCell>
+                                                <TableCell className="font-poppins text-black">{order.customer_name}</TableCell>
+                                                <TableCell className="text-right font-poppins font-semibold text-black">
+                                                    €{Number(order.total).toFixed(2)}
                                                 </TableCell>
-                                                <TableCell className="text-muted-foreground text-sm">
+                                                <TableCell className={cn(VENDOR_MUTED, 'text-sm')}>
                                                     {new Date(order.created_at).toLocaleDateString('fr-FR')}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge variant={statusVariant(order.status)}>{order.status}</Badge>
+                                                    <Badge
+                                                        className={cn(
+                                                            VENDOR_BADGE,
+                                                            'px-3 py-1 font-poppins text-xs font-semibold',
+                                                            statusBadgeClass(order.status),
+                                                        )}
+                                                    >
+                                                        {order.status}
+                                                    </Badge>
                                                 </TableCell>
-                                                <TableCell className="max-w-xs text-sm text-muted-foreground">
+                                                <TableCell className="max-w-xs font-poppins text-sm font-normal text-[#747474]">
                                                     {order.items.map((i) => `${i.product_name} ×${i.quantity}`).join(', ')}
                                                 </TableCell>
                                             </TableRow>
@@ -105,9 +115,9 @@ export default function VendorOrders({ orders }: Props) {
                     </CardContent>
                 </Card>
 
-                <p className="text-sm text-muted-foreground">
-                    <Link href={route('vendor.dashboard')} className="underline">
-                        Retour au tableau de bord
+                <p className="font-poppins text-base font-normal">
+                    <Link href={route('vendor.dashboard')} className="font-semibold text-[#0059DD] hover:underline">
+                        ← Tableau de bord
                     </Link>
                 </p>
             </div>

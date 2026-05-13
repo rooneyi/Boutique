@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { AddToCartButton } from '@/components/storefront/add-to-cart-button';
 import { Star, ShoppingCart, Heart, Truck, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 import { route } from '@/lib/route';
@@ -60,11 +61,11 @@ export default function ProductDetail() {
                 <div className="border-b px-6 py-4 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
                         <Link href={route('customer.products.index')} className="hover:text-gray-900">
-                            All Products
+                            Produits
                         </Link>
                         <span>›</span>
                         <Link href={route('customer.products.index')} className="hover:text-gray-900">
-                            {category_name || 'Category'}
+                            {category_name || 'Catégorie'}
                         </Link>
                         <span>›</span>
                         <span className="text-gray-900 font-medium">{product.name}</span>
@@ -75,7 +76,7 @@ export default function ProductDetail() {
                     <div className="grid gap-12 md:grid-cols-2">
                         {/* Image Gallery */}
                         <div className="space-y-4">
-                            <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
+                            <div className="aspect-square overflow-hidden rounded-sm bg-gray-100">
                                 {product.image_path ? (
                                     <img
                                         src={product.image_path}
@@ -94,7 +95,7 @@ export default function ProductDetail() {
                                 {[...Array(4)].map((_, i) => (
                                     <button
                                         key={i}
-                                        className={`aspect-square overflow-hidden rounded-lg border-2 ${
+                                        className={`aspect-square overflow-hidden rounded-sm border-2 ${
                                             i === selectedColor ? 'border-black' : 'border-gray-200'
                                         }`}
                                     >
@@ -134,12 +135,12 @@ export default function ProductDetail() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                     <span className="text-4xl font-bold">
-                                        ${product.price.toFixed(2)}
+                                        €{product.price.toFixed(2)}
                                     </span>
                                     {product.original_price && (
                                         <>
                                             <span className="text-lg text-gray-400 line-through">
-                                                ${product.original_price.toFixed(2)}
+                                                €{Number(product.original_price).toFixed(2)}
                                             </span>
                                             <span className="text-lg font-semibold text-green-600">
                                                 {discount}% Off
@@ -180,7 +181,7 @@ export default function ProductDetail() {
                                         <button
                                             key={size}
                                             onClick={() => setSelectedSize(size)}
-                                            className={`px-4 py-2 border-2 rounded font-medium transition-all ${
+                                            className={`px-4 py-2 border-2 rounded-sm font-medium transition-all ${
                                                 selectedSize === size
                                                     ? 'border-black bg-black text-white'
                                                     : 'border-gray-300 text-gray-700 hover:border-gray-400'
@@ -198,7 +199,7 @@ export default function ProductDetail() {
                                 <div className="flex items-center gap-3 w-fit">
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                                        className="rounded-sm border border-gray-300 px-3 py-2 hover:bg-gray-50"
                                     >
                                         -
                                     </button>
@@ -206,12 +207,12 @@ export default function ProductDetail() {
                                         type="number"
                                         value={quantity}
                                         onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                        className="w-16 text-center border border-gray-300 rounded py-2"
+                                        className="w-16 rounded-sm border border-gray-300 py-2 text-center"
                                         min="1"
                                     />
                                     <button
                                         onClick={() => setQuantity(quantity + 1)}
-                                        className="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                                        className="rounded-sm border border-gray-300 px-3 py-2 hover:bg-gray-50"
                                     >
                                         +
                                     </button>
@@ -220,21 +221,14 @@ export default function ProductDetail() {
 
                             {/* Action Buttons */}
                             <div className="flex gap-3 pt-4">
-                                <Button
+                                <AddToCartButton
+                                    productId={product.id}
+                                    quantity={quantity}
+                                    disabled={product.stock <= 0}
+                                    className="flex-1 text-base"
                                     size="lg"
-                                    className="flex-1 bg-black hover:bg-gray-900 text-white font-semibold"
-                                    asChild
-                                >
-                                    <button>
-                                        <ShoppingCart className="mr-2 h-5 w-5" />
-                                        Add to Cart
-                                    </button>
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    className="px-6 border-gray-300"
-                                >
+                                />
+                                <Button size="lg" variant="outline" className="rounded-sm border-gray-300 px-6">
                                     <Heart className="h-5 w-5" />
                                 </Button>
                             </div>
@@ -266,12 +260,12 @@ export default function ProductDetail() {
 
                             {/* Stock Status */}
                             {product.stock > 0 ? (
-                                <Badge variant="outline" className="w-fit bg-green-50 border-green-200 text-green-700">
-                                    In Stock ({product.stock} items)
+                                <Badge variant="outline" className="w-fit rounded-sm border-green-200 bg-green-50 text-green-700">
+                                    En stock ({product.stock})
                                 </Badge>
                             ) : (
-                                <Badge variant="outline" className="w-fit bg-red-50 border-red-200 text-red-700">
-                                    Out of Stock
+                                <Badge variant="outline" className="w-fit rounded-sm border-red-200 bg-red-50 text-red-700">
+                                    Rupture de stock
                                 </Badge>
                             )}
                         </div>

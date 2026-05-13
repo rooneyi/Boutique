@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { FlashToaster } from '@/components/flash-toaster';
 import { Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
@@ -172,6 +173,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     {children}
                 </main>
             </div>
+            <FlashToaster />
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -10,6 +10,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { route } from '@/lib/route';
+import { VENDOR_BADGE, VENDOR_CARD, VENDOR_H1, VENDOR_H3, VENDOR_H4, VENDOR_MUTED } from '@/lib/vendor-ui-styles';
+import { cn } from '@/lib/utils';
 
 type OrderItem = {
     product_name: string;
@@ -24,6 +26,19 @@ type OrderRow = {
     created_at: string;
     items: OrderItem[];
 };
+
+function statusBadgeClass(status: string): string {
+    switch (status) {
+        case 'PAID':
+            return 'bg-[#0059DD] text-white';
+        case 'PENDING':
+            return 'bg-neutral-200 text-black';
+        case 'CANCELLED':
+            return 'bg-black text-white';
+        default:
+            return 'bg-neutral-100 text-[#747474]';
+    }
+}
 
 type Props = {
     customer: {
@@ -42,41 +57,43 @@ export default function VendorCustomerShow({ customer, orders }: Props) {
         <>
             <Head title={`Client · ${customer.name}`} />
 
-            <div className="space-y-8">
+            <div className="space-y-10">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{customer.name}</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">{customer.email}</p>
-                    <p className="mt-4 text-sm">
-                        <Link href={route('vendor.customers.index')} className="text-primary underline">
+                    <h1 className={VENDOR_H1}>{customer.name}</h1>
+                    <p className={cn(VENDOR_MUTED, 'mt-3 text-lg')}>{customer.email}</p>
+                    <p className="mt-4 font-poppins text-base font-normal">
+                        <Link href={route('vendor.customers.index')} className="font-semibold text-[#0059DD] hover:underline">
                             ← Tous les clients
                         </Link>
                     </p>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3">
-                    <Card>
+                    <Card className={VENDOR_CARD}>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium">Commandes</CardTitle>
+                            <h4 className={VENDOR_H4}>Commandes</h4>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold">{customer.orders_count}</p>
-                            <p className="text-xs text-muted-foreground">Fréquence (chez vous)</p>
+                            <p className="font-poppins text-3xl font-semibold text-black">{customer.orders_count}</p>
+                            <p className={cn(VENDOR_MUTED, 'mt-1 text-sm')}>Fréquence (chez vous)</p>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card className={VENDOR_CARD}>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium">Total dépensé</CardTitle>
+                            <h4 className={VENDOR_H4}>Total dépensé</h4>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold">€{Number(customer.total_spent).toFixed(2)}</p>
+                            <p className="font-poppins text-3xl font-semibold text-black">
+                                €{Number(customer.total_spent).toFixed(2)}
+                            </p>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card className={VENDOR_CARD}>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium">Dernière commande</CardTitle>
+                            <h4 className={VENDOR_H4}>Dernière commande</h4>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-lg font-semibold">
+                            <p className="font-poppins text-xl font-semibold text-black">
                                 {customer.last_order_at
                                     ? new Date(customer.last_order_at).toLocaleString('fr-FR')
                                     : '—'}
@@ -85,39 +102,51 @@ export default function VendorCustomerShow({ customer, orders }: Props) {
                     </Card>
                 </div>
 
-                <Card>
+                <Card className={VENDOR_CARD}>
                     <CardHeader>
-                        <CardTitle>Historique des commandes</CardTitle>
-                        <CardDescription>Produits, quantités et montants pour votre boutique</CardDescription>
+                        <h3 className={VENDOR_H3}>Historique des commandes</h3>
+                        <CardDescription className={cn(VENDOR_MUTED, 'text-base')}>
+                            Produits, quantités et montants pour votre boutique
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-8">
                         {orders.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">Aucune commande.</p>
+                            <p className={VENDOR_MUTED}>Aucune commande.</p>
                         ) : (
                             orders.map((order) => (
-                                <div key={order.id} className="rounded-lg border">
-                                    <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/30 px-4 py-3 text-sm">
-                                        <span className="font-medium">Commande #{order.id}</span>
-                                        <span className="text-muted-foreground">
+                                <div key={order.id} className="overflow-hidden rounded-sm border border-neutral-200">
+                                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 bg-neutral-50 px-4 py-3 font-poppins text-base">
+                                        <span className="font-semibold text-black">Commande #{order.id}</span>
+                                        <span className={VENDOR_MUTED}>
                                             {new Date(order.created_at).toLocaleString('fr-FR')}
                                         </span>
-                                        <Badge variant="secondary">{order.status}</Badge>
-                                        <span className="font-semibold">€{Number(order.total).toFixed(2)}</span>
+                                        <Badge
+                                            className={cn(
+                                                VENDOR_BADGE,
+                                                'px-3 py-1 font-poppins text-xs font-semibold',
+                                                statusBadgeClass(order.status),
+                                            )}
+                                        >
+                                            {order.status}
+                                        </Badge>
+                                        <span className="font-semibold text-black">€{Number(order.total).toFixed(2)}</span>
                                     </div>
                                     <Table>
                                         <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Produit</TableHead>
-                                                <TableHead className="text-right">Qté</TableHead>
-                                                <TableHead className="text-right">Sous-total</TableHead>
+                                            <TableRow className="bg-white hover:bg-white">
+                                                <TableHead className={cn(VENDOR_H4, 'text-[#747474]')}>Produit</TableHead>
+                                                <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>Qté</TableHead>
+                                                <TableHead className={cn(VENDOR_H4, 'text-right text-[#747474]')}>
+                                                    Sous-total
+                                                </TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {order.items.map((it, idx) => (
-                                                <TableRow key={`${order.id}-${idx}`}>
-                                                    <TableCell>{it.product_name}</TableCell>
-                                                    <TableCell className="text-right">{it.quantity}</TableCell>
-                                                    <TableCell className="text-right">
+                                                <TableRow key={`${order.id}-${idx}`} className="border-neutral-100">
+                                                    <TableCell className="font-poppins text-black">{it.product_name}</TableCell>
+                                                    <TableCell className="text-right font-poppins text-black">{it.quantity}</TableCell>
+                                                    <TableCell className="text-right font-poppins font-semibold text-black">
                                                         €{Number(it.line_total).toFixed(2)}
                                                     </TableCell>
                                                 </TableRow>
