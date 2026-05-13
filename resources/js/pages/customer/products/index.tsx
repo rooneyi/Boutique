@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/select';
 import { Search, ShoppingCart } from 'lucide-react';
 import { AddToCartButton } from '@/components/storefront/add-to-cart-button';
+import { FavoriteButton } from '@/components/storefront/favorite-button';
+import { StarRatingDisplay } from '@/components/storefront/star-rating-display';
 import { SF_CARD } from '@/lib/storefront-ui-styles';
 import { useState } from 'react';
 import { route } from '@/lib/route';
@@ -28,6 +30,9 @@ type Product = {
     vendor: {
         shop_name: string;
     };
+    rating_avg: number | null;
+    reviews_count: number;
+    is_favorite: boolean;
 };
 
 type PaginatedProducts = {
@@ -103,17 +108,24 @@ export default function BrowseProducts({ products }: Props) {
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {filtered.map((product) => (
                             <Card key={product.id} className={cn(SF_CARD, 'overflow-hidden')}>
-                                {product.image_path ? (
-                                    <img
-                                        src={product.image_path}
-                                        alt={product.name}
-                                        className="h-48 w-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="flex h-48 w-full items-center justify-center bg-muted">
-                                        <ShoppingCart className="h-8 w-8 text-muted-foreground" />
+                                <div className="relative">
+                                    {product.image_path ? (
+                                        <Link href={route('customer.products.show', product.id)} className="block">
+                                            <img
+                                                src={product.image_path}
+                                                alt={product.name}
+                                                className="h-48 w-full object-cover"
+                                            />
+                                        </Link>
+                                    ) : (
+                                        <div className="flex h-48 w-full items-center justify-center bg-muted">
+                                            <ShoppingCart className="h-8 w-8 text-muted-foreground" />
+                                        </div>
+                                    )}
+                                    <div className="absolute right-2 top-2 rounded-sm bg-white/90 shadow-sm">
+                                        <FavoriteButton productId={product.id} favorited={product.is_favorite} />
                                     </div>
-                                )}
+                                </div>
 
                                 <CardContent className="p-4">
                                     <div className="space-y-3">
@@ -122,6 +134,8 @@ export default function BrowseProducts({ products }: Props) {
                                         </p>
 
                                         <h3 className="line-clamp-2 font-semibold leading-tight">{product.name}</h3>
+
+                                        <StarRatingDisplay value={product.rating_avg} count={product.reviews_count} />
 
                                         <p className="line-clamp-2 text-sm text-muted-foreground">
                                             {product.description}

@@ -10,7 +10,7 @@ import {
     DropdownMenuTrigger,
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, Store, ShoppingBag, ChevronDown, ShoppingCart } from 'lucide-react';
+import { LogOut, Store, ShoppingBag, ChevronDown, ShoppingCart, Heart } from 'lucide-react';
 import { route } from '@/lib/route';
 import { SF_BRAND, SF_BRAND_SHORT, SF_NAV_LINK } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
@@ -26,8 +26,9 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
     const page = usePage<{
         auth: { user?: AuthUser | null };
         cartCount?: number;
+        favoritesCount?: number;
     }>();
-    const { auth, cartCount = 0 } = page.props;
+    const { auth, cartCount = 0, favoritesCount = 0 } = page.props;
     const user = auth?.user;
     const isCustomer = user?.role === 'CUSTOMER';
 
@@ -54,6 +55,15 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                         </Link>
                         {isCustomer && (
                             <>
+                                <Link href={route('customer.favorites.index')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
+                                    <Heart className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
+                                    Favoris
+                                    {favoritesCount > 0 && (
+                                        <Badge className="rounded-sm border-0 bg-[#0059DD] px-2 py-0 text-xs font-semibold text-white">
+                                            {favoritesCount}
+                                        </Badge>
+                                    )}
+                                </Link>
                                 <Link href={route('customer.cart')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
                                     <ShoppingCart className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
                                     Panier

@@ -1,6 +1,8 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { AddToCartButton } from '@/components/storefront/add-to-cart-button';
+import { FavoriteButton } from '@/components/storefront/favorite-button';
+import { StarRatingDisplay } from '@/components/storefront/star-rating-display';
 import {
     ArrowRight,
     Footprints,
@@ -38,6 +40,9 @@ type FeaturedProduct = {
     image_path: string | null;
     vendor_shop: string;
     category: string;
+    rating_avg: number | null;
+    reviews_count: number;
+    is_favorite: boolean;
 };
 
 type HighlightCategory = {
@@ -107,7 +112,10 @@ export default function Welcome() {
 
                         <div className="flex items-center gap-2 sm:gap-4">
                             <Button type="button" variant="ghost" size="icon" className="hidden rounded-sm md:inline-flex" asChild>
-                                <Link href={route('customer.products.index')} aria-label="Favoris">
+                                <Link
+                                    href={user?.role === 'CUSTOMER' ? route('customer.favorites.index') : route('login')}
+                                    aria-label="Mes favoris"
+                                >
                                     <Heart className="h-5 w-5" />
                                 </Link>
                             </Button>
@@ -162,6 +170,9 @@ export default function Welcome() {
                                 </Link>
                                 {user?.role === 'CUSTOMER' && (
                                     <>
+                                        <Link href={route('customer.favorites.index')} className={cn(SF_NAV_LINK, 'py-2')} onClick={closeMobile}>
+                                            Mes favoris
+                                        </Link>
                                         <Link href={route('customer.cart')} className={cn(SF_NAV_LINK, 'py-2')} onClick={closeMobile}>
                                             Panier
                                         </Link>
@@ -282,20 +293,26 @@ export default function Welcome() {
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                                 {featuredProducts.map((product) => (
                                     <div key={product.id} className={cn(SF_CARD, 'overflow-hidden')}>
-                                        <Link href={route('customer.products.show', product.id)} className="block aspect-square bg-neutral-100">
-                                            {product.image_path ? (
-                                                <img src={product.image_path} alt="" className="h-full w-full object-cover" />
-                                            ) : (
-                                                <div className="flex h-full items-center justify-center">
-                                                    <ShoppingCart className="h-14 w-14 text-neutral-300" />
-                                                </div>
-                                            )}
-                                        </Link>
+                                        <div className="relative aspect-square bg-neutral-100">
+                                            <Link href={route('customer.products.show', product.id)} className="block h-full">
+                                                {product.image_path ? (
+                                                    <img src={product.image_path} alt="" className="h-full w-full object-cover" />
+                                                ) : (
+                                                    <div className="flex h-full items-center justify-center">
+                                                        <ShoppingCart className="h-14 w-14 text-neutral-300" />
+                                                    </div>
+                                                )}
+                                            </Link>
+                                            <div className="absolute right-2 top-2 rounded-sm bg-white/90 shadow-sm">
+                                                <FavoriteButton productId={product.id} favorited={product.is_favorite} />
+                                            </div>
+                                        </div>
                                         <div className="space-y-3 p-4">
                                             <p className="text-xs font-medium uppercase tracking-wide text-[#747474]">{product.vendor_shop}</p>
                                             <Link href={route('customer.products.show', product.id)}>
                                                 <h3 className="line-clamp-2 font-semibold text-black hover:text-[#0059DD]">{product.name}</h3>
                                             </Link>
+                                            <StarRatingDisplay value={product.rating_avg} count={product.reviews_count} />
                                             <p className="text-lg font-semibold text-black">€{product.price.toFixed(2)}</p>
                                             <AddToCartButton productId={product.id} className="w-full justify-center text-base" />
                                         </div>

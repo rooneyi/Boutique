@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductReview;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Services\OrderService;
@@ -172,5 +173,24 @@ class DatabaseSeeder extends Seeder
             'total' => 2 * (float) $pLucasTee->price,
             'status' => 'PAID',
         ]));
+
+        ProductReview::query()->updateOrCreate(
+            ['customer_id' => $sophie->id, 'product_id' => $pEmmaRobe->id],
+            ['rating' => 5, 'comment' => 'Qualité au rendez-vous, coupe parfaite.'],
+        );
+        ProductReview::query()->updateOrCreate(
+            ['customer_id' => $marc->id, 'product_id' => $pEmmaRobe->id],
+            ['rating' => 4, 'comment' => 'Très jolie robe, livraison rapide.'],
+        );
+        ProductReview::query()->updateOrCreate(
+            ['customer_id' => $lea->id, 'product_id' => $pLucasSneakers->id],
+            ['rating' => 5, 'comment' => 'Confortables au quotidien.'],
+        );
+
+        $sophie->favoriteProducts()->syncWithoutDetaching([
+            $pEmmaRobe->id,
+            $pLucasSneakers->id,
+        ]);
+        $marc->favoriteProducts()->syncWithoutDetaching([$pLucasTee->id]);
     }
 }

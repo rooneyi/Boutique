@@ -3,8 +3,10 @@
 use App\Data\CustomerRegisterData;
 use App\Data\VendorRegisterData;
 use App\Http\Controllers\Customer\CartController;
+use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
+use App\Http\Controllers\Customer\ProductReviewController;
 use App\Http\Controllers\Vendor\CustomerController as VendorCustomerController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController as VendorProductController;
@@ -21,13 +23,20 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 Route::get('/', function () {
+    $favoriteIdSet = [];
+    if (auth()->check() && auth()->user()->role === 'CUSTOMER' && auth()->user()->customer) {
+        $favoriteIdSet = auth()->user()->customer->favoriteProducts()->pluck('products.id')->flip()->all();
+    }
+
     $featured = Product::query()
         ->where('status', '!=', 'DISCONTINUED')
         ->with(['category', 'vendor'])
+        ->withAvg('reviews', 'rating')
+        ->withCount('reviews')
         ->latest()
         ->limit(4)
         ->get()
-        ->map(function (Product $p) {
+        ->map(function (Product $p) use ($favoriteIdSet) {
             return [
                 'id' => $p->id,
                 'name' => $p->name,
@@ -37,6 +46,9 @@ Route::get('/', function () {
                     : null,
                 'vendor_shop' => $p->vendor->shop_name,
                 'category' => $p->category?->name ?? '',
+                'rating_avg' => $p->reviews_avg_rating !== null ? round((float) $p->reviews_avg_rating, 1) : null,
+                'reviews_count' => (int) ($p->reviews_count ?? 0),
+                'is_favorite' => isset($favoriteIdSet[$p->id]),
             ];
         });
 
@@ -186,6 +198,12 @@ Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('c
     Route::get('cart', [CartController::class, 'index'])->name('cart');
     Route::post('cart/items', [CartController::class, 'store'])->name('cart.items.store');
     Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+
+    Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('favorites/{product}', [FavoriteController::class, 'store'])->name('favorites.store');
+    Route::delete('favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+
+    Route::post('products/{product}/reviews', [ProductReviewController::class, 'store'])->name('products.reviews.store');
 
     Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
     Route::post('orders', [CustomerOrderController::class, 'store'])->name('orders.store');

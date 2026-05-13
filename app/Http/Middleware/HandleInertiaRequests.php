@@ -45,6 +45,9 @@ class HandleInertiaRequests extends Middleware
             'cartCount' => $request->user()?->role === 'CUSTOMER'
                 ? app(CartService::class)->count()
                 : 0,
+            'favoritesCount' => $request->user()?->role === 'CUSTOMER'
+                ? (int) $request->user()->customer->favoriteProducts()->count()
+                : 0,
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),

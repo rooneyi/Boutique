@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['vendor_id', 'category_id', 'name', 'description', 'price', 'stock', 'status', 'image'])]
@@ -36,10 +37,20 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
+    /** Clients qui ont mis ce produit en favori */
+    public function favoritingCustomers(): BelongsToMany
+    {
+        return $this->belongsToMany(Customer::class, 'product_favorites')->withTimestamps();
+    }
+
     /** Alias pour les vues (stock) */
     public function getQuantityAttribute(): int
     {
         return (int) $this->stock;
     }
 }
-
