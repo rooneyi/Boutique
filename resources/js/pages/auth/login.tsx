@@ -1,21 +1,24 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
+import GoogleIcon from '@/components/icons/google-icon';
 import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import { cn } from '@/lib/utils';
 
 type Props = {
     status?: string;
     canResetPassword: boolean;
     canRegister: boolean;
 };
+
+const inputClassName =
+    'h-12 rounded-xl border-neutral-300 bg-white px-4 text-base text-black placeholder:text-neutral-400 focus-visible:border-black focus-visible:ring-black/20';
+
+const linkClassName = 'text-sm font-normal text-[#e53935] no-underline hover:text-[#c62828]';
 
 export default function Login({
     status,
@@ -24,98 +27,127 @@ export default function Login({
 }: Props) {
     return (
         <>
-            <Head title="Log in" />
+            <Head title="Connexion" />
 
-            <Form
-                {...store.form()}
-                resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
-            >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+            <div className="space-y-8">
+                <div className="space-y-2 text-center lg:text-left">
+                    <h1 className="text-2xl font-bold tracking-tight text-black sm:text-3xl">
+                        Connecte-toi à ton style
+                    </h1>
+                    <p className="text-sm text-neutral-600 sm:text-base">
+                        Bienvenue chez POSE COMME JAMAIS
+                    </p>
+                </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            Forgot password?
-                                        </TextLink>
-                                    )}
+                {status && (
+                    <div className="text-center text-sm font-medium text-green-600">
+                        {status}
+                    </div>
+                )}
+
+                <Form
+                    {...store.form()}
+                    resetOnSuccess={['password']}
+                    className="space-y-5"
+                >
+                    {({ processing, errors }) => (
+                        <>
+                            <div className="space-y-4">
+                                <div className="space-y-1">
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        required
+                                        autoFocus
+                                        tabIndex={1}
+                                        autoComplete="email"
+                                        placeholder="Email"
+                                        className={inputClassName}
+                                    />
+                                    <InputError message={errors.email} />
                                 </div>
-                                <PasswordInput
-                                    id="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
+
+                                <div className="space-y-1">
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="current-password"
+                                        placeholder="mot de passe"
+                                        className={inputClassName}
+                                    />
+                                    {canResetPassword && (
+                                        <div className="flex justify-end pt-1">
+                                            <TextLink
+                                                href={request()}
+                                                className={linkClassName}
+                                                tabIndex={5}
+                                            >
+                                                Mot de passe oublié ?
+                                            </TextLink>
+                                        </div>
+                                    )}
+                                    <InputError message={errors.password} />
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    className="h-12 w-full rounded-xl bg-black text-sm font-semibold tracking-wide text-white uppercase hover:bg-neutral-800"
+                                    tabIndex={3}
+                                    disabled={processing}
+                                    data-test="login-button"
+                                >
+                                    {processing && <Spinner />}
+                                    SE CONNECTER
+                                </Button>
                             </div>
 
-                            <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
+                            <div className="flex items-center gap-3">
+                                <div className="h-px flex-1 bg-neutral-200" />
+                                <span className="text-sm text-neutral-400">
+                                    — ou —
+                                </span>
+                                <div className="h-px flex-1 bg-neutral-200" />
                             </div>
 
                             <Button
-                                type="submit"
-                                className="mt-4 w-full"
+                                type="button"
+                                variant="outline"
+                                className="h-12 w-full rounded-xl border-neutral-300 bg-white text-sm font-normal text-black normal-case hover:bg-neutral-50"
                                 tabIndex={4}
-                                disabled={processing}
-                                data-test="login-button"
                             >
-                                {processing && <Spinner />}
-                                Log in
+                                <span className="flex-1 text-center lowercase">
+                                    se connecter avec google
+                                </span>
+                                <GoogleIcon className="size-5 shrink-0" />
                             </Button>
-                        </div>
 
-                        {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
-                                </TextLink>
-                            </div>
-                        )}
-                    </>
-                )}
-            </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+                            {canRegister && (
+                                <p className="text-center text-sm text-neutral-600">
+                                    vous n&apos;avez pas de compte ?{' '}
+                                    <Link
+                                        href={route('auth.customer.register')}
+                                        className={cn(
+                                            linkClassName,
+                                            'font-semibold',
+                                        )}
+                                        tabIndex={6}
+                                    >
+                                        Inscrivez-vous
+                                    </Link>
+                                </p>
+                            )}
+                        </>
+                    )}
+                </Form>
+            </div>
         </>
     );
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    variant: 'split',
 };
