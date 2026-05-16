@@ -6,17 +6,24 @@ import { cn } from '@/lib/utils';
 type Props = {
     line: CartLine;
     busy: boolean;
+    showRemove: boolean;
     onQuantityChange: (quantity: number) => void;
     onRemove: () => void;
 };
 
-export function CartDrawerLine({ line, busy, onQuantityChange, onRemove }: Props) {
+export function CartDrawerLine({
+    line,
+    busy,
+    showRemove,
+    onQuantityChange,
+    onRemove,
+}: Props) {
     const atMin = line.quantity <= 1;
     const atMax = line.quantity >= line.stock;
 
     return (
-        <article className="relative flex flex-col gap-5 border-b border-[#e8e8e8] py-8 last:border-b-0 sm:flex-row">
-            <div className="mx-auto h-[140px] w-full max-w-[170px] shrink-0 overflow-hidden rounded-[10px] bg-neutral-100 sm:mx-0 sm:h-[186px] sm:w-[170px]">
+        <article className="relative flex gap-2.5">
+            <div className="h-[186px] w-[170px] shrink-0 overflow-hidden rounded-[10px] bg-neutral-100">
                 {line.image_path ? (
                     <img
                         src={line.image_path}
@@ -30,63 +37,71 @@ export function CartDrawerLine({ line, busy, onQuantityChange, onRemove }: Props
                 )}
             </div>
 
-            <div className="min-w-0 flex-1 pt-1">
-                <h3 className="font-poppins pr-10 text-[28px] font-bold leading-tight text-black">
-                    {line.name}
-                </h3>
-                <p className="font-poppins mt-3 text-xl text-[#737373]">Couleur : Noir</p>
-                <p className="font-poppins text-xl text-[#737373]">Taille : M</p>
-
-                <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-                    <div
-                        className={cn(
-                            'inline-flex h-10 items-center gap-4 rounded-full border border-[#d9d9d9] px-4',
-                            busy && 'pointer-events-none opacity-60',
-                        )}
+            <div className="relative min-w-0 flex-1">
+                {showRemove && (
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-0.5 size-[30px] text-[#737373] hover:bg-neutral-100 hover:text-black"
+                        disabled={busy}
+                        onClick={onRemove}
+                        aria-label="Retirer du panier"
                     >
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="size-7 rounded-full text-black hover:bg-neutral-100"
-                            disabled={busy || atMin}
-                            onClick={() => onQuantityChange(line.quantity - 1)}
-                            aria-label="Diminuer la quantité"
-                        >
-                            <Minus className="size-4" />
-                        </Button>
-                        <span className="font-poppins min-w-[1.5rem] text-center text-lg font-semibold text-black">
-                            {line.quantity}
-                        </span>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="size-7 rounded-full text-black hover:bg-neutral-100"
-                            disabled={busy || atMax}
-                            onClick={() => onQuantityChange(line.quantity + 1)}
-                            aria-label="Augmenter la quantité"
-                        >
-                            <Plus className="size-4" />
-                        </Button>
-                    </div>
-                    <p className="font-poppins text-[28px] font-bold text-black">
-                        {line.line_total.toFixed(2)} $
+                        <Trash2 className="size-6" strokeWidth={1.25} />
+                    </Button>
+                )}
+
+                <div className="flex flex-col gap-2.5 pr-10">
+                    <h3 className="font-poppins text-[28px] font-bold leading-normal text-black">
+                        {line.name}
+                    </h3>
+                    <p className="font-poppins text-xl font-medium text-[#737373]">
+                        Couleur : Noir
                     </p>
+                    <p className="font-poppins text-xl font-medium text-[#737373]">
+                        Taille : M
+                    </p>
+
+                    <div className="mt-1 flex items-center justify-between gap-4">
+                        <div
+                            className={cn(
+                                'inline-flex items-center gap-10 rounded-[25px] border border-[rgba(91,94,100,0.62)] px-2 py-1',
+                                busy && 'pointer-events-none opacity-60',
+                            )}
+                        >
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="size-9 rounded-full text-black hover:bg-neutral-100"
+                                disabled={busy || atMin}
+                                onClick={() => onQuantityChange(line.quantity - 1)}
+                                aria-label="Diminuer la quantité"
+                            >
+                                <Minus className="size-5" />
+                            </Button>
+                            <span className="font-poppins min-w-[1.25rem] text-center text-2xl font-normal leading-[1.24] text-black">
+                                {line.quantity}
+                            </span>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="size-9 rounded-full text-black hover:bg-neutral-100"
+                                disabled={busy || atMax}
+                                onClick={() => onQuantityChange(line.quantity + 1)}
+                                aria-label="Augmenter la quantité"
+                            >
+                                <Plus className="size-5" />
+                            </Button>
+                        </div>
+                        <p className="font-poppins shrink-0 text-2xl font-medium text-black">
+                            {line.line_total.toFixed(2)} $
+                        </p>
+                    </div>
                 </div>
             </div>
-
-            <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute top-6 right-0 size-10 text-[#737373] hover:bg-neutral-100 hover:text-black"
-                disabled={busy}
-                onClick={onRemove}
-                aria-label="Retirer du panier"
-            >
-                <Trash2 className="size-6" strokeWidth={1.25} />
-            </Button>
         </article>
     );
 }

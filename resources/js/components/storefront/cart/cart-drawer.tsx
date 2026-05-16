@@ -12,7 +12,6 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { route } from '@/lib/route';
-import { SF_PILL_BTN_DARK } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 import { destroy as deleteCartItem, update as patchCartItem } from '@/routes/customer/cart/items';
 
@@ -20,12 +19,13 @@ export function CartDrawer() {
     const { open, closeCart, lines, total, loading, refresh } = useCartDrawer();
     const [busyProductId, setBusyProductId] = useState<number | null>(null);
 
-    function mutate(
-        productId: number,
-        request: () => void,
-    ) {
+    function mutate(productId: number, request: () => void) {
         setBusyProductId(productId);
         request();
+    }
+
+    function syncCartCount() {
+        router.reload({ only: ['cartCount'] });
     }
 
     function setQuantity(productId: number, quantity: number) {
@@ -66,31 +66,27 @@ export function CartDrawer() {
 
     const isEmpty = !loading && lines.length === 0;
 
-    function syncCartCount() {
-        router.reload({ only: ['cartCount'] });
-    }
-
     return (
         <Sheet open={open} onOpenChange={(next) => !next && closeCart()}>
             <SheetContent
                 side="right"
                 showCloseButton={false}
-                className="flex w-full max-w-[min(791px,100vw)] flex-col gap-0 border-0 bg-white p-0 sm:max-w-[min(791px,100vw)]"
-                overlayClassName="bg-black/60 backdrop-blur-sm"
+                className="flex h-full w-full max-w-[791px] flex-col gap-9 border-0 bg-white p-0 sm:max-w-[791px]"
+                overlayClassName="bg-black/60 backdrop-blur-[2px]"
             >
-                <div className="flex items-start justify-between border-b border-[#e8e8e8] px-8 py-8 sm:px-12">
-                    <SheetTitle className="font-poppins text-[40px] font-bold leading-none text-black">
+                <div className="relative shrink-0 px-5 pt-10">
+                    <SheetTitle className="font-poppins text-[36px] font-semibold leading-normal text-black">
                         Mon panier
                     </SheetTitle>
                     <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="size-10 rounded-full text-black hover:bg-neutral-100"
+                        className="absolute top-[52px] right-[30px] size-10 rounded-full text-black hover:bg-neutral-100"
                         onClick={closeCart}
                         aria-label="Fermer le panier"
                     >
-                        <X className="size-8" strokeWidth={1.25} />
+                        <X className="size-10" strokeWidth={1.25} />
                     </Button>
                 </div>
 
@@ -98,62 +94,63 @@ export function CartDrawer() {
                     Articles ajoutés à votre panier
                 </SheetDescription>
 
-                <div className="flex-1 overflow-y-auto px-8 sm:px-12">
-                    {loading && lines.length === 0 ? (
-                        <div className="flex items-center justify-center py-24 text-[#737373]">
-                            <Loader2 className="size-8 animate-spin" aria-hidden />
-                            <span className="sr-only">Chargement du panier</span>
-                        </div>
-                    ) : isEmpty ? (
-                        <div className="py-24 text-center">
-                            <p className="font-poppins text-xl text-[#737373]">
-                                Votre panier est vide.
-                            </p>
-                            <Link
-                                href={route('customer.products.index')}
-                                className="font-poppins mt-4 inline-block text-lg font-semibold text-[#0059DD] hover:underline"
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6">
+                    <div className="min-h-0 flex-1 overflow-y-auto p-2.5">
+                        {loading && lines.length === 0 ? (
+                            <div className="flex items-center justify-center py-24 text-[#737373]">
+                                <Loader2 className="size-8 animate-spin" aria-hidden />
+                                <span className="sr-only">Chargement du panier</span>
+                            </div>
+                        ) : isEmpty ? (
+                            <div className="py-24 text-center">
+                                <p className="font-poppins text-xl font-medium text-[#737373]">
+                                    Votre panier est vide.
+                                </p>
+                                <Link
+                                    href={route('customer.products.index')}
+                                    className="font-poppins mt-4 inline-block text-lg font-semibold text-[#0059DD] hover:underline"
+                                    onClick={closeCart}
+                                >
+                                    Parcourir la collection
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-5">
+                                {lines.map((line, index) => (
+                                    <CartDrawerLine
+                                        key={line.product_id}
+                                        line={line}
+                                        busy={busyProductId === line.product_id}
+                                        showRemove={lines.length === 1 || index > 0}
+                                        onQuantityChange={(quantity) =>
+                                            setQuantity(line.product_id, quantity)
+                                        }
+                                        onRemove={() => removeLine(line.product_id)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {!isEmpty && lines.length > 0 && (
+                        <footer className="shrink-0 bg-white px-[15px] pt-2.5 pb-6 shadow-[0_-0.1px_2px_rgba(0,0,0,0.2)]">
+                            <div className="font-poppins flex items-center justify-between text-[28px] font-semibold leading-normal">
+                                <span className="text-black">Total :</span>
+                                <span className="text-[#0059DD]">{total.toFixed(2)}$</span>
+                            </div>
+                            <Button
+                                type="button"
+                                className={cn(
+                                    'font-poppins mt-2.5 h-auto w-full rounded-[27px] border border-black bg-black py-[18px] text-base font-semibold uppercase text-white hover:bg-neutral-800',
+                                )}
                                 onClick={closeCart}
+                                asChild
                             >
-                                Parcourir la collection
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="pb-4">
-                            {lines.map((line) => (
-                                <CartDrawerLine
-                                    key={line.product_id}
-                                    line={line}
-                                    busy={busyProductId === line.product_id}
-                                    onQuantityChange={(quantity) =>
-                                        setQuantity(line.product_id, quantity)
-                                    }
-                                    onRemove={() => removeLine(line.product_id)}
-                                />
-                            ))}
-                        </div>
+                                <Link href={route('customer.cart')}>PASSER COMMANDE</Link>
+                            </Button>
+                        </footer>
                     )}
                 </div>
-
-                {!isEmpty && lines.length > 0 && (
-                    <footer className="border-t border-[#e8e8e8] px-8 py-8 sm:px-12">
-                        <div className="flex flex-wrap items-end justify-between gap-6">
-                            <p className="font-poppins text-[32px] font-semibold text-black">
-                                Total :
-                            </p>
-                            <p className="font-poppins text-[40px] font-bold text-[#0059DD]">
-                                {total.toFixed(2)} $
-                            </p>
-                        </div>
-                        <Button
-                            type="button"
-                            className={cn(SF_PILL_BTN_DARK, 'mt-8 h-14 w-full text-base uppercase tracking-wide')}
-                            onClick={closeCart}
-                            asChild
-                        >
-                            <Link href={route('customer.cart')}>Passer commande</Link>
-                        </Button>
-                    </footer>
-                )}
             </SheetContent>
         </Sheet>
     );
