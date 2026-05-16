@@ -20,19 +20,26 @@ type AuthUser = {
     role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
 };
 
+type ActiveNav = 'home' | 'collection';
+
 type Props = {
     user?: AuthUser | null;
     canRegister: boolean;
+    activeNav?: ActiveNav;
 };
 
-const NAV = [
-    { label: 'Accueil', href: route('home'), active: true },
-    { label: 'Collection', href: route('customer.products.index'), active: false },
-    { label: 'A Propos', href: '#pourquoi-nous', active: false },
-    { label: 'Contact', href: 'mailto:kambmusene@gmail.com', active: false },
-] as const;
+const NAV_ITEMS = [
+    { key: 'home' as const, label: 'Accueil', href: route('home') },
+    {
+        key: 'collection' as const,
+        label: 'Collection',
+        href: route('customer.products.index'),
+    },
+    { key: 'about' as const, label: 'A Propos', href: `${route('home')}#pourquoi-nous` },
+    { key: 'contact' as const, label: 'Contact', href: 'mailto:kambmusene@gmail.com' },
+];
 
-export function HomeHeader({ user, canRegister }: Props) {
+export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const accountHref =
@@ -92,20 +99,23 @@ export function HomeHeader({ user, canRegister }: Props) {
                     </Link>
 
                     <nav className="hidden items-center gap-1 lg:flex">
-                        {NAV.map((item) => (
-                            <Link
-                                key={item.label}
-                                href={item.href}
-                                className={
-                                    item.active ? SF_NAV_ITEM_ACTIVE : SF_NAV_ITEM
-                                }
-                            >
-                                {item.label}
-                                {item.active && (
-                                    <span className="mt-0.5 size-1.5 rounded-full bg-[#0059DD]" />
-                                )}
-                            </Link>
-                        ))}
+                        {NAV_ITEMS.map((item) => {
+                            const isActive = item.key === activeNav;
+                            return (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    className={
+                                        isActive ? SF_NAV_ITEM_ACTIVE : SF_NAV_ITEM
+                                    }
+                                >
+                                    {item.label}
+                                    {isActive && (
+                                        <span className="mt-0.5 size-1.5 rounded-full bg-[#0059DD]" />
+                                    )}
+                                </Link>
+                            );
+                        })}
                     </nav>
 
                     <div className="flex items-center gap-3 sm:gap-4">
@@ -174,19 +184,22 @@ export function HomeHeader({ user, canRegister }: Props) {
 
                 {mobileOpen && (
                     <nav className="border-t border-neutral-100 bg-white px-4 py-4 lg:hidden">
-                        {NAV.map((item) => (
-                            <Link
-                                key={item.label}
-                                href={item.href}
-                                className={cn(
-                                    'font-poppins block py-2 text-base',
-                                    item.active && 'font-semibold text-[#0059DD]',
-                                )}
-                                onClick={() => setMobileOpen(false)}
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
+                        {NAV_ITEMS.map((item) => {
+                            const isActive = item.key === activeNav;
+                            return (
+                                <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    className={cn(
+                                        'font-poppins block py-2 text-base',
+                                        isActive && 'font-semibold text-[#0059DD]',
+                                    )}
+                                    onClick={() => setMobileOpen(false)}
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
                         <Link
                             href={accountHref}
                             className="font-poppins mt-2 block py-2 text-base"

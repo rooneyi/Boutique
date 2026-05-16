@@ -1,35 +1,19 @@
-import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Search, ShoppingCart } from 'lucide-react';
-import { AddToCartButton } from '@/components/storefront/add-to-cart-button';
-import { FavoriteButton } from '@/components/storefront/favorite-button';
-import { StarRatingDisplay } from '@/components/storefront/star-rating-display';
-import { SF_CARD } from '@/lib/storefront-ui-styles';
-import { useState } from 'react';
-import { route } from '@/lib/route';
-import { cn } from '@/lib/utils';
+import { Head, usePage } from '@inertiajs/react';
+import { FlashToaster } from '@/components/flash-toaster';
+import { CollectionFilters } from '@/components/storefront/collection/collection-filters';
+import { CollectionHero } from '@/components/storefront/collection/collection-hero';
+import { CollectionPagination } from '@/components/storefront/collection/collection-pagination';
+import { CollectionToolbar } from '@/components/storefront/collection/collection-toolbar';
+import { HomeProductShowcaseCard } from '@/components/storefront/home/home-product-showcase-card';
+import { HomeCurated } from '@/components/storefront/home/home-curated';
+import { HomeFooter } from '@/components/storefront/home/home-footer';
+import { HomeHeader } from '@/components/storefront/home/home-header';
 
 type Product = {
     id: number;
     name: string;
-    description: string;
     price: number;
-    quantity: number;
-    category: string;
-    image_path?: string;
-    vendor: {
-        shop_name: string;
-    };
+    image_path: string | null;
     rating_avg: number | null;
     reviews_count: number;
     is_favorite: boolean;
@@ -41,171 +25,89 @@ type PaginatedProducts = {
     meta?: { current_page: number; last_page: number; total: number };
 };
 
-type Props = {
-    products: PaginatedProducts;
+type CategoryFilter = {
+    name: string;
+    count: number;
 };
 
-export default function BrowseProducts({ products }: Props) {
-    const [search, setSearch] = useState('');
-    const [category, setCategory] = useState('all');
+type Filters = {
+    category: string;
+    sort: string;
+    min_price: number;
+    max_price: number;
+};
 
+type AuthUser = {
+    id: number;
+    role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
+};
+
+type PageProps = {
+    products: PaginatedProducts;
+    categories: CategoryFilter[];
+    totalProducts: number;
+    filters: Filters;
+    canRegister: boolean;
+    auth?: { user?: AuthUser | null };
+};
+
+export default function BrowseProducts() {
+    const { auth, canRegister, products, categories, totalProducts, filters } =
+        usePage<PageProps>().props;
     const items = products.data ?? [];
-
-    const filtered = items.filter((p) => {
-        const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = category === 'all' || p.category === category;
-        return matchesSearch && matchesCategory;
-    });
-
-    const categories = [...new Set(items.map((p) => p.category))].filter(Boolean);
 
     return (
         <>
-            <Head title="Parcourir les Produits" />
+            <Head title="Collection · PCJ" />
 
-            <div className="space-y-8">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Nos Produits</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        Découvrez notre sélection de vêtements
-                    </p>
-                </div>
+            <div className="min-h-screen bg-white font-poppins text-black antialiased">
+                <HomeHeader
+                    user={auth?.user}
+                    canRegister={canRegister}
+                    activeNav="collection"
+                />
 
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                            placeholder="Chercher un produit..."
-                            className="pl-9"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
+                <main>
+                    <CollectionHero />
+                    <CollectionToolbar filters={filters} />
 
-                    <Select value={category} onValueChange={setCategory}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Catégorie" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Toutes les catégories</SelectItem>
-                            {categories.map((cat) => (
-                                <SelectItem key={cat} value={cat}>
-                                    {cat}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <section className="px-4 pb-16 sm:px-8 lg:px-7">
+                        <div className="mx-auto flex max-w-[1440px] flex-col gap-8 lg:flex-row lg:gap-3">
+                            <CollectionFilters
+                                categories={categories}
+                                totalProducts={totalProducts}
+                                filters={filters}
+                            />
 
-                    <div className="flex items-center gap-2">
-                        <Badge variant="secondary">
-                            {filtered.length} affiché{filtered.length > 1 ? 's' : ''}
-                            {products.meta?.total != null ? ` / ${products.meta.total} au total` : ''}
-                        </Badge>
-                    </div>
-                </div>
-
-                {filtered.length > 0 ? (
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {filtered.map((product) => (
-                            <Card key={product.id} className={cn(SF_CARD, 'overflow-hidden')}>
-                                <div className="relative">
-                                    {product.image_path ? (
-                                        <Link href={route('customer.products.show', product.id)} className="block">
-                                            <img
-                                                src={product.image_path}
-                                                alt={product.name}
-                                                className="h-48 w-full object-cover"
+                            <div className="min-w-0 flex-1">
+                                {items.length > 0 ? (
+                                    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                                        {items.map((product) => (
+                                            <HomeProductShowcaseCard
+                                                key={product.id}
+                                                product={product}
                                             />
-                                        </Link>
-                                    ) : (
-                                        <div className="flex h-48 w-full items-center justify-center bg-muted">
-                                            <ShoppingCart className="h-8 w-8 text-muted-foreground" />
-                                        </div>
-                                    )}
-                                    <div className="absolute right-2 top-2 rounded-sm bg-white/90 shadow-sm">
-                                        <FavoriteButton productId={product.id} favorited={product.is_favorite} />
+                                        ))}
                                     </div>
-                                </div>
+                                ) : (
+                                    <p className="py-16 text-center font-poppins text-lg text-[#747474]">
+                                        Aucun produit ne correspond à vos filtres.
+                                    </p>
+                                )}
 
-                                <CardContent className="p-4">
-                                    <div className="space-y-3">
-                                        <p className="text-xs font-medium text-muted-foreground">
-                                            {product.vendor?.shop_name}
-                                        </p>
+                                <CollectionPagination
+                                    links={products.links}
+                                    meta={products.meta}
+                                />
+                            </div>
+                        </div>
+                    </section>
 
-                                        <h3 className="line-clamp-2 font-semibold leading-tight">{product.name}</h3>
+                    <HomeCurated />
+                </main>
 
-                                        <StarRatingDisplay value={product.rating_avg} count={product.reviews_count} />
-
-                                        <p className="line-clamp-2 text-sm text-muted-foreground">
-                                            {product.description}
-                                        </p>
-
-                                        <div className="flex items-center justify-between pt-2">
-                                            <span className="text-lg font-bold">€{product.price.toFixed(2)}</span>
-                                            {product.quantity > 0 ? (
-                                                <Badge variant="outline">En stock</Badge>
-                                            ) : (
-                                                <Badge variant="destructive">Rupture</Badge>
-                                            )}
-                                        </div>
-
-                                        <div className="flex flex-col gap-2">
-                                            <Button variant="outline" className="w-full rounded-sm font-poppins" asChild>
-                                                <Link href={route('customer.products.show', product.id)}>
-                                                    Voir détail
-                                                </Link>
-                                            </Button>
-                                            <AddToCartButton
-                                                productId={product.id}
-                                                disabled={product.quantity === 0}
-                                                className="w-full justify-center text-base"
-                                                label="Ajouter au panier"
-                                            />
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                ) : (
-                    <Card>
-                        <CardContent className="py-12 text-center">
-                            <p className="text-muted-foreground">
-                                Aucun produit ne correspond à votre recherche.
-                            </p>
-                        </CardContent>
-                    </Card>
-                )}
-
-                {products.meta && products.meta.last_page > 1 && (
-                    <nav className="flex flex-wrap items-center justify-center gap-2">
-                        {products.links?.map((link, i) => {
-                            if (link.label.includes('...')) {
-                                return (
-                                    <span key={i} className="px-2 text-muted-foreground">
-                                        …
-                                    </span>
-                                );
-                            }
-                            const label = link.label.replace(/<[^>]+>/g, '').trim();
-                            if (!link.url) {
-                                return (
-                                    <Button key={i} variant="outline" size="sm" disabled>
-                                        {label}
-                                    </Button>
-                                );
-                            }
-                            return (
-                                <Button key={i} variant={link.active ? 'default' : 'outline'} size="sm" asChild>
-                                    <Link href={link.url} preserveScroll>
-                                        {label}
-                                    </Link>
-                                </Button>
-                            );
-                        })}
-                    </nav>
-                )}
+                <HomeFooter />
+                <FlashToaster />
             </div>
         </>
     );

@@ -1,3 +1,4 @@
+import collectionHero from '../../media/collection-hero.jpg';
 import aboutModels from '../../media/about-models.jpg';
 import brandCta from '../../media/brand-cta.jpg';
 import categoryCap from '../../media/category-cap.jpg';
@@ -10,6 +11,7 @@ import testimonialImage from '../../media/testimonial.jpg';
 
 export const HOME_ASSETS = {
     logo: logoPcj,
+    collectionHero,
     heroModel,
     categoryPull,
     categoryTshirt,

@@ -3,36 +3,88 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductReview;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Fortify\Features;
 
 class ProductController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $favoriteIdSet = [];
         if (auth()->check() && auth()->user()->role === 'CUSTOMER' && auth()->user()->customer) {
             $favoriteIdSet = auth()->user()->customer->favoriteProducts()->pluck('products.id')->flip()->all();
         }
 
-        $products = Product::query()
+        $query = Product::query()
             ->where('status', '!=', 'DISCONTINUED')
             ->with(['category', 'vendor'])
             ->withAvg('reviews', 'rating')
-            ->withCount('reviews')
-            ->orderByDesc('created_at')
-            ->paginate(12);
+            ->withCount('reviews');
+
+        $categoryFilter = $request->string('category')->toString();
+        if ($categoryFilter !== '' && $categoryFilter !== 'all') {
+            $query->whereHas('category', fn ($q) => $q->where('name', $categoryFilter));
+        }
+
+        $minPrice = $request->has('min_price') ? (float) $request->input('min_price') : null;
+        $maxPrice = $request->has('max_price') ? (float) $request->input('max_price') : null;
+        if ($minPrice !== null) {
+            $query->where('price', '>=', $minPrice);
+        }
+        if ($maxPrice !== null) {
+            $query->where('price', '<=', $maxPrice);
+        }
+
+        $sort = $request->string('sort', 'popular')->toString();
+        match ($sort) {
+            'newest' => $query->orderByDesc('created_at'),
+            'price_asc' => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
+            default => $query->orderByDesc('reviews_count')->orderByDesc('reviews_avg_rating'),
+        };
+
+        $products = $query->paginate(6)->withQueryString();
 
         $products->through(function (Product $product) use ($favoriteIdSet) {
             return $this->productListPayload($product, isset($favoriteIdSet[$product->id]));
         });
 
+        $categories = Category::query()
+            ->withCount([
+                'products' => fn ($q) => $q->where('status', '!=', 'DISCONTINUED'),
+            ])
+            ->having('products_count', '>', 0)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Category $c) => [
+                'name' => $c->name,
+                'count' => (int) $c->products_count,
+            ])
+            ->values()
+            ->all();
+
+        $totalProducts = Product::query()
+            ->where('status', '!=', 'DISCONTINUED')
+            ->count();
+
         return Inertia::render('customer/products/index', [
             'products' => $products,
+            'categories' => $categories,
+            'totalProducts' => $totalProducts,
+            'filters' => [
+                'category' => $categoryFilter !== '' ? $categoryFilter : 'all',
+                'sort' => $sort,
+                'min_price' => (int) ($minPrice ?? 10),
+                'max_price' => (int) ($maxPrice ?? 50),
+            ],
+            'canRegister' => Features::enabled(Features::registration()),
         ]);
     }
 

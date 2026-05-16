@@ -48,7 +48,7 @@ export default function Welcome() {
             <Head title="PCJ · Pose Comme Jamais" />
 
             <div className="min-h-screen bg-[#f8f7f9] font-poppins text-black antialiased">
-                <HomeHeader user={user} canRegister={canRegister} />
+                <HomeHeader user={user} canRegister={canRegister} activeNav="home" />
                 <main>
                     <HomeHero />
                     <HomeCategories />
