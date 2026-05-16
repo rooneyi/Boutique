@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
 import { router, usePage } from '@inertiajs/react';
 import { ShoppingCart } from 'lucide-react';
 import { store as postCartItem } from '@/routes/customer/cart/items';
@@ -38,6 +39,7 @@ export function AddToCartButton({
     size = 'default',
 }: Props) {
     const { auth } = usePage<PageProps>().props;
+    const cartDrawer = useOptionalCartDrawer();
 
     function handleClick(e: React.MouseEvent) {
         e.preventDefault();
@@ -65,6 +67,11 @@ export function AddToCartButton({
             { product_id: productId, quantity },
             {
                 preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Produit ajouté au panier.');
+                    router.reload({ only: ['cartCount'] });
+                    cartDrawer?.openCart();
+                },
                 onError: (errors) => {
                     const first =
                         (typeof errors.quantity === 'string' && errors.quantity) ||

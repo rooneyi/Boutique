@@ -1,4 +1,5 @@
 import { FlashToaster } from '@/components/flash-toaster';
+import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
 import { ReactNode, useMemo } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
     const { auth, cartCount = 0, favoritesCount = 0 } = page.props;
     const user = auth?.user;
     const isCustomer = user?.role === 'CUSTOMER';
+    const cartDrawer = useOptionalCartDrawer();
 
     const headerBrand = useMemo(
         () => (
@@ -64,7 +66,11 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                                         </Badge>
                                     )}
                                 </Link>
-                                <Link href={route('customer.cart')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
+                                <button
+                                    type="button"
+                                    className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}
+                                    onClick={() => cartDrawer?.openCart()}
+                                >
                                     <ShoppingCart className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
                                     Panier
                                     {cartCount > 0 && (
@@ -72,7 +78,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                                             {cartCount}
                                         </Badge>
                                     )}
-                                </Link>
+                                </button>
                                 <Link href={route('customer.orders.index')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
                                     <ShoppingBag className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
                                     Commandes
@@ -94,14 +100,19 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                         )}
 
                         {user && isCustomer && (
-                            <Link href={route('customer.cart')} className="relative inline-flex md:hidden">
+                            <button
+                                type="button"
+                                className="relative inline-flex md:hidden"
+                                onClick={() => cartDrawer?.openCart()}
+                                aria-label="Panier"
+                            >
                                 <ShoppingCart className="h-6 w-6" />
                                 {cartCount > 0 && (
                                     <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-sm bg-[#0059DD] px-1 text-[10px] font-bold text-white">
                                         {cartCount > 99 ? '99+' : cartCount}
                                     </span>
                                 )}
-                            </Link>
+                            </button>
                         )}
 
                         {user && (

@@ -1,4 +1,6 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { CartDrawer } from '@/components/storefront/cart/cart-drawer';
+import { CartDrawerProvider } from '@/components/storefront/cart/cart-drawer-context';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
@@ -38,7 +40,10 @@ createInertiaApp({
     withApp(app) {
         return (
             <TooltipProvider delayDuration={0}>
-                {app}
+                <CartDrawerProvider>
+                    {app}
+                    <CartDrawer />
+                </CartDrawerProvider>
                 <Toaster />
             </TooltipProvider>
         );

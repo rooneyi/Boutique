@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
 import { HOME_ASSETS } from '@/lib/home-assets';
 import { route } from '@/lib/route';
 import { SF_NAV_ITEM, SF_NAV_ITEM_ACTIVE } from '@/lib/storefront-ui-styles';
@@ -41,6 +42,7 @@ const NAV_ITEMS = [
 
 export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const cartDrawer = useOptionalCartDrawer();
 
     const accountHref =
         user?.role === 'ADMIN'
@@ -162,12 +164,11 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                                 type="button"
                                 variant="outline"
                                 size="icon"
-                                className="hidden rounded-full border-[#bfbfbf] lg:inline-flex"
-                                asChild
+                                className="rounded-full border-[#bfbfbf]"
+                                onClick={() => cartDrawer?.openCart()}
+                                aria-label="Panier"
                             >
-                                <Link href={route('customer.cart')} aria-label="Panier">
-                                    <ShoppingCart className="size-5" />
-                                </Link>
+                                <ShoppingCart className="size-5" />
                             </Button>
                         )}
                         <Button

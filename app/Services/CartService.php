@@ -48,6 +48,32 @@ class CartService
         Session::put(self::SESSION_KEY, $items);
     }
 
+    public function setQuantity(int $productId, int $quantity): void
+    {
+        if ($quantity <= 0) {
+            $this->remove($productId);
+
+            return;
+        }
+
+        $items = $this->items();
+        $found = false;
+        foreach ($items as &$item) {
+            if ($item['product_id'] === $productId) {
+                $item['quantity'] = $quantity;
+                $found = true;
+                break;
+            }
+        }
+        unset($item);
+
+        if (! $found) {
+            $items[] = ['product_id' => $productId, 'quantity' => $quantity];
+        }
+
+        Session::put(self::SESSION_KEY, $items);
+    }
+
     /**
      * @return list<array{
      *   product_id: int,

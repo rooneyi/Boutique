@@ -196,7 +196,9 @@ Route::middleware(['auth', 'verified', 'vendor'])->prefix('vendor')->name('vendo
 
 Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('customer.')->group(function () {
     Route::get('cart', [CartController::class, 'index'])->name('cart');
+    Route::get('cart/preview', [CartController::class, 'preview'])->name('cart.preview');
     Route::post('cart/items', [CartController::class, 'store'])->name('cart.items.store');
+    Route::patch('cart/items/{product}', [CartController::class, 'update'])->name('cart.items.update');
     Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
 
     Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
