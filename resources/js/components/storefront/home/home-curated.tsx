@@ -1,0 +1,76 @@
+import { Link } from '@inertiajs/react';
+import { ChevronRight } from 'lucide-react';
+import { HOME_ASSETS } from '@/lib/home-assets';
+import { route } from '@/lib/route';
+import { SF_SECTION_SUBTITLE, SF_SECTION_TITLE } from '@/lib/storefront-ui-styles';
+
+const ITEMS = [
+    {
+        title: 'LE MANIFESTE',
+        image: HOME_ASSETS.selectionManifeste,
+        description:
+            'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
+    },
+    {
+        title: 'STREET WEAR',
+        image: HOME_ASSETS.categoryTshirt,
+        description:
+            'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
+    },
+    {
+        title: 'SIGNATURE PCJ',
+        image: HOME_ASSETS.categoryTshirt,
+        description:
+            'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
+    },
+] as const;
+
+export function HomeCurated() {
+    return (
+        <section className="bg-white py-10 md:py-14">
+            <div className="mx-auto max-w-[1440px] px-4 sm:px-14">
+                <div className="mb-8 space-y-1">
+                    <h2 className={SF_SECTION_TITLE}>Notre Sélection Pour Vous</h2>
+                    <p className={SF_SECTION_SUBTITLE}>
+                        Lorem ipsum sit dolor amet pelentesque
+                    </p>
+                    <Link
+                        href={route('customer.products.index')}
+                        className="font-poppins inline-block border-b border-black py-3 text-[13px] font-semibold text-black"
+                    >
+                        VOIR LA COLLECTION
+                    </Link>
+                </div>
+
+                <div className="relative">
+                    <div className="flex gap-1 overflow-x-auto pb-4">
+                        {ITEMS.map((item) => (
+                            <Link
+                                key={item.title}
+                                href={route('customer.products.index')}
+                                className="w-[min(492px,85vw)] shrink-0 p-2"
+                            >
+                                <div className="aspect-[492/682] overflow-hidden">
+                                    <img
+                                        src={item.image}
+                                        alt=""
+                                        className="size-full object-cover"
+                                    />
+                                </div>
+                                <p className="mt-2 font-poppins text-2xl font-semibold text-black">
+                                    {item.title}
+                                </p>
+                                <p className="font-poppins text-base font-medium text-[#737373]">
+                                    {item.description}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+                    <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 md:block">
+                        <ChevronRight className="size-12 text-neutral-400" />
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}

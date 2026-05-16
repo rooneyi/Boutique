@@ -29,3 +29,21 @@ export const SF_NAV_LINK =
 
 export const SF_INPUT =
     'font-poppins w-full rounded-sm border border-neutral-300 px-4 py-2 text-base text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#0059DD]/30';
+
+export const SF_SECTION_TITLE =
+    'font-poppins text-[clamp(1.75rem,4vw,2.25rem)] font-semibold leading-none text-black';
+
+export const SF_SECTION_SUBTITLE =
+    'font-poppins text-lg font-medium text-[#747474] md:text-xl';
+
+export const SF_PILL_BTN_LIGHT =
+    'font-poppins inline-flex h-12 items-center justify-center rounded-full border border-white bg-white px-5 text-[13px] font-semibold text-black transition-colors hover:bg-neutral-100';
+
+export const SF_PILL_BTN_DARK =
+    'font-poppins inline-flex h-12 items-center justify-center rounded-full border border-black bg-black px-5 text-[13px] font-semibold text-white transition-colors hover:bg-neutral-800';
+
+export const SF_NAV_ITEM =
+    'font-poppins relative flex h-12 flex-col items-center justify-center px-5 text-base text-black transition-colors hover:text-[#0059DD]';
+
+export const SF_NAV_ITEM_ACTIVE =
+    'font-poppins relative flex h-12 flex-col items-center justify-center px-5 text-base font-semibold text-black';
