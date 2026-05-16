@@ -1,4 +1,6 @@
 import collectionHero from '../../media/collection-hero.jpg';
+import wearLook1 from '../../media/wear-look-1.jpg';
+import wearLook2 from '../../media/wear-look-2.jpg';
 import aboutModels from '../../media/about-models.jpg';
 import brandCta from '../../media/brand-cta.jpg';
 import categoryCap from '../../media/category-cap.jpg';
@@ -20,4 +22,6 @@ export const HOME_ASSETS = {
     testimonial: testimonialImage,
     selectionManifeste,
     brandCta,
+    wearLook1,
+    wearLook2,
 } as const;

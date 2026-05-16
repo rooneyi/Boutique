@@ -57,10 +57,13 @@ class ProductController extends Controller
         });
 
         $categories = Category::query()
+            ->whereHas(
+                'products',
+                fn ($q) => $q->where('status', '!=', 'DISCONTINUED'),
+            )
             ->withCount([
                 'products' => fn ($q) => $q->where('status', '!=', 'DISCONTINUED'),
             ])
-            ->having('products_count', '>', 0)
             ->orderBy('name')
             ->get()
             ->map(fn (Category $c) => [
@@ -136,6 +139,7 @@ class ProductController extends Controller
         $canReview = $customer !== null && $this->customerHasPurchasedProduct($customer->id, $product->id);
 
         return Inertia::render('customer/products/show', [
+            'canRegister' => Features::enabled(Features::registration()),
             'product' => [
                 'id' => $product->id,
                 'name' => $product->name,
