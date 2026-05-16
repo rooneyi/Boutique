@@ -6,6 +6,7 @@ import {
     useState,
     type ReactNode,
 } from 'react';
+import { toast } from 'sonner';
 import { preview as favoritesPreview } from '@/routes/customer/favorites';
 import type { FavoriteProduct, FavoritesPreview } from '@/components/storefront/favorites/favorites-types';
 
@@ -42,11 +43,23 @@ export function FavoritesDrawerProvider({ children }: { children: ReactNode }) {
                 },
                 credentials: 'same-origin',
             });
-            if (!response.ok) {
+
+            if (response.status === 401 || response.status === 403) {
+                setProducts([]);
+                setCount(0);
+                toast.error('Connectez-vous pour voir vos favoris.');
                 return;
             }
+
+            if (!response.ok) {
+                toast.error('Impossible de charger vos favoris.');
+                return;
+            }
+
             const data = (await response.json()) as FavoritesPreview;
             applyPreview(data);
+        } catch {
+            toast.error('Impossible de charger vos favoris.');
         } finally {
             setLoading(false);
         }

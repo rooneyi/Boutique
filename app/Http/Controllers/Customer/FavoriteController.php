@@ -12,9 +12,20 @@ use Inertia\Response;
 
 class FavoriteController extends Controller
 {
+    private function customer()
+    {
+        $customer = auth()->user()?->customer;
+
+        if ($customer === null) {
+            abort(403, 'Profil client introuvable.');
+        }
+
+        return $customer;
+    }
+
     public function index(): Response
     {
-        $customer = auth()->user()->customer;
+        $customer = $this->customer();
 
         $products = $customer->favoriteProducts()
             ->where('products.status', '!=', 'DISCONTINUED')
@@ -33,7 +44,7 @@ class FavoriteController extends Controller
 
     public function preview(): JsonResponse
     {
-        $customer = auth()->user()->customer;
+        $customer = $this->customer();
 
         $products = $customer->favoriteProducts()
             ->where('products.status', '!=', 'DISCONTINUED')
@@ -68,7 +79,7 @@ class FavoriteController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
-        auth()->user()->customer->favoriteProducts()->detach($product->id);
+        $this->customer()->favoriteProducts()->detach($product->id);
 
         return back();
     }

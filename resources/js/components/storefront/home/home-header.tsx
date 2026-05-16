@@ -146,7 +146,7 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="hidden rounded-full text-black lg:inline-flex"
+                            className="rounded-full text-black"
                             onClick={() => {
                                 if (user?.role === 'CUSTOMER') {
                                     favoritesDrawer?.openFavorites();
@@ -200,6 +200,18 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                                 </Link>
                             );
                         })}
+                        {user?.role === 'CUSTOMER' && (
+                            <button
+                                type="button"
+                                className="font-poppins block w-full py-2 text-left text-base"
+                                onClick={() => {
+                                    setMobileOpen(false);
+                                    favoritesDrawer?.openFavorites();
+                                }}
+                            >
+                                Mes favoris
+                            </button>
+                        )}
                         <Link
                             href={accountHref}
                             className="font-poppins mt-2 block py-2 text-base"

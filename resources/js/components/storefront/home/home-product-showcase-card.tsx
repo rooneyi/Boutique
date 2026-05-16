@@ -25,7 +25,7 @@ export function HomeProductShowcaseCard({ product }: Props) {
         <article className="relative flex h-[503px] w-full max-w-[343px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]">
             <Link
                 href={route('customer.products.show', product.id)}
-                className="absolute inset-0"
+                className="absolute inset-0 z-0"
             >
                 {product.image_path ? (
                     <img
@@ -40,10 +40,11 @@ export function HomeProductShowcaseCard({ product }: Props) {
                 )}
             </Link>
 
-            <div className="absolute top-2 right-2 z-10 flex size-[50px] items-center justify-center rounded-full border border-white bg-white shadow-sm">
+            <div className="pointer-events-auto absolute top-2 right-2 z-20 flex size-[50px] items-center justify-center rounded-full border border-white bg-white shadow-sm">
                 <FavoriteButton
                     productId={product.id}
                     favorited={product.is_favorite}
+                    openDrawerOnAdd={false}
                     className="size-7 hover:bg-transparent"
                 />
             </div>
