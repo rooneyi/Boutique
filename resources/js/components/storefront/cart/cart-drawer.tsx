@@ -70,8 +70,9 @@ export function CartDrawer() {
         <Sheet open={open} onOpenChange={(next) => !next && closeCart()}>
             <SheetContent
                 side="right"
+                size="wide"
                 showCloseButton={false}
-                className="flex h-full w-full max-w-[791px] flex-col gap-9 border-0 bg-white p-0 sm:max-w-[791px]"
+                className="flex flex-col overflow-hidden border-0 bg-white p-0"
                 overlayClassName="bg-black/60 backdrop-blur-[2px]"
             >
                 <div className="relative shrink-0 px-5 pt-10">

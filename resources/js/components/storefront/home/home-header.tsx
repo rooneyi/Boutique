@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import {
     Bell,
     Globe,
@@ -11,6 +11,7 @@ import {
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
+import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
 import { HOME_ASSETS } from '@/lib/home-assets';
 import { route } from '@/lib/route';
 import { SF_NAV_ITEM, SF_NAV_ITEM_ACTIVE } from '@/lib/storefront-ui-styles';
@@ -146,18 +147,16 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                             variant="ghost"
                             size="icon"
                             className="hidden rounded-full text-black lg:inline-flex"
-                            asChild
-                        >
-                            <Link
-                                href={
-                                    user?.role === 'CUSTOMER'
-                                        ? route('customer.favorites.index')
-                                        : route('login')
+                            onClick={() => {
+                                if (user?.role === 'CUSTOMER') {
+                                    favoritesDrawer?.openFavorites();
+                                } else {
+                                    router.visit(route('login'));
                                 }
-                                aria-label="Favoris"
-                            >
-                                <Heart className="size-6" strokeWidth={1.25} />
-                            </Link>
+                            }}
+                            aria-label="Favoris"
+                        >
+                            <Heart className="size-6" strokeWidth={1.25} />
                         </Button>
                         {user?.role === 'CUSTOMER' && (
                             <Button

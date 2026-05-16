@@ -40,10 +40,11 @@ export function HomeProductShowcaseCard({ product }: Props) {
                 )}
             </Link>
 
-            <div className="absolute right-2 top-2 z-10 rounded-full bg-white p-2.5 shadow-sm">
+            <div className="absolute top-2 right-2 z-10 flex size-[50px] items-center justify-center rounded-full border border-white bg-white shadow-sm">
                 <FavoriteButton
                     productId={product.id}
                     favorited={product.is_favorite}
+                    className="size-7 hover:bg-transparent"
                 />
             </div>
 
@@ -60,7 +61,7 @@ export function HomeProductShowcaseCard({ product }: Props) {
                 />
                 <div className="mt-2 flex items-center justify-between gap-3">
                     <p className="font-poppins text-2xl font-medium tracking-tight text-[#f5f5f5]">
-                        €{product.price.toFixed(2)}
+                        {product.price.toFixed(2)} $
                     </p>
                     <AddToCartButton
                         productId={product.id}

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
 import { router, usePage } from '@inertiajs/react';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
@@ -28,6 +29,12 @@ type Props = {
 
 export function FavoriteButton({ productId, favorited, variant = 'icon', className }: Props) {
     const { auth } = usePage<PageProps>().props;
+    const favoritesDrawer = useOptionalFavoritesDrawer();
+
+    function syncFavorites() {
+        router.reload({ only: ['favoritesCount'] });
+        void favoritesDrawer?.refresh();
+    }
 
     function toggle(e: React.MouseEvent) {
         e.preventDefault();
@@ -49,22 +56,40 @@ export function FavoriteButton({ productId, favorited, variant = 'icon', classNa
         }
 
         if (favorited) {
-            router.delete(deleteFavorite.url(productId), { preserveScroll: true });
+            router.delete(deleteFavorite.url(productId), {
+                preserveScroll: true,
+                onSuccess: syncFavorites,
+            });
         } else {
-            router.post(postFavorite.url(productId), {}, { preserveScroll: true });
+            router.post(postFavorite.url(productId), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    syncFavorites();
+                    favoritesDrawer?.openFavorites();
+                },
+            });
         }
     }
 
     const icon = (
         <Heart
-            className={cn('h-5 w-5 transition-colors', favorited ? 'fill-[#0059DD] text-[#0059DD]' : 'text-[#747474]')}
+            className={cn(
+                'h-5 w-5 transition-colors',
+                favorited ? 'fill-black text-black' : 'text-[#747474]',
+            )}
             aria-hidden
         />
     );
 
     if (variant === 'outline') {
         return (
-            <Button type="button" variant="outline" size="sm" className={cn('rounded-sm gap-2 font-poppins', className)} onClick={toggle}>
+            <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className={cn('gap-2 rounded-sm font-poppins', className)}
+                onClick={toggle}
+            >
                 {icon}
                 {favorited ? 'Retirer des favoris' : 'Favoris'}
             </Button>
@@ -72,7 +97,14 @@ export function FavoriteButton({ productId, favorited, variant = 'icon', classNa
     }
 
     return (
-        <Button type="button" variant="ghost" size="icon" className={cn('rounded-sm', className)} onClick={toggle} aria-label={favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}>
+        <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={cn('rounded-sm', className)}
+            onClick={toggle}
+            aria-label={favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+        >
             {icon}
         </Button>
     );

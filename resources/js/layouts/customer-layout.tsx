@@ -1,5 +1,6 @@
 import { FlashToaster } from '@/components/flash-toaster';
 import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
+import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
 import { ReactNode, useMemo } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
     const user = auth?.user;
     const isCustomer = user?.role === 'CUSTOMER';
     const cartDrawer = useOptionalCartDrawer();
+    const favoritesDrawer = useOptionalFavoritesDrawer();
 
     const headerBrand = useMemo(
         () => (
@@ -57,7 +59,11 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                         </Link>
                         {isCustomer && (
                             <>
-                                <Link href={route('customer.favorites.index')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
+                                <button
+                                    type="button"
+                                    className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}
+                                    onClick={() => favoritesDrawer?.openFavorites()}
+                                >
                                     <Heart className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
                                     Favoris
                                     {favoritesCount > 0 && (
@@ -65,7 +71,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                                             {favoritesCount}
                                         </Badge>
                                     )}
-                                </Link>
+                                </button>
                                 <button
                                     type="button"
                                     className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}

@@ -22,8 +22,8 @@ export function CartDrawerLine({
     const atMax = line.quantity >= line.stock;
 
     return (
-        <article className="relative flex gap-2.5">
-            <div className="h-[186px] w-[170px] shrink-0 overflow-hidden rounded-[10px] bg-neutral-100">
+        <article className="relative flex flex-col gap-4 border-b border-[#e8e8e8] pb-8 last:border-b-0 sm:flex-row sm:gap-2.5">
+            <div className="mx-auto h-[160px] w-full max-w-[200px] shrink-0 overflow-hidden rounded-[10px] bg-neutral-100 sm:mx-0 sm:h-[186px] sm:w-[170px]">
                 {line.image_path ? (
                     <img
                         src={line.image_path}
@@ -43,7 +43,7 @@ export function CartDrawerLine({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="absolute top-2 right-0.5 size-[30px] text-[#737373] hover:bg-neutral-100 hover:text-black"
+                        className="absolute top-0 right-0 size-[30px] text-[#737373] hover:bg-neutral-100 hover:text-black"
                         disabled={busy}
                         onClick={onRemove}
                         aria-label="Retirer du panier"
@@ -52,21 +52,21 @@ export function CartDrawerLine({
                     </Button>
                 )}
 
-                <div className="flex flex-col gap-2.5 pr-10">
-                    <h3 className="font-poppins text-[28px] font-bold leading-normal text-black">
+                <div className="flex flex-col gap-2 pr-8 sm:pr-10">
+                    <h3 className="font-poppins text-xl font-bold leading-snug text-black sm:text-[28px]">
                         {line.name}
                     </h3>
-                    <p className="font-poppins text-xl font-medium text-[#737373]">
+                    <p className="font-poppins text-base font-medium text-[#737373] sm:text-xl">
                         Couleur : Noir
                     </p>
-                    <p className="font-poppins text-xl font-medium text-[#737373]">
+                    <p className="font-poppins text-base font-medium text-[#737373] sm:text-xl">
                         Taille : M
                     </p>
 
-                    <div className="mt-1 flex items-center justify-between gap-4">
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
                         <div
                             className={cn(
-                                'inline-flex items-center gap-10 rounded-[25px] border border-[rgba(91,94,100,0.62)] px-2 py-1',
+                                'inline-flex items-center gap-6 rounded-[25px] border border-[rgba(91,94,100,0.62)] px-2 py-1 sm:gap-10',
                                 busy && 'pointer-events-none opacity-60',
                             )}
                         >
@@ -81,7 +81,7 @@ export function CartDrawerLine({
                             >
                                 <Minus className="size-5" />
                             </Button>
-                            <span className="font-poppins min-w-[1.25rem] text-center text-2xl font-normal leading-[1.24] text-black">
+                            <span className="font-poppins min-w-[1.25rem] text-center text-xl font-normal text-black sm:text-2xl">
                                 {line.quantity}
                             </span>
                             <Button
@@ -96,7 +96,7 @@ export function CartDrawerLine({
                                 <Plus className="size-5" />
                             </Button>
                         </div>
-                        <p className="font-poppins shrink-0 text-2xl font-medium text-black">
+                        <p className="font-poppins text-xl font-medium text-black sm:text-2xl">
                             {line.line_total.toFixed(2)} $
                         </p>
                     </div>

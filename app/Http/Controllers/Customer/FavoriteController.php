@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -30,6 +31,29 @@ class FavoriteController extends Controller
         ]);
     }
 
+    public function preview(): JsonResponse
+    {
+        $customer = auth()->user()->customer;
+
+        $products = $customer->favoriteProducts()
+            ->where('products.status', '!=', 'DISCONTINUED')
+            ->with(['category', 'vendor'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->orderByPivot('created_at', 'desc')
+            ->limit(24)
+            ->get()
+            ->map(fn (Product $product) => $this->productPayload($product, true))
+            ->values();
+
+        return response()->json([
+            'products' => $products,
+            'count' => (int) $customer->favoriteProducts()
+                ->where('products.status', '!=', 'DISCONTINUED')
+                ->count(),
+        ]);
+    }
+
     public function store(Product $product): RedirectResponse
     {
         if ($product->status === 'DISCONTINUED') {
@@ -46,7 +70,7 @@ class FavoriteController extends Controller
     {
         auth()->user()->customer->favoriteProducts()->detach($product->id);
 
-        return back()->with('success', 'Retiré des favoris.');
+        return back();
     }
 
     /**

@@ -202,6 +202,7 @@ Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('c
     Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
 
     Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::get('favorites/preview', [FavoriteController::class, 'preview'])->name('favorites.preview');
     Route::post('favorites/{product}', [FavoriteController::class, 'store'])->name('favorites.store');
     Route::delete('favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
 
