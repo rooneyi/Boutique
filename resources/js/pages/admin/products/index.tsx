@@ -1,6 +1,5 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Head, usePage } from '@inertiajs/react';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -10,8 +9,11 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Eye } from 'lucide-react';
+import { AdminFilterTabs } from '@/components/admin/admin-filter-tabs';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { route } from '@/lib/route';
+import { ADMIN_CARD, ADMIN_H3, ADMIN_MUTED, ADMIN_TABLE_CELL, ADMIN_TABLE_HEAD } from '@/lib/admin-ui-styles';
+import { cn } from '@/lib/utils';
 
 type Product = {
     id: number;
@@ -42,111 +44,101 @@ type Props = {
     filter?: 'all' | 'in-stock' | 'low-stock' | 'out-of-stock' | 'discontinued';
 };
 
+function getFilterLabel(filter?: Props['filter']) {
+    switch (filter) {
+        case 'in-stock':
+            return 'En stock';
+        case 'low-stock':
+            return 'Stocks faibles';
+        case 'out-of-stock':
+            return 'Ruptures';
+        case 'discontinued':
+            return 'Produits terminés';
+        default:
+            return 'Tous les produits';
+    }
+}
+
+function stockBadge(product: Product) {
+    if (product.status === 'DISCONTINUED') {
+        return <Badge variant="outline" className="font-poppins">Terminé</Badge>;
+    }
+    if (product.quantity === 0) {
+        return <Badge className="font-poppins border-0 bg-red-600 text-white">Rupture</Badge>;
+    }
+    if (product.quantity < 10) {
+        return <Badge className="font-poppins border-0 bg-amber-500 text-white">Faible</Badge>;
+    }
+    return <Badge className="font-poppins border-0 bg-[#0059DD] text-white">En stock</Badge>;
+}
+
 export default function AdminProducts() {
     const { products, filter } = usePage<Props>().props;
+    const title = getFilterLabel(filter);
 
-    const getFilterLabel = () => {
-        switch (filter) {
-            case 'in-stock':
-                return 'En stock';
-            case 'low-stock':
-                return 'Stocks faibles';
-            case 'out-of-stock':
-                return 'Ruptures';
-            case 'discontinued':
-                return 'Produits terminés';
-            default:
-                return 'Tous les produits';
-        }
-    };
-
-    const stockBadge = (product: Product) => {
-        if (product.status === 'DISCONTINUED') {
-            return <Badge variant="outline">Terminé</Badge>;
-        }
-        if (product.quantity === 0) {
-            return <Badge variant="destructive">Rupture</Badge>;
-        }
-        if (product.quantity < 10) {
-            return <Badge variant="secondary">Faible</Badge>;
-        }
-        return <Badge variant="outline">En stock</Badge>;
-    };
+    const tabs = [
+        { label: 'Tous', href: route('admin.products.index'), active: filter === 'all' || !filter },
+        { label: 'En stock', href: route('admin.products.in-stock'), active: filter === 'in-stock' },
+        { label: 'Faible stock', href: route('admin.products.low-stock'), active: filter === 'low-stock' },
+        { label: 'Ruptures', href: route('admin.products.out-of-stock'), active: filter === 'out-of-stock' },
+        { label: 'Terminés', href: route('admin.products.discontinued'), active: filter === 'discontinued' },
+    ];
 
     return (
         <>
-            <Head title={getFilterLabel()} />
+            <Head title={title} />
 
             <div className="space-y-8">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            {getFilterLabel()}
-                        </h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            Supervision de l'inventaire
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        <Button variant={filter === 'all' || !filter ? 'default' : 'outline'} asChild>
-                            <Link href={route('admin.products.index')}>Tous</Link>
-                        </Button>
-                        <Button variant={filter === 'in-stock' ? 'default' : 'outline'} asChild>
-                            <Link href={route('admin.products.in-stock')}>En stock</Link>
-                        </Button>
-                        <Button variant={filter === 'low-stock' ? 'default' : 'outline'} asChild>
-                            <Link href={route('admin.products.low-stock')}>Faible stock</Link>
-                        </Button>
-                        <Button variant={filter === 'out-of-stock' ? 'default' : 'outline'} asChild>
-                            <Link href={route('admin.products.out-of-stock')}>Ruptures</Link>
-                        </Button>
-                        <Button variant={filter === 'discontinued' ? 'default' : 'outline'} asChild>
-                            <Link href={route('admin.products.discontinued')}>Terminés</Link>
-                        </Button>
-                    </div>
-                </div>
+                <AdminPageHeader
+                    title={title}
+                    description="Supervision de l'inventaire sur toute la plateforme."
+                />
 
-                {/* Tableaux */}
-                <Card>
+                <AdminFilterTabs tabs={tabs} />
+
+                <Card className={ADMIN_CARD}>
                     <CardHeader>
-                        <CardTitle>{getFilterLabel()}</CardTitle>
-                        <CardDescription>
-                            Gestion complète de l'inventaire
+                        <h3 className={ADMIN_H3}>{title}</h3>
+                        <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
+                            {products.data.length} produit(s) affiché(s)
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {products.data.length > 0 ? (
-                            <div className="rounded-md border">
+                            <div className="overflow-x-auto rounded-sm border border-neutral-200">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Produit</TableHead>
-                                            <TableHead>Vendeur</TableHead>
-                                            <TableHead className="text-right">Prix</TableHead>
-                                            <TableHead className="text-right">
+                                        <TableRow className="hover:bg-transparent">
+                                            <TableHead className={ADMIN_TABLE_HEAD}>Produit</TableHead>
+                                            <TableHead className={ADMIN_TABLE_HEAD}>Vendeur</TableHead>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
+                                                Prix
+                                            </TableHead>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
                                                 Stock
                                             </TableHead>
-                                            <TableHead>Catégorie</TableHead>
-                                            <TableHead>Statut</TableHead>
+                                            <TableHead className={ADMIN_TABLE_HEAD}>Catégorie</TableHead>
+                                            <TableHead className={ADMIN_TABLE_HEAD}>Statut</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {products.data.map((product) => (
                                             <TableRow key={product.id}>
-                                                <TableCell className="font-medium">
+                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'font-medium')}>
                                                     {product.name}
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell className={ADMIN_TABLE_CELL}>
                                                     {product.vendor?.shop_name}
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'text-right')}>
                                                     €{Number(product.price).toFixed(2)}
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'text-right')}>
                                                     {product.quantity}
                                                 </TableCell>
-                                                <TableCell>{categoryLabel(product.category)}</TableCell>
+                                                <TableCell className={ADMIN_TABLE_CELL}>
+                                                    {categoryLabel(product.category)}
+                                                </TableCell>
                                                 <TableCell>{stockBadge(product)}</TableCell>
                                             </TableRow>
                                         ))}
@@ -154,9 +146,7 @@ export default function AdminProducts() {
                                 </Table>
                             </div>
                         ) : (
-                            <div className="py-12 text-center text-muted-foreground">
-                                <p>Aucun produit à afficher</p>
-                            </div>
+                            <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>Aucun produit à afficher</p>
                         )}
                     </CardContent>
                 </Card>

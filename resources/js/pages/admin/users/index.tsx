@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -9,6 +9,15 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
+import {
+    ADMIN_CARD,
+    ADMIN_H3,
+    ADMIN_MUTED,
+    ADMIN_TABLE_CELL,
+    ADMIN_TABLE_HEAD,
+} from '@/lib/admin-ui-styles';
+import { cn } from '@/lib/utils';
 
 type VendorRow = {
     id: number;
@@ -49,22 +58,24 @@ function segmentLabel(segment: CustomerRow['segment']): string {
     }
 }
 
-function segmentVariant(segment: CustomerRow['segment']): 'default' | 'secondary' | 'destructive' | 'outline' {
+function segmentBadgeClass(segment: CustomerRow['segment']): string {
     switch (segment) {
         case 'frequent':
-            return 'default';
+            return 'border-0 bg-[#0059DD] text-white';
         case 'inactive':
         case 'never_ordered':
-            return 'secondary';
+            return 'border-neutral-300 bg-neutral-100 text-[#747474]';
         default:
-            return 'outline';
+            return 'border-[#0059DD] text-[#0059DD]';
     }
 }
 
 export default function AdminUsers({ users, role }: Props) {
     const title = role === 'vendor' ? 'Vendeurs' : 'Clients';
     const description =
-        role === 'vendor' ? 'Gestion des vendeurs de la plateforme' : 'Liste globale — fidèles et inactifs';
+        role === 'vendor'
+            ? 'Gestion des vendeurs inscrits sur la plateforme PCJ.'
+            : 'Liste globale des clients — fidèles, actifs et inactifs.';
 
     const formatDate = (date: string) => new Date(date).toLocaleDateString('fr-FR');
 
@@ -73,78 +84,125 @@ export default function AdminUsers({ users, role }: Props) {
             <Head title={title} />
 
             <div className="space-y-8">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-                </div>
+                <AdminPageHeader title={title} description={description} />
 
-                <Card>
+                <Card className={ADMIN_CARD}>
                     <CardHeader>
-                        <CardTitle>{title}</CardTitle>
-                        <CardDescription>Données agrégées pour le pilotage</CardDescription>
+                        <h3 className={ADMIN_H3}>{title}</h3>
+                        <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
+                            {users.data.length} compte(s) affiché(s)
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {users.data.length > 0 ? (
-                            <div className="rounded-md border">
+                            <div className="overflow-x-auto rounded-sm border border-neutral-200">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Nom</TableHead>
-                                            <TableHead>Email</TableHead>
-                                            {role === 'vendor' && <TableHead>Boutique</TableHead>}
+                                        <TableRow className="hover:bg-transparent">
+                                            <TableHead className={ADMIN_TABLE_HEAD}>Nom</TableHead>
+                                            <TableHead className={ADMIN_TABLE_HEAD}>Email</TableHead>
+                                            {role === 'vendor' && (
+                                                <TableHead className={ADMIN_TABLE_HEAD}>Boutique</TableHead>
+                                            )}
                                             {role === 'customer' && (
                                                 <>
-                                                    <TableHead className="text-right">Commandes</TableHead>
-                                                    <TableHead className="text-right">Total dépensé</TableHead>
-                                                    <TableHead>Dernière commande</TableHead>
-                                                    <TableHead>Profil</TableHead>
+                                                    <TableHead
+                                                        className={cn(ADMIN_TABLE_HEAD, 'text-right')}
+                                                    >
+                                                        Commandes
+                                                    </TableHead>
+                                                    <TableHead
+                                                        className={cn(ADMIN_TABLE_HEAD, 'text-right')}
+                                                    >
+                                                        Total dépensé
+                                                    </TableHead>
+                                                    <TableHead className={ADMIN_TABLE_HEAD}>
+                                                        Dernière commande
+                                                    </TableHead>
+                                                    <TableHead className={ADMIN_TABLE_HEAD}>Profil</TableHead>
                                                 </>
                                             )}
-                                            <TableHead>Inscription</TableHead>
-                                            {role === 'vendor' && <TableHead>Statut</TableHead>}
+                                            <TableHead className={ADMIN_TABLE_HEAD}>Inscription</TableHead>
+                                            {role === 'vendor' && (
+                                                <TableHead className={ADMIN_TABLE_HEAD}>Statut</TableHead>
+                                            )}
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {role === 'vendor'
                                             ? (users.data as VendorRow[]).map((user) => (
                                                   <TableRow key={user.id}>
-                                                      <TableCell className="font-medium">{user.name}</TableCell>
-                                                      <TableCell>{user.email}</TableCell>
-                                                      <TableCell>{user.shop_name || '—'}</TableCell>
-                                                      <TableCell>{formatDate(user.created_at)}</TableCell>
+                                                      <TableCell
+                                                          className={cn(ADMIN_TABLE_CELL, 'font-medium')}
+                                                      >
+                                                          {user.name}
+                                                      </TableCell>
+                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                          {user.email}
+                                                      </TableCell>
+                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                          {user.shop_name || '—'}
+                                                      </TableCell>
+                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                          {formatDate(user.created_at)}
+                                                      </TableCell>
                                                       <TableCell>
-                                                          <Badge variant="outline">Actif</Badge>
+                                                          <Badge
+                                                              className="font-poppins border-0 bg-[#0059DD] text-white"
+                                                          >
+                                                              Actif
+                                                          </Badge>
                                                       </TableCell>
                                                   </TableRow>
                                               ))
                                             : (users.data as CustomerRow[]).map((user) => (
                                                   <TableRow key={user.id}>
-                                                      <TableCell className="font-medium">{user.name}</TableCell>
-                                                      <TableCell>{user.email}</TableCell>
-                                                      <TableCell className="text-right">{user.orders_count}</TableCell>
-                                                      <TableCell className="text-right">
+                                                      <TableCell
+                                                          className={cn(ADMIN_TABLE_CELL, 'font-medium')}
+                                                      >
+                                                          {user.name}
+                                                      </TableCell>
+                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                          {user.email}
+                                                      </TableCell>
+                                                      <TableCell
+                                                          className={cn(ADMIN_TABLE_CELL, 'text-right')}
+                                                      >
+                                                          {user.orders_count}
+                                                      </TableCell>
+                                                      <TableCell
+                                                          className={cn(ADMIN_TABLE_CELL, 'text-right')}
+                                                      >
                                                           €{Number(user.total_spent).toFixed(2)}
                                                       </TableCell>
-                                                      <TableCell className="text-sm text-muted-foreground">
+                                                      <TableCell className={ADMIN_TABLE_CELL}>
                                                           {user.last_order_at
                                                               ? formatDate(user.last_order_at)
                                                               : '—'}
                                                       </TableCell>
                                                       <TableCell>
-                                                          <Badge variant={segmentVariant(user.segment)}>
+                                                          <Badge
+                                                              variant="outline"
+                                                              className={cn(
+                                                                  'font-poppins',
+                                                                  segmentBadgeClass(user.segment),
+                                                              )}
+                                                          >
                                                               {segmentLabel(user.segment)}
                                                           </Badge>
                                                       </TableCell>
-                                                      <TableCell>{formatDate(user.created_at)}</TableCell>
+                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                          {formatDate(user.created_at)}
+                                                      </TableCell>
                                                   </TableRow>
                                               ))}
                                     </TableBody>
                                 </Table>
                             </div>
                         ) : (
-                            <div className="py-12 text-center text-muted-foreground">
-                                <p>Aucun {title.toLowerCase()} enregistré</p>
-                            </div>
+                            <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>
+                                Aucun {title.toLowerCase()} enregistré
+                            </p>
                         )}
                     </CardContent>
                 </Card>
