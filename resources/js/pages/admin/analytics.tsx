@@ -6,7 +6,7 @@ import {
     AdminCardDescription,
     AdminCardHeader,
 } from '@/components/admin/admin-card';
-import { AdminPageHeader } from '@/components/admin/admin-page-header';
+import { AdminPageHero } from '@/components/admin/admin-page-hero';
 import { AdminStatCard } from '@/components/admin/admin-stat-card';
 import { route } from '@/lib/route';
 import {
@@ -61,7 +61,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
             <Head title="Analyse des ventes" />
 
             <div className="space-y-10">
-                <AdminPageHeader
+                <AdminPageHero
                     title="Analyse des ventes"
                     description="Indicateurs globaux, période et analyses avancées de la plateforme."
                     actions={

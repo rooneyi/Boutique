@@ -15,7 +15,7 @@ import {
     AdminCardHeader,
 } from '@/components/admin/admin-card';
 import { AdminFilterTabs } from '@/components/admin/admin-filter-tabs';
-import { AdminPageHeader } from '@/components/admin/admin-page-header';
+import { AdminPageHero } from '@/components/admin/admin-page-hero';
 import { route } from '@/lib/route';
 import { ADMIN_H3, ADMIN_MUTED, ADMIN_TABLE_CELL, ADMIN_TABLE_HEAD } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
@@ -107,7 +107,7 @@ export default function AdminProducts() {
             <Head title={title} />
 
             <div className="space-y-8">
-                <AdminPageHeader
+                <AdminPageHero
                     title={title}
                     description="Supervision de l'inventaire sur toute la plateforme."
                 />

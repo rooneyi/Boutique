@@ -37,7 +37,7 @@ export const ADMIN_BTN_PILL_OUTLINE =
 export const ADMIN_CARD =
     'rounded-sm border border-neutral-200 bg-white text-black shadow-sm !rounded-sm ring-0 !bg-white !text-black [&_[data-slot=card-description]]:font-poppins [&_[data-slot=card-description]]:text-base [&_[data-slot=card-description]]:text-[#747474]';
 
-export const ADMIN_PAGE_BG = 'bg-[#f0f0f0]';
+export const ADMIN_PAGE_BG = 'bg-[#f8f7f9]';
 
 export const ADMIN_SHELL_MAX = 'mx-auto max-w-[1440px]';
 

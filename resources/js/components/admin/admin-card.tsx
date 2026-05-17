@@ -1,23 +1,53 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ADMIN_CARD } from '@/lib/admin-ui-styles';
+import { SF_CARD, SF_SECTION_SUBTITLE, SF_SECTION_TITLE } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
-type AdminCardProps = React.ComponentProps<typeof Card>;
+type AdminCardProps = {
+    className?: string;
+    children: React.ReactNode;
+};
 
-export function AdminCard({ className, ...props }: AdminCardProps) {
+export function AdminCard({ className, children }: AdminCardProps) {
     return (
-        <Card
-            className={cn(
-                ADMIN_CARD,
-                'gap-0 py-0 shadow-sm ring-0',
-                '[&_[data-slot=card-header]]:border-b [&_[data-slot=card-header]]:border-neutral-100 [&_[data-slot=card-header]]:px-6 [&_[data-slot=card-header]]:pt-6 [&_[data-slot=card-header]]:pb-4',
-                '[&_[data-slot=card-content]]:px-6 [&_[data-slot=card-content]]:py-6',
-                '[&_[data-slot=card-title]]:font-poppins [&_[data-slot=card-title]]:text-base [&_[data-slot=card-title]]:font-semibold [&_[data-slot=card-title]]:text-black',
-                className,
-            )}
-            {...props}
-        />
+        <article className={cn(SF_CARD, 'p-6 text-black md:p-8', className)}>{children}</article>
     );
 }
 
-export { CardHeader as AdminCardHeader, CardContent as AdminCardContent, CardDescription as AdminCardDescription, CardTitle as AdminCardTitle };
+export function AdminCardTitle({
+    className,
+    children,
+}: {
+    className?: string;
+    children: React.ReactNode;
+}) {
+    return <h3 className={cn(SF_SECTION_TITLE, 'text-2xl md:text-[36px]', className)}>{children}</h3>;
+}
+
+export function AdminCardDescription({
+    className,
+    children,
+}: {
+    className?: string;
+    children: React.ReactNode;
+}) {
+    return <p className={cn(SF_SECTION_SUBTITLE, 'mt-1', className)}>{children}</p>;
+}
+
+export function AdminCardHeader({
+    className,
+    children,
+}: {
+    className?: string;
+    children: React.ReactNode;
+}) {
+    return <header className={cn('mb-6 space-y-1 border-b border-neutral-100 pb-4', className)}>{children}</header>;
+}
+
+export function AdminCardContent({
+    className,
+    children,
+}: {
+    className?: string;
+    children: React.ReactNode;
+}) {
+    return <div className={cn(className)}>{children}</div>;
+}

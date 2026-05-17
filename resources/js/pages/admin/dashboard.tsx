@@ -6,7 +6,7 @@ import {
     AdminCardDescription,
     AdminCardHeader,
 } from '@/components/admin/admin-card';
-import { AdminPageHeader } from '@/components/admin/admin-page-header';
+import { AdminPageHero } from '@/components/admin/admin-page-hero';
 import { AdminStatCard } from '@/components/admin/admin-stat-card';
 import { route } from '@/lib/route';
 import {
@@ -62,7 +62,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
             <Head title="Tableau de bord" />
 
             <div className="space-y-10">
-                <AdminPageHeader
+                <AdminPageHero
                     title="Tableau de bord"
                     description="Vue d'ensemble de la plateforme PCJ — ventes, catalogue et utilisateurs."
                     actions={

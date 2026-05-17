@@ -1,0 +1,54 @@
+import { route } from '@/lib/route';
+
+export type AdminNavKey = 'dashboard' | 'analytics' | 'products' | 'vendors' | 'customers';
+
+export const ADMIN_MAIN_NAV: {
+    key: AdminNavKey;
+    label: string;
+    href: string;
+    match: (path: string) => boolean;
+}[] = [
+    {
+        key: 'dashboard',
+        label: 'Tableau de bord',
+        href: route('admin.dashboard'),
+        match: (path) => path === '/admin/dashboard',
+    },
+    {
+        key: 'analytics',
+        label: 'Analyse',
+        href: route('admin.analytics.sales'),
+        match: (path) => path.startsWith('/admin/analytics'),
+    },
+    {
+        key: 'products',
+        label: 'Produits',
+        href: route('admin.products.index'),
+        match: (path) => path.startsWith('/admin/products'),
+    },
+    {
+        key: 'vendors',
+        label: 'Vendeurs',
+        href: route('admin.vendors.index'),
+        match: (path) => path.startsWith('/admin/users/vendors'),
+    },
+    {
+        key: 'customers',
+        label: 'Clients',
+        href: route('admin.customers.index'),
+        match: (path) => path.startsWith('/admin/users/customers'),
+    },
+];
+
+export const ADMIN_STOCK_NAV = [
+    { label: 'Tous', href: route('admin.products.index'), match: (p: string) => p === '/admin/products' },
+    { label: 'En stock', href: route('admin.products.in-stock'), match: (p: string) => p.endsWith('/in-stock') },
+    { label: 'Faibles stocks', href: route('admin.products.low-stock'), match: (p: string) => p.endsWith('/low-stock') },
+    { label: 'Ruptures', href: route('admin.products.out-of-stock'), match: (p: string) => p.endsWith('/out-of-stock') },
+    { label: 'Terminés', href: route('admin.products.discontinued'), match: (p: string) => p.endsWith('/discontinued') },
+] as const;
+
+export function resolveAdminNavKey(path: string): AdminNavKey {
+    const item = ADMIN_MAIN_NAV.find((n) => n.match(path));
+    return item?.key ?? 'dashboard';
+}
