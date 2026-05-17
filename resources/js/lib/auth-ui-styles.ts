@@ -5,6 +5,9 @@ export const AUTH_INPUT =
 export const AUTH_LINK_RED =
     'font-poppins text-xs font-normal text-[#dc0000] no-underline hover:text-[#b80000]';
 
+export const AUTH_LINK_MUTED =
+    'font-poppins text-xs font-normal text-[rgba(91,94,100,0.62)] no-underline hover:text-[#484848]';
+
 export const AUTH_BTN_PRIMARY =
     'font-poppins h-auto w-full rounded-full border border-black bg-black px-[18px] py-[15px] text-[15px] font-semibold tracking-normal text-white uppercase hover:bg-neutral-800';
 

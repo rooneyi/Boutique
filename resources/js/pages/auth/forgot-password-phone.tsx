@@ -10,13 +10,12 @@ import {
     AUTH_LINK_RED,
 } from '@/lib/auth-ui-styles';
 import { route } from '@/lib/route';
-import { email } from '@/routes/password';
 
 type Props = {
     status?: string;
 };
 
-export default function ForgotPassword({ status }: Props) {
+export default function ForgotPasswordPhone({ status }: Props) {
     return (
         <>
             <Head title="Réinitialiser le mot de passe · PCJ" />
@@ -39,7 +38,8 @@ export default function ForgotPassword({ status }: Props) {
                 )}
 
                 <Form
-                    {...email.form()}
+                    method="post"
+                    action={route('auth.forgot-password.phone.store')}
                     className="flex w-full flex-col items-center gap-[25px]"
                 >
                     {({ processing, errors }) => (
@@ -47,24 +47,23 @@ export default function ForgotPassword({ status }: Props) {
                             <div className="flex w-full flex-col items-end gap-10 pb-2">
                                 <div className="w-full space-y-1">
                                     <Input
-                                        id="email"
-                                        type="email"
-                                        name="email"
+                                        id="phone"
+                                        type="tel"
+                                        name="phone"
                                         required
                                         autoFocus
-                                        autoComplete="email"
-                                        placeholder="Adresse email"
+                                        autoComplete="tel"
+                                        placeholder="Numéro de téléphone"
                                         disabled={processing}
                                         className={AUTH_INPUT_UNDERLINE}
                                     />
-                                    <InputError message={errors.email} />
+                                    <InputError message={errors.phone} />
                                 </div>
 
                                 <Button
                                     type="submit"
                                     className={AUTH_BTN_PRIMARY}
                                     disabled={processing}
-                                    data-test="email-password-reset-link-button"
                                 >
                                     {processing && <Spinner className="text-white" />}
                                     VERIFICATION
@@ -72,10 +71,10 @@ export default function ForgotPassword({ status }: Props) {
 
                                 <p className="w-full text-center">
                                     <Link
-                                        href={route('auth.forgot-password.phone')}
+                                        href={route('password.request')}
                                         className={AUTH_LINK_MUTED}
                                     >
-                                        Utilisez votre numéro de téléphone
+                                        Utilisez votre adresse email
                                     </Link>
                                 </p>
                             </div>
@@ -94,6 +93,6 @@ export default function ForgotPassword({ status }: Props) {
     );
 }
 
-ForgotPassword.layout = {
+ForgotPasswordPhone.layout = {
     variant: 'split',
 };

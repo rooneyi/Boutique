@@ -13,12 +13,14 @@ use App\Http\Controllers\Vendor\CustomerController as VendorCustomerController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController as VendorProductController;
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Services\AdminService;
 use App\Services\CustomerService;
 use App\Services\DashboardService;
 use App\Services\VendorService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -84,6 +86,37 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     Route::get('forgot-password', fn () => Inertia::render('auth/forgot-password', [
         'status' => session('status'),
     ]))->name('forgot-password');
+
+    Route::get('forgot-password/phone', fn () => Inertia::render('auth/forgot-password-phone', [
+        'status' => session('status'),
+    ]))->name('forgot-password.phone');
+
+    Route::post('forgot-password/phone', function (Request $request) {
+        $validated = $request->validate([
+            'phone' => ['required', 'string', 'max:50'],
+        ]);
+
+        $customer = Customer::query()
+            ->where('phone', $validated['phone'])
+            ->with('user')
+            ->first();
+
+        if (! $customer?->user) {
+            return back()->withErrors([
+                'phone' => 'Aucun compte associé à ce numéro.',
+            ]);
+        }
+
+        $status = Password::sendResetLink(['email' => $customer->user->email]);
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            return back()->withErrors([
+                'phone' => __($status),
+            ]);
+        }
+
+        return back()->with('status', __($status));
+    })->name('forgot-password.phone.store');
 
     Route::get('reset-password/{token}', fn ($token) => Inertia::render('auth/reset-password', [
         'email' => request('email'),
