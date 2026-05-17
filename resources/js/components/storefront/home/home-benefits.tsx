@@ -23,9 +23,9 @@ const BENEFITS = [
 
 export function HomeBenefits() {
     return (
-        <section className="bg-[#f0f0f0] px-4 py-16 md:px-8 md:py-24">
+        <section className="bg-[#f0f0f0] px-4 py-16 sm:px-8 lg:px-[100px] lg:py-[100px]">
             <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-10">
-                <h2 className="text-center font-poppins text-[clamp(2rem,5vw,5.25rem)] font-extrabold leading-tight text-black">
+                <h2 className="text-center font-poppins text-[clamp(2rem,6vw,5.25rem)] font-extrabold leading-tight text-black">
                     Simplifiez Vos
                     <br />
                     Achats Avec PCJ

@@ -50,16 +50,16 @@ export function HomeCategories() {
                                 alt={cat.title}
                                 className="absolute inset-0 size-full object-cover"
                             />
-                            <motion className="relative z-10 flex w-full flex-1 flex-col items-center justify-center gap-2.5 bg-black/30 px-5 py-4">
+                            <div className="relative z-10 flex w-full flex-1 flex-col items-center justify-center gap-2.5 bg-black/30 px-5 py-4">
                                 <p className="font-poppins text-[32px] font-bold text-white">
                                     {cat.title}
                                 </p>
                                 <span className={SF_PILL_BTN_LIGHT}>{cat.cta}</span>
-                            </motion>
+                            </div>
                         </Link>
                     ))}
                 </div>
-            </motion>
+            </div>
         </section>
     );
 }

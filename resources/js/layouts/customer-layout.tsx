@@ -68,7 +68,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                                     className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}
                                     onClick={() => favoritesDrawer?.openFavorites()}
                                 >
-                                    <Heart className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
+                                    <Heart className="h-4 w-4 shrink-0 text-[#dc0000]" aria-hidden />
                                     Favoris
                                     {favoritesCount > 0 && (
                                         <Badge className="rounded-sm border-0 bg-[#0059DD] px-2 py-0 text-xs font-semibold text-white">

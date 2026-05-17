@@ -12,7 +12,7 @@ export function HomeAbout() {
         <section id="pourquoi-nous" className="bg-white px-4 py-16 sm:px-8 lg:px-[100px] lg:py-[100px]">
             <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-6 lg:flex-row lg:items-start lg:justify-center">
                 <div className="flex max-w-[578px] flex-col justify-center gap-7 py-5">
-                    <motion>
+                    <div>
                         <h2 className="font-poppins text-[clamp(2.5rem,6vw,5.25rem)] font-extrabold leading-tight text-black">
                             Pourquoi
                             <br />
@@ -25,7 +25,7 @@ export function HomeAbout() {
                             utilisant des matériaux respectueux de l&apos;environnement. Faites un
                             choix de mode responsable et élégant avec PCJ.
                         </p>
-                    </motion>
+                    </div>
 
                     <div className="grid w-full max-w-[578px] grid-cols-3 gap-0 overflow-hidden pr-5">
                         {FEATURES.map(({ icon: Icon, label }, index) => (
@@ -39,10 +39,10 @@ export function HomeAbout() {
                                 <p className="font-poppins text-xl font-medium text-black">
                                     {label}
                                 </p>
-                            </motion>
+                            </div>
                         ))}
-                    </motion>
-                </motion>
+                    </div>
+                </div>
 
                 <div className="h-[min(720px,70vh)] w-full max-w-[600px] overflow-hidden rounded-br-[20px] rounded-tr-[20px] lg:shrink-0">
                     <img
@@ -50,8 +50,8 @@ export function HomeAbout() {
                         alt="Modèles PCJ"
                         className="size-full object-cover"
                     />
-                </motion>
-            </motion>
+                </div>
+            </div>
         </section>
     );
 }

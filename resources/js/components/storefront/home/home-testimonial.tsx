@@ -4,8 +4,8 @@ import { HOME_ASSETS } from '@/lib/home-assets';
 
 export function HomeTestimonial() {
     return (
-        <section className="bg-white py-12 md:py-16">
-            <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-8 px-4 sm:px-8">
+        <section className="bg-white py-16 lg:px-[100px] lg:py-[100px]">
+            <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-8 px-4 sm:px-8 lg:px-0">
                 <div className="flex w-full items-center gap-4 md:gap-12">
                     <button
                         type="button"

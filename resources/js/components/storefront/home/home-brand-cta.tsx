@@ -5,8 +5,8 @@ import { SF_PILL_BTN_DARK } from '@/lib/storefront-ui-styles';
 
 export function HomeBrandCta() {
     return (
-        <section className="bg-[#f0f0f0] py-8 md:py-12">
-            <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 sm:px-8 md:px-24 lg:grid-cols-2">
+        <section className="bg-[#f0f0f0] py-12 lg:px-[100px] lg:py-[100px]">
+            <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 sm:px-8 lg:grid-cols-2 lg:px-0">
                 <div className="overflow-hidden bg-[#bfbfbf] lg:min-h-[619px]">
                     <img
                         src={HOME_ASSETS.brandCta}

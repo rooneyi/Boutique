@@ -31,8 +31,8 @@ export function HomeNouveautes({ products }: Props) {
     };
 
     return (
-        <section className="bg-[#f0f0f0] py-16 md:py-24">
-            <div className="mx-auto max-w-[1440px] px-4 sm:px-8">
+        <section className="bg-[#f0f0f0] py-16 lg:px-[100px] lg:py-[100px]">
+            <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-0">
                 <div className="mb-10 text-center">
                     <h2 className={SF_SECTION_TITLE}>Nouveautés</h2>
                     <p className={`${SF_SECTION_SUBTITLE} mt-1`}>

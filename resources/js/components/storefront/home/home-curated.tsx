@@ -13,13 +13,13 @@ const ITEMS = [
     },
     {
         title: 'STREET WEAR',
-        image: HOME_ASSETS.categoryTshirt,
+        image: HOME_ASSETS.wearLook1,
         description:
             'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
     },
     {
         title: 'SIGNATURE PCJ',
-        image: HOME_ASSETS.categoryTshirt,
+        image: HOME_ASSETS.wearLook2,
         description:
             'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
     },
@@ -27,8 +27,8 @@ const ITEMS = [
 
 export function HomeCurated() {
     return (
-        <section className="bg-white py-10 md:py-14">
-            <div className="mx-auto max-w-[1440px] px-4 sm:px-14">
+        <section className="bg-white py-16 lg:px-[100px] lg:py-[100px]">
+            <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-0">
                 <div className="mb-8 space-y-1">
                     <h2 className={SF_SECTION_TITLE}>Notre Sélection Pour Vous</h2>
                     <p className={SF_SECTION_SUBTITLE}>
