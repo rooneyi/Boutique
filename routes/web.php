@@ -3,24 +3,24 @@
 use App\Data\CustomerRegisterData;
 use App\Data\VendorRegisterData;
 use App\Http\Controllers\Customer\AccountController;
+use App\Http\Controllers\Customer\ContactController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
+use App\Http\Controllers\Auth\PasswordResetOtpController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\Customer\ProductReviewController;
 use App\Http\Controllers\Vendor\CustomerController as VendorCustomerController;
 use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\ProductController as VendorProductController;
 use App\Models\Category;
-use App\Models\Customer;
 use App\Models\Product;
 use App\Services\AdminService;
 use App\Services\CustomerService;
 use App\Services\DashboardService;
 use App\Services\VendorService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -91,32 +91,20 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
         'status' => session('status'),
     ]))->name('forgot-password.phone');
 
-    Route::post('forgot-password/phone', function (Request $request) {
-        $validated = $request->validate([
-            'phone' => ['required', 'string', 'max:50'],
-        ]);
+    Route::post('forgot-password', [PasswordResetOtpController::class, 'sendEmail'])
+        ->name('forgot-password.store');
 
-        $customer = Customer::query()
-            ->where('phone', $validated['phone'])
-            ->with('user')
-            ->first();
+    Route::post('forgot-password/phone', [PasswordResetOtpController::class, 'sendPhone'])
+        ->name('forgot-password.phone.store');
 
-        if (! $customer?->user) {
-            return back()->withErrors([
-                'phone' => 'Aucun compte associé à ce numéro.',
-            ]);
-        }
+    Route::get('forgot-password/verify', [PasswordResetOtpController::class, 'showVerify'])
+        ->name('forgot-password.verify');
 
-        $status = Password::sendResetLink(['email' => $customer->user->email]);
+    Route::post('forgot-password/verify', [PasswordResetOtpController::class, 'verify'])
+        ->name('forgot-password.verify.store');
 
-        if ($status !== Password::RESET_LINK_SENT) {
-            return back()->withErrors([
-                'phone' => __($status),
-            ]);
-        }
-
-        return back()->with('status', __($status));
-    })->name('forgot-password.phone.store');
+    Route::post('forgot-password/verify/resend', [PasswordResetOtpController::class, 'resend'])
+        ->name('forgot-password.verify.resend');
 
     Route::get('reset-password/{token}', fn ($token) => Inertia::render('auth/reset-password', [
         'email' => request('email'),
@@ -271,6 +259,9 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
             'highlightCategories' => $highlightCategories,
         ]);
     })->name('home');
+
+    Route::get('contact', [ContactController::class, 'index'])->name('contact');
+    Route::post('contact', [ContactController::class, 'store'])->name('contact.store');
 
     Route::prefix('customer')->name('customer.')->group(function () {
         Route::get('products', [CustomerProductController::class, 'index'])->name('products.index');

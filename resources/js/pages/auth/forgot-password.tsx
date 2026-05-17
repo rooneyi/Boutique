@@ -10,7 +10,6 @@ import {
     AUTH_LINK_RED,
 } from '@/lib/auth-ui-styles';
 import { route } from '@/lib/route';
-import { email } from '@/routes/password';
 
 type Props = {
     status?: string;
@@ -39,7 +38,8 @@ export default function ForgotPassword({ status }: Props) {
                 )}
 
                 <Form
-                    {...email.form()}
+                    method="post"
+                    action={route('auth.forgot-password.store')}
                     className="flex w-full flex-col items-center gap-[25px]"
                 >
                     {({ processing, errors }) => (

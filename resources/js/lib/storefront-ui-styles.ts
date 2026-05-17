@@ -31,16 +31,26 @@ export const SF_INPUT =
     'font-poppins w-full rounded-sm border border-neutral-300 px-4 py-2 text-base text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#0059DD]/30';
 
 export const SF_SECTION_TITLE =
-    'font-poppins text-[clamp(1.75rem,4vw,2.25rem)] font-semibold leading-none text-black';
+    'font-poppins text-[36px] font-semibold leading-none text-black';
 
 export const SF_SECTION_SUBTITLE =
-    'font-poppins text-lg font-medium text-[#747474] md:text-xl';
+    'font-poppins text-xl font-medium text-[#747474]';
+
+/** Cœur favoris — Figma home (95-1350) */
+export const SF_FAVORITE_RED = 'text-[#dc0000]';
+export const SF_FAVORITE_RED_FILL = 'fill-[#dc0000] text-[#dc0000]';
 
 export const SF_PILL_BTN_LIGHT =
-    'font-poppins inline-flex h-12 items-center justify-center rounded-full border border-white bg-white px-5 text-[13px] font-semibold text-black transition-colors hover:bg-neutral-100';
+    'font-poppins inline-flex items-center justify-center rounded-full border border-white bg-white px-[14px] py-3.5 text-[15px] font-semibold text-black transition-colors hover:bg-neutral-100';
 
 export const SF_PILL_BTN_DARK =
-    'font-poppins inline-flex h-12 items-center justify-center rounded-full border border-black bg-black px-5 text-[13px] font-semibold text-white transition-colors hover:bg-neutral-800';
+    'font-poppins inline-flex items-center justify-center rounded-[32px] border border-black bg-black px-[18px] py-[15px] text-[15px] font-semibold text-white transition-colors hover:bg-neutral-800';
+
+export const SF_HERO_CTA =
+    'font-poppins inline-flex items-center justify-center rounded-[32px] border border-white bg-white px-[18px] py-[15px] text-[15px] font-semibold text-black transition-colors hover:bg-neutral-100';
+
+export const SF_PRODUCT_BUY_BTN =
+    'font-poppins inline-flex items-center justify-center gap-1 rounded-full border border-white bg-white px-3.5 py-2.5 text-[15px] font-semibold text-black transition-colors hover:bg-neutral-100';
 
 export const SF_NAV_ITEM =
     'font-poppins relative flex h-12 flex-col items-center justify-center px-5 text-base text-black transition-colors hover:text-[#0059DD]';

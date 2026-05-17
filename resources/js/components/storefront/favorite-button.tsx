@@ -7,12 +7,13 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { destroy as deleteFavorite, store as postFavorite } from '@/routes/customer/favorites';
 import { route } from '@/lib/route';
+import { SF_FAVORITE_RED, SF_FAVORITE_RED_FILL } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Props = {
     productId: number;
     favorited: boolean;
-    variant?: 'icon' | 'outline';
+    variant?: 'icon' | 'outline' | 'showcase';
     className?: string;
     /** Ne pas ouvrir le tiroir après ajout (ex. carte déjà dans le tiroir). */
     openDrawerOnAdd?: boolean;
@@ -107,8 +108,15 @@ export function FavoriteButton({
     const icon = (
         <Heart
             className={cn(
-                'h-5 w-5 transition-colors',
-                liked ? 'fill-black text-black' : 'text-[#747474]',
+                'transition-colors',
+                variant === 'showcase' ? 'size-7' : 'size-5',
+                variant === 'showcase' || variant === 'icon'
+                    ? liked
+                        ? SF_FAVORITE_RED_FILL
+                        : SF_FAVORITE_RED
+                    : liked
+                      ? SF_FAVORITE_RED_FILL
+                      : 'text-[#747474]',
             )}
             aria-hidden
         />
@@ -126,6 +134,23 @@ export function FavoriteButton({
                 {icon}
                 {liked ? 'Retirer des favoris' : 'Favoris'}
             </Button>
+        );
+    }
+
+    if (variant === 'showcase') {
+        return (
+            <button
+                type="button"
+                className={cn(
+                    'relative z-20 flex size-full items-center justify-center',
+                    className,
+                )}
+                onClick={toggle}
+                aria-label={liked ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                aria-pressed={liked}
+            >
+                {icon}
+            </button>
         );
     }
 

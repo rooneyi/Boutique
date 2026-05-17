@@ -29,16 +29,16 @@ const CATEGORIES = [
 
 export function HomeCategories() {
     return (
-        <section className="bg-[#f0f0f0] py-16 md:py-20">
-            <div className="mx-auto max-w-[1440px] px-4 sm:px-8">
-                <div className="mb-8 text-center md:mb-10">
+        <section className="bg-[#f0f0f0] py-16">
+            <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-[30px] px-4 sm:px-8">
+                <div className="text-center">
                     <h2 className={SF_SECTION_TITLE}>Catégories</h2>
                     <p className={`${SF_SECTION_SUBTITLE} mt-1`}>
                         Lorem ipsum sit dolor amet pelentesque
                     </p>
                 </div>
 
-                <div className="flex flex-col items-center justify-center gap-4 md:flex-row md:items-end md:gap-[18px]">
+                <div className="flex w-full flex-col items-center justify-center gap-[18px] md:flex-row md:items-end">
                     {CATEGORIES.map((cat) => (
                         <Link
                             key={cat.title}
@@ -50,16 +50,16 @@ export function HomeCategories() {
                                 alt={cat.title}
                                 className="absolute inset-0 size-full object-cover"
                             />
-                            <div className="relative z-10 flex w-full flex-1 flex-col items-center justify-center gap-2.5 bg-black/30 px-5 py-4">
-                                <p className="font-poppins text-3xl font-bold text-white">
+                            <motion className="relative z-10 flex w-full flex-1 flex-col items-center justify-center gap-2.5 bg-black/30 px-5 py-4">
+                                <p className="font-poppins text-[32px] font-bold text-white">
                                     {cat.title}
                                 </p>
                                 <span className={SF_PILL_BTN_LIGHT}>{cat.cta}</span>
-                            </div>
+                            </motion>
                         </Link>
                     ))}
                 </div>
-            </div>
+            </motion>
         </section>
     );
 }

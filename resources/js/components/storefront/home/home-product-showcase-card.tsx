@@ -4,7 +4,7 @@ import { FavoriteButton } from '@/components/storefront/favorite-button';
 import { StarRatingDisplay } from '@/components/storefront/star-rating-display';
 import { AddToCartButton } from '@/components/storefront/add-to-cart-button';
 import { route } from '@/lib/route';
-import { SF_PILL_BTN_LIGHT } from '@/lib/storefront-ui-styles';
+import { SF_PRODUCT_BUY_BTN } from '@/lib/storefront-ui-styles';
 
 type Product = {
     id: number;
@@ -49,12 +49,13 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                 )}
             </Link>
 
-            <div className="pointer-events-auto absolute top-2 right-2 z-20 flex size-[50px] items-center justify-center rounded-full border border-white bg-white shadow-sm">
+            <div className="pointer-events-auto absolute top-2 right-2 z-20 flex size-[50px] items-center justify-center rounded-[27px] border border-white bg-white shadow-sm">
                 <FavoriteButton
                     productId={product.id}
                     favorited={product.is_favorite}
+                    variant="showcase"
                     openDrawerOnAdd={false}
-                    className="size-7 hover:bg-transparent"
+                    className="hover:bg-transparent"
                 />
             </div>
 
@@ -75,7 +76,7 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                     </p>
                     <AddToCartButton
                         productId={product.id}
-                        className={`${SF_PILL_BTN_LIGHT} h-12 gap-1 px-4`}
+                        className={SF_PRODUCT_BUY_BTN}
                         label="ACHETER"
                     />
                 </div>

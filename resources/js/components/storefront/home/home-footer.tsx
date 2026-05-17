@@ -44,12 +44,9 @@ export function HomeFooter() {
                         <a href="#pourquoi-nous" className="hover:opacity-80">
                             a propos
                         </a>
-                        <a
-                            href="mailto:kambmusene@gmail.com"
-                            className="hover:opacity-80"
-                        >
+                        <Link href={route('contact')} className="hover:opacity-80">
                             Contact
-                        </a>
+                        </Link>
                     </nav>
                 </div>
 

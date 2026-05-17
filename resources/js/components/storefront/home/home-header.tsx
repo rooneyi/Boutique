@@ -24,7 +24,7 @@ type AuthUser = {
     role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
 };
 
-type ActiveNav = 'home' | 'collection';
+type ActiveNav = 'home' | 'collection' | 'contact';
 
 type Props = {
     user?: AuthUser | null;
@@ -40,7 +40,7 @@ const NAV_ITEMS = [
         href: route('customer.products.index'),
     },
     { key: 'about' as const, label: 'A Propos', href: `${route('home')}#pourquoi-nous` },
-    { key: 'contact' as const, label: 'Contact', href: 'mailto:kambmusene@gmail.com' },
+    { key: 'contact' as const, label: 'Contact', href: route('contact') },
 ];
 
 export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
@@ -118,16 +118,22 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                     <nav className="hidden items-center gap-1 lg:flex">
                         {NAV_ITEMS.map((item) => {
                             const isActive = item.key === activeNav;
+                            const isContactActive =
+                                isActive && item.key === 'contact';
                             return (
                                 <Link
                                     key={item.label}
                                     href={item.href}
                                     className={
-                                        isActive ? SF_NAV_ITEM_ACTIVE : SF_NAV_ITEM
+                                        isContactActive
+                                            ? 'font-poppins border-b-2 border-[#0059DD] px-2.5 py-2.5 text-base font-medium text-black'
+                                            : isActive
+                                              ? SF_NAV_ITEM_ACTIVE
+                                              : SF_NAV_ITEM
                                     }
                                 >
                                     {item.label}
-                                    {isActive && (
+                                    {isActive && !isContactActive && (
                                         <span className="mt-0.5 size-1.5 rounded-full bg-[#0059DD]" />
                                     )}
                                 </Link>
@@ -183,7 +189,7 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                             }}
                             aria-label="Favoris"
                         >
-                            <Heart className="size-6" strokeWidth={1.25} />
+                            <Heart className="size-6 text-[#dc0000]" strokeWidth={1.25} />
                         </Button>
                         {user?.role === 'CUSTOMER' && (
                             <Button

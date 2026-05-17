@@ -72,6 +72,7 @@ class PasswordResetOtpController extends Controller
             'resendAvailableAt' => $resendAvailableAt,
             'identifier' => $flow['identifier'] ?? '',
             'channel' => $flow['channel'] ?? 'email',
+            'status' => session('status'),
         ]);
     }
 

@@ -9,49 +9,49 @@ const FEATURES = [
 
 export function HomeAbout() {
     return (
-        <section id="pourquoi-nous" className="bg-white py-16 md:py-24">
-            <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 sm:px-8 lg:grid-cols-2 lg:gap-6 lg:px-[100px]">
-                <div className="flex flex-col justify-center gap-7">
-                    <div>
+        <section id="pourquoi-nous" className="bg-white px-4 py-16 sm:px-8 lg:px-[100px] lg:py-[100px]">
+            <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-6 lg:flex-row lg:items-start lg:justify-center">
+                <div className="flex max-w-[578px] flex-col justify-center gap-7 py-5">
+                    <motion>
                         <h2 className="font-poppins text-[clamp(2.5rem,6vw,5.25rem)] font-extrabold leading-tight text-black">
                             Pourquoi
                             <br />
                             Nous ?
                         </h2>
-                        <p className="mt-4 max-w-xl font-poppins text-lg text-[#393939] md:text-xl">
+                        <p className="mt-1 max-w-xl font-poppins text-xl text-[#393939]">
                             Chez PCJ, la mode est une expression personnelle. Nos collections
                             uniques de vêtements et d&apos;accessoires sont conçus pour affirmer
                             votre style. Nous privilégions la durabilité et l&apos;éthique, en
                             utilisant des matériaux respectueux de l&apos;environnement. Faites un
                             choix de mode responsable et élégant avec PCJ.
                         </p>
-                    </div>
+                    </motion>
 
-                    <div className="grid grid-cols-3 gap-2 border-t border-black/10 pt-6">
+                    <div className="grid w-full max-w-[578px] grid-cols-3 gap-0 overflow-hidden pr-5">
                         {FEATURES.map(({ icon: Icon, label }, index) => (
                             <div
                                 key={label}
-                                className={`flex flex-col items-center gap-2.5 px-2 text-center ${
+                                className={`flex flex-col items-center gap-2.5 px-2.5 pt-11 pb-2.5 text-center ${
                                     index === 1 ? 'border-x border-black' : ''
                                 }`}
                             >
-                                <Icon className="size-12 text-black" strokeWidth={1.25} />
-                                <p className="font-poppins text-base font-medium text-black md:text-xl">
+                                <Icon className="size-[54px] text-black" strokeWidth={1.25} />
+                                <p className="font-poppins text-xl font-medium text-black">
                                     {label}
                                 </p>
-                            </div>
+                            </motion>
                         ))}
-                    </div>
-                </div>
+                    </motion>
+                </motion>
 
-                <div className="overflow-hidden rounded-r-[20px] lg:h-[720px]">
+                <div className="h-[min(720px,70vh)] w-full max-w-[600px] overflow-hidden rounded-br-[20px] rounded-tr-[20px] lg:shrink-0">
                     <img
                         src={HOME_ASSETS.aboutModels}
                         alt="Modèles PCJ"
-                        className="h-full w-full object-cover"
+                        className="size-full object-cover"
                     />
-                </div>
-            </div>
+                </motion>
+            </motion>
         </section>
     );
 }

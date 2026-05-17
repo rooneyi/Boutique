@@ -17,3 +17,9 @@ export const AUTH_BTN_GOOGLE =
 /** Champs avec soulignement — Figma register (313-2426). */
 export const AUTH_INPUT_UNDERLINE =
     'font-poppins h-auto w-full rounded-none border-0 border-b border-[rgba(91,94,100,0.62)] bg-transparent px-0 py-4 text-base text-black shadow-none placeholder:text-[rgba(91,94,100,0.62)] focus-visible:border-b focus-visible:border-black focus-visible:ring-0';
+
+/** Cases OTP — Figma 313-2599 */
+export const AUTH_OTP_SLOT =
+    'font-poppins relative flex h-[51px] w-10 items-center justify-center rounded-none border border-[rgba(91,94,100,0.62)] bg-white text-lg text-black shadow-none first:rounded-none first:border-l last:rounded-none data-[active=true]:z-10 data-[active=true]:border-black data-[active=true]:ring-0';
+
+export const AUTH_OTP_GROUP = 'flex gap-2.5 rounded-none border-0 ring-0';
