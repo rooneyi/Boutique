@@ -9,10 +9,17 @@ class EnsureAdmin
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || auth()->user()->role !== 'ADMIN') {
-            return redirect('/')->with('error', 'Accès réservé aux administrateurs');
+        if (! auth()->check()) {
+            return redirect()->guest(route('login'));
         }
 
-        return $next($request);
+        $user = auth()->user();
+
+        return match ($user->role) {
+            'CUSTOMER' => redirect()->route('home'),
+            'VENDOR' => redirect()->route('vendor.dashboard'),
+            'ADMIN' => $next($request),
+            default => abort(403),
+        };
     }
 }

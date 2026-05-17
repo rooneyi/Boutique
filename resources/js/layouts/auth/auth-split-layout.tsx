@@ -3,26 +3,26 @@ import type { AuthLayoutProps } from '@/types';
 
 export default function AuthSplitLayout({ children }: AuthLayoutProps) {
     return (
-        <div className="font-poppins grid min-h-dvh lg:grid-cols-2">
-            <div className="relative hidden items-center justify-center bg-black lg:flex">
+        <div className="font-poppins flex min-h-dvh bg-white">
+            <aside className="hidden w-1/2 shrink-0 items-center justify-center bg-black px-12 py-20 lg:flex xl:px-[145px] xl:py-[120px]">
                 <img
                     src={logoPcj}
                     alt="POSE COMME JAMAIS"
-                    className="h-auto w-64 max-w-[70%] object-contain"
+                    className="size-[min(386px,70vw)] object-contain"
                 />
-            </div>
+            </aside>
 
-            <div className="flex flex-col items-center justify-center bg-white px-6 py-10 sm:px-10">
-                <div className="mb-8 flex justify-center lg:hidden">
+            <main className="flex w-full flex-1 flex-col items-center justify-center px-6 py-10 sm:px-10">
+                <div className="mb-10 flex justify-center lg:hidden">
                     <img
                         src={logoPcj}
                         alt="POSE COMME JAMAIS"
-                        className="h-28 w-28 object-contain"
+                        className="size-32 object-contain"
                     />
                 </div>
 
-                <div className="w-full max-w-md">{children}</div>
-            </div>
+                <div className="w-full max-w-[380px]">{children}</div>
+            </main>
         </div>
     );
 }

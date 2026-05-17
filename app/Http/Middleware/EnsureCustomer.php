@@ -9,10 +9,17 @@ class EnsureCustomer
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || auth()->user()->role !== 'CUSTOMER') {
-            return redirect('/')->with('error', 'Accès réservé aux clients');
+        if (! auth()->check()) {
+            return redirect()->guest(route('login'));
         }
 
-        return $next($request);
+        $user = auth()->user();
+
+        return match ($user->role) {
+            'VENDOR' => redirect()->route('vendor.dashboard'),
+            'ADMIN' => redirect()->route('admin.dashboard'),
+            'CUSTOMER' => $next($request),
+            default => abort(403),
+        };
     }
 }

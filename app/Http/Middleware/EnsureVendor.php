@@ -9,10 +9,17 @@ class EnsureVendor
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || auth()->user()->role !== 'VENDOR') {
-            return redirect('/')->with('error', 'Accès réservé aux vendeurs');
+        if (! auth()->check()) {
+            return redirect()->guest(route('login'));
         }
 
-        return $next($request);
+        $user = auth()->user();
+
+        return match ($user->role) {
+            'CUSTOMER' => redirect()->route('home'),
+            'ADMIN' => redirect()->route('admin.dashboard'),
+            'VENDOR' => $next($request),
+            default => abort(403),
+        };
     }
 }

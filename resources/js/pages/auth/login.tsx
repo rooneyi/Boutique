@@ -1,24 +1,26 @@
 import { Form, Head, Link } from '@inertiajs/react';
+import { toast } from 'sonner';
 import GoogleIcon from '@/components/icons/google-icon';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
+import {
+    AUTH_BTN_GOOGLE,
+    AUTH_BTN_PRIMARY,
+    AUTH_INPUT,
+    AUTH_LINK_RED,
+} from '@/lib/auth-ui-styles';
+import { route } from '@/lib/route';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { cn } from '@/lib/utils';
 
 type Props = {
     status?: string;
     canResetPassword: boolean;
     canRegister: boolean;
 };
-
-const inputClassName =
-    'h-12 rounded-xl border-neutral-300 bg-white px-4 text-base text-black placeholder:text-neutral-400 focus-visible:border-black focus-visible:ring-black/20';
-
-const linkClassName = 'text-sm font-normal text-[#e53935] no-underline hover:text-[#c62828]';
 
 export default function Login({
     status,
@@ -29,111 +31,111 @@ export default function Login({
         <>
             <Head title="Connexion" />
 
-            <div className="space-y-8">
-                <div className="space-y-2 text-center lg:text-left">
-                    <h1 className="text-2xl font-bold tracking-tight text-black sm:text-3xl">
+            <div className="flex w-full flex-col items-center gap-[54px]">
+                <header className="flex w-full flex-col items-center gap-2.5 py-3 text-center">
+                    <h1 className="font-poppins text-[36px] font-bold leading-tight text-[#171616]">
                         Connecte-toi à ton style
                     </h1>
-                    <p className="text-sm text-neutral-600 sm:text-base">
+                    <p className="font-poppins text-[15px] font-normal text-[#484848]">
                         Bienvenue chez POSE COMME JAMAIS
                     </p>
-                </div>
+                </header>
 
                 {status && (
-                    <div className="text-center text-sm font-medium text-green-600">
-                        {status}
-                    </div>
+                    <p className="text-center text-sm font-medium text-green-600">{status}</p>
                 )}
 
                 <Form
                     {...store.form()}
                     resetOnSuccess={['password']}
-                    className="space-y-5"
+                    className="flex w-full flex-col items-center gap-[25px]"
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div className="space-y-4">
-                                <div className="space-y-1">
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        name="email"
-                                        required
-                                        autoFocus
-                                        tabIndex={1}
-                                        autoComplete="email"
-                                        placeholder="Email"
-                                        className={inputClassName}
-                                    />
-                                    <InputError message={errors.email} />
+                            <div className="flex w-full flex-col items-end gap-[25px] pb-2">
+                                <div className="flex w-full flex-col gap-[25px]">
+                                    <div className="space-y-1">
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            name="email"
+                                            required
+                                            autoFocus
+                                            tabIndex={1}
+                                            autoComplete="email"
+                                            placeholder="Email"
+                                            className={AUTH_INPUT}
+                                        />
+                                        <InputError message={errors.email} />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <Input
+                                            id="password"
+                                            type="password"
+                                            name="password"
+                                            required
+                                            tabIndex={2}
+                                            autoComplete="current-password"
+                                            placeholder="mot de passe"
+                                            className={AUTH_INPUT}
+                                        />
+                                        <InputError message={errors.password} />
+                                    </div>
                                 </div>
 
-                                <div className="space-y-1">
-                                    <Input
-                                        id="password"
-                                        type="password"
-                                        name="password"
-                                        required
-                                        tabIndex={2}
-                                        autoComplete="current-password"
-                                        placeholder="mot de passe"
-                                        className={inputClassName}
-                                    />
-                                    {canResetPassword && (
-                                        <div className="flex justify-end pt-1">
-                                            <TextLink
-                                                href={request()}
-                                                className={linkClassName}
-                                                tabIndex={5}
-                                            >
-                                                Mot de passe oublié ?
-                                            </TextLink>
-                                        </div>
-                                    )}
-                                    <InputError message={errors.password} />
-                                </div>
+                                {canResetPassword && (
+                                    <TextLink
+                                        href={request()}
+                                        className={AUTH_LINK_RED}
+                                        tabIndex={5}
+                                    >
+                                        Mot de passe oublié ?
+                                    </TextLink>
+                                )}
 
                                 <Button
                                     type="submit"
-                                    className="h-12 w-full rounded-xl bg-black text-sm font-semibold tracking-wide text-white uppercase hover:bg-neutral-800"
+                                    className={AUTH_BTN_PRIMARY}
                                     tabIndex={3}
                                     disabled={processing}
                                     data-test="login-button"
                                 >
-                                    {processing && <Spinner />}
+                                    {processing && <Spinner className="text-white" />}
                                     SE CONNECTER
                                 </Button>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <div className="h-px flex-1 bg-neutral-200" />
-                                <span className="text-sm text-neutral-400">
-                                    — ou —
-                                </span>
-                                <div className="h-px flex-1 bg-neutral-200" />
+                            <div className="flex items-center gap-1.5">
+                                <span className="h-px w-5 bg-[#8a8a8a]" aria-hidden />
+                                <span className="font-poppins text-xs text-[#8a8a8a]">Ou</span>
+                                <span className="h-px w-5 bg-[#8a8a8a]" aria-hidden />
                             </div>
 
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="h-12 w-full rounded-xl border-neutral-300 bg-white text-sm font-normal text-black normal-case hover:bg-neutral-50"
+                                className={AUTH_BTN_GOOGLE}
                                 tabIndex={4}
+                                onClick={() =>
+                                    toast.message('Bientôt disponible', {
+                                        description:
+                                            'La connexion Google sera activée prochainement.',
+                                    })
+                                }
                             >
                                 <span className="flex-1 text-center lowercase">
                                     se connecter avec google
                                 </span>
-                                <GoogleIcon className="size-5 shrink-0" />
+                                <GoogleIcon className="size-[26px] shrink-0" />
                             </Button>
 
                             {canRegister && (
-                                <p className="text-center text-sm text-neutral-600">
-                                    vous n&apos;avez pas de compte ?{' '}
+                                <p className="text-center font-poppins text-xs text-[#484848]">
+                                    Vous n&apos;avez pas de compte ?{' '}
                                     <Link
                                         href={route('auth.customer.register')}
-                                        className={cn(
-                                            linkClassName,
-                                            'font-semibold',
-                                        )}
+                                        className={AUTH_LINK_RED}
                                         tabIndex={6}
                                     >
                                         Inscrivez-vous

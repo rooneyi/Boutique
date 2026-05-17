@@ -8,6 +8,7 @@ class CustomerRegisterData
         public string $name,
         public string $email,
         public string $password,
+        public ?string $phone = null,
     ) {}
 
     public static function from(array $data): self
@@ -16,6 +17,7 @@ class CustomerRegisterData
             name: $data['name'],
             email: $data['email'],
             password: $data['password'],
+            phone: $data['phone'] ?? null,
         );
     }
 

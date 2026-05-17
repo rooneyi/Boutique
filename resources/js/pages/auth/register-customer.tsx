@@ -1,130 +1,168 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
+import { toast } from 'sonner';
+import GoogleIcon from '@/components/icons/google-icon';
 import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+    AUTH_BTN_GOOGLE,
+    AUTH_BTN_PRIMARY,
+    AUTH_INPUT_UNDERLINE,
+    AUTH_LINK_RED,
+} from '@/lib/auth-ui-styles';
+import { route } from '@/lib/route';
 
 export default function RegisterCustomer() {
     return (
         <>
-            <Head title="S'inscrire" />
+            <Head title="Créer un compte · PCJ" />
 
-            <div className="mx-auto max-w-sm space-y-6">
-                <div className="space-y-2 text-center">
-                    <h1 className="text-2xl font-bold">Créer un Compte Client</h1>
-                    <p className="text-sm text-muted-foreground">
-                        Parcourez et achetez vos vêtements préférés
+            <div className="flex w-full flex-col items-center gap-[54px]">
+                <header className="flex w-full flex-col items-center gap-2.5 py-3 text-center">
+                    <h1 className="font-poppins text-[36px] font-bold leading-tight text-[#171616]">
+                        Créez un compte
+                    </h1>
+                    <p className="font-poppins text-[15px] font-normal text-[#484848]">
+                        Bienvenue chez POSE COMME JAMAIS
                     </p>
-                </div>
+                </header>
 
                 <Form
                     method="post"
-                    action={route('auth.customer.register')}
-                    className="space-y-4"
+                    action={route('auth.customer.register.store')}
+                    className="flex w-full flex-col items-center gap-[25px]"
                 >
                     {({ processing, errors }) => (
                         <>
-                            {/* Nom */}
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Nom Complet</Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    placeholder="Marie Martin"
-                                    required
-                                    autoFocus
+                            <div className="flex w-full flex-col items-end gap-[60px] pb-2">
+                                <div className="flex w-full flex-col gap-[25px]">
+                                    <div className="grid grid-cols-2 gap-2.5">
+                                        <div className="space-y-1">
+                                            <Input
+                                                id="first_name"
+                                                name="first_name"
+                                                type="text"
+                                                placeholder="Prénom"
+                                                required
+                                                autoFocus
+                                                disabled={processing}
+                                                className={AUTH_INPUT_UNDERLINE}
+                                                autoComplete="given-name"
+                                            />
+                                            <InputError message={errors.first_name} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Input
+                                                id="last_name"
+                                                name="last_name"
+                                                type="text"
+                                                placeholder="Postnom"
+                                                required
+                                                disabled={processing}
+                                                className={AUTH_INPUT_UNDERLINE}
+                                                autoComplete="family-name"
+                                            />
+                                            <InputError message={errors.last_name} />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <Input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            placeholder="Email"
+                                            required
+                                            disabled={processing}
+                                            className={AUTH_INPUT_UNDERLINE}
+                                            autoComplete="email"
+                                        />
+                                        <InputError message={errors.email} />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <Input
+                                            id="phone"
+                                            name="phone"
+                                            type="tel"
+                                            placeholder="Téléphone"
+                                            required
+                                            disabled={processing}
+                                            className={AUTH_INPUT_UNDERLINE}
+                                            autoComplete="tel"
+                                        />
+                                        <InputError message={errors.phone} />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <Input
+                                            id="password"
+                                            name="password"
+                                            type="password"
+                                            placeholder="Mot de passe"
+                                            required
+                                            disabled={processing}
+                                            className={AUTH_INPUT_UNDERLINE}
+                                            autoComplete="new-password"
+                                        />
+                                        <InputError message={errors.password} />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <Input
+                                            id="password_confirmation"
+                                            name="password_confirmation"
+                                            type="password"
+                                            placeholder="Confirmer le mot de passe"
+                                            required
+                                            disabled={processing}
+                                            className={AUTH_INPUT_UNDERLINE}
+                                            autoComplete="new-password"
+                                        />
+                                        <InputError message={errors.password_confirmation} />
+                                    </div>
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    className={AUTH_BTN_PRIMARY}
                                     disabled={processing}
-                                />
-                                <InputError message={errors.name} />
+                                >
+                                    {processing && <Spinner className="text-white" />}
+                                    INSCRIPTION
+                                </Button>
                             </div>
 
-                            {/* Email */}
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    placeholder="marie@example.com"
-                                    required
-                                    disabled={processing}
-                                />
-                                <InputError message={errors.email} />
+                            <div className="flex items-center gap-1.5">
+                                <span className="h-px w-5 bg-[#8a8a8a]" aria-hidden />
+                                <span className="font-poppins text-xs text-[#8a8a8a]">Ou</span>
+                                <span className="h-px w-5 bg-[#8a8a8a]" aria-hidden />
                             </div>
 
-                            {/* Mot de passe */}
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Mot de passe</Label>
-                                <PasswordInput
-                                    id="password"
-                                    name="password"
-                                    placeholder="••••••••"
-                                    required
-                                    disabled={processing}
-                                />
-                                <InputError message={errors.password} />
-                            </div>
-
-                            {/* Confirmation mot de passe */}
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirmer le mot de passe
-                                </Label>
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    name="password_confirmation"
-                                    placeholder="••••••••"
-                                    required
-                                    disabled={processing}
-                                />
-                                <InputError message={errors.password_confirmation} />
-                            </div>
-
-                            {/* Information */}
-                            <Alert>
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertDescription>
-                                    Créez un compte pour profiter d'une meilleure expérience de shopping
-                                </AlertDescription>
-                            </Alert>
-
-                            {/* Bouton */}
                             <Button
-                                className="w-full"
-                                disabled={processing}
-                                type="submit"
+                                type="button"
+                                variant="outline"
+                                className={AUTH_BTN_GOOGLE}
+                                onClick={() =>
+                                    toast.message('Bientôt disponible', {
+                                        description:
+                                            'L’inscription Google sera activée prochainement.',
+                                    })
+                                }
                             >
-                                {processing ? (
-                                    <>
-                                        <Spinner className="mr-2 h-4 w-4" />
-                                        Création en cours...
-                                    </>
-                                ) : (
-                                    'S\'inscrire'
-                                )}
+                                <span className="flex-1 text-center">
+                                    Se connecter avec Google
+                                </span>
+                                <GoogleIcon className="size-[26px] shrink-0" />
                             </Button>
 
-                            {/* Lien vers connexion */}
-                            <div className="text-center text-sm">
-                                Vous avez déjà un compte?{' '}
-                                <TextLink href={route('login')}>
-                                    Se connecter
-                                </TextLink>
-                            </div>
-
-                            {/* Lien vers inscription vendeur */}
-                            <div className="text-center text-sm">
-                                Vous êtes vendeur?{' '}
-                                <TextLink href={route('auth.vendor.register')}>
-                                    Créer une boutique
-                                </TextLink>
-                            </div>
+                            <p className="text-center font-poppins text-xs text-[#484848]">
+                                Vous avez déjà un compte ?{' '}
+                                <Link href={route('login')} className={AUTH_LINK_RED}>
+                                    Connectez-vous
+                                </Link>
+                            </p>
                         </>
                     )}
                 </Form>
@@ -132,3 +170,7 @@ export default function RegisterCustomer() {
         </>
     );
 }
+
+RegisterCustomer.layout = {
+    variant: 'split',
+};

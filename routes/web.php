@@ -24,59 +24,6 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
-Route::get('/', function () {
-    $favoriteIdSet = [];
-    if (auth()->check() && auth()->user()->role === 'CUSTOMER' && auth()->user()->customer) {
-        $favoriteIdSet = auth()->user()->customer->favoriteProducts()->pluck('products.id')->flip()->all();
-    }
-
-    $featured = Product::query()
-        ->where('status', '!=', 'DISCONTINUED')
-        ->with(['category', 'vendor'])
-        ->withAvg('reviews', 'rating')
-        ->withCount('reviews')
-        ->latest()
-        ->limit(4)
-        ->get()
-        ->map(function (Product $p) use ($favoriteIdSet) {
-            return [
-                'id' => $p->id,
-                'name' => $p->name,
-                'price' => (float) $p->price,
-                'image_path' => $p->image
-                    ? Storage::disk('public')->url($p->image)
-                    : null,
-                'vendor_shop' => $p->vendor->shop_name,
-                'category' => $p->category?->name ?? '',
-                'rating_avg' => $p->reviews_avg_rating !== null ? round((float) $p->reviews_avg_rating, 1) : null,
-                'reviews_count' => (int) ($p->reviews_count ?? 0),
-                'is_favorite' => isset($favoriteIdSet[$p->id]),
-            ];
-        });
-
-    $highlightCategories = Category::query()
-        ->withCount([
-            'products as active_count' => fn ($q) => $q->where('status', '!=', 'DISCONTINUED'),
-        ])
-        ->orderBy('name')
-        ->limit(6)
-        ->get()
-        ->map(fn (Category $c) => [
-            'id' => $c->id,
-            'name' => $c->name,
-            'count' => (int) $c->active_count,
-        ]);
-
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-        'featuredProducts' => $featured,
-        'highlightCategories' => $highlightCategories,
-    ]);
-})->name('home');
-
-Route::get('customer/products', [CustomerProductController::class, 'index'])->name('customer.products.index');
-Route::get('customer/products/{product}', [CustomerProductController::class, 'show'])->name('customer.products.show');
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         $user = request()->user();
@@ -89,7 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::location(route('vendor.dashboard'));
         }
 
-        return Inertia::location(route('customer.products.index'));
+        return Inertia::location(route('home'));
     })->name('dashboard');
 });
 
@@ -150,18 +97,27 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     })->name('vendor.register.store');
 
     Route::post('customer/register', function (Request $request) {
-        $data = CustomerRegisterData::from($request->validate([
-            'name' => ['required', 'string', 'max:255'],
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:120'],
+            'last_name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['required', 'string', 'max:50'],
             'password' => ['required', 'confirmed', 'min:8'],
-        ]));
+        ]);
+
+        $data = CustomerRegisterData::from([
+            'name' => trim($validated['first_name'].' '.$validated['last_name']),
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'phone' => $validated['phone'],
+        ]);
 
         $user = app(CustomerService::class)->register($data);
 
         auth()->login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('customer.products.index');
+        return redirect()->route('home');
     })->name('customer.register.store');
 });
 
@@ -196,28 +152,84 @@ Route::middleware(['auth', 'verified', 'vendor'])->prefix('vendor')->name('vendo
     Route::get('settings', fn () => redirect()->route('settings.profile'))->name('settings');
 });
 
-Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('customer.')->group(function () {
-    Route::get('cart', [CartController::class, 'index'])->name('cart');
-    Route::get('cart/preview', [CartController::class, 'preview'])->name('cart.preview');
-    Route::post('cart/items', [CartController::class, 'store'])->name('cart.items.store');
-    Route::patch('cart/items/{product}', [CartController::class, 'update'])->name('cart.items.update');
-    Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+Route::middleware(['auth', 'verified', 'customer'])->group(function () {
+    Route::get('/', function () {
+        $favoriteIdSet = [];
+        $customer = auth()->user()->customer;
+        if ($customer) {
+            $favoriteIdSet = $customer->favoriteProducts()->pluck('products.id')->flip()->all();
+        }
 
-    Route::get('checkout', [CheckoutController::class, 'create'])->name('checkout');
-    Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+        $featured = Product::query()
+            ->where('status', '!=', 'DISCONTINUED')
+            ->with(['category', 'vendor'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->latest()
+            ->limit(4)
+            ->get()
+            ->map(function (Product $p) use ($favoriteIdSet) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'price' => (float) $p->price,
+                    'image_path' => $p->image
+                        ? Storage::disk('public')->url($p->image)
+                        : null,
+                    'vendor_shop' => $p->vendor->shop_name,
+                    'category' => $p->category?->name ?? '',
+                    'rating_avg' => $p->reviews_avg_rating !== null ? round((float) $p->reviews_avg_rating, 1) : null,
+                    'reviews_count' => (int) ($p->reviews_count ?? 0),
+                    'is_favorite' => isset($favoriteIdSet[$p->id]),
+                ];
+            });
 
-    Route::get('account/preview', [AccountController::class, 'preview'])->name('account.preview');
+        $highlightCategories = Category::query()
+            ->withCount([
+                'products as active_count' => fn ($q) => $q->where('status', '!=', 'DISCONTINUED'),
+            ])
+            ->orderBy('name')
+            ->limit(6)
+            ->get()
+            ->map(fn (Category $c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'count' => (int) $c->active_count,
+            ]);
 
-    Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
-    Route::get('favorites/preview', [FavoriteController::class, 'preview'])->name('favorites.preview');
-    Route::post('favorites/{product}', [FavoriteController::class, 'store'])->name('favorites.store');
-    Route::delete('favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+        return Inertia::render('welcome', [
+            'canRegister' => Features::enabled(Features::registration()),
+            'featuredProducts' => $featured,
+            'highlightCategories' => $highlightCategories,
+        ]);
+    })->name('home');
 
-    Route::post('products/{product}/reviews', [ProductReviewController::class, 'store'])->name('products.reviews.store');
+    Route::prefix('customer')->name('customer.')->group(function () {
+        Route::get('products', [CustomerProductController::class, 'index'])->name('products.index');
+        Route::get('products/{product}', [CustomerProductController::class, 'show'])->name('products.show');
 
-    Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
-    Route::post('orders', [CustomerOrderController::class, 'store'])->name('orders.store');
-    Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
+        Route::get('cart', [CartController::class, 'index'])->name('cart');
+        Route::get('cart/preview', [CartController::class, 'preview'])->name('cart.preview');
+        Route::post('cart/items', [CartController::class, 'store'])->name('cart.items.store');
+        Route::patch('cart/items/{product}', [CartController::class, 'update'])->name('cart.items.update');
+        Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+
+        Route::get('checkout', [CheckoutController::class, 'create'])->name('checkout');
+        Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+        Route::get('account/preview', [AccountController::class, 'preview'])->name('account.preview');
+
+        Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+        Route::get('favorites/preview', [FavoriteController::class, 'preview'])->name('favorites.preview');
+        Route::post('favorites/{product}', [FavoriteController::class, 'store'])->name('favorites.store');
+        Route::delete('favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+
+        Route::post('products/{product}/reviews', [ProductReviewController::class, 'store'])->name('products.reviews.store');
+
+        Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
+        Route::post('orders', [CustomerOrderController::class, 'store'])->name('orders.store');
+        Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
+    });
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
