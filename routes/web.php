@@ -59,6 +59,16 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('customer.register');
 
+    Route::get('customer/register/birth', function () {
+        if (! session()->has('customer_register_pending')) {
+            return redirect()->route('auth.customer.register');
+        }
+
+        return Inertia::render('auth/register-customer-birth', [
+            'canRegister' => Features::enabled(Features::registration()),
+        ]);
+    })->name('customer.register.birth');
+
     Route::get('register', fn () => Inertia::render('auth/register', [
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('register');
@@ -105,20 +115,45 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
-        $data = CustomerRegisterData::from([
-            'name' => trim($validated['first_name'].' '.$validated['last_name']),
+        $request->session()->put('customer_register_pending', [
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
             'email' => $validated['email'],
-            'password' => $validated['password'],
             'phone' => $validated['phone'],
+            'password' => $validated['password'],
+        ]);
+
+        return redirect()->route('auth.customer.register.birth');
+    })->name('customer.register.store');
+
+    Route::post('customer/register/birth', function (Request $request) {
+        $pending = $request->session()->get('customer_register_pending');
+
+        if (! is_array($pending)) {
+            return redirect()->route('auth.customer.register');
+        }
+
+        $validated = $request->validate([
+            'birth_date' => ['required', 'date', 'before:today', 'after:1900-01-01'],
+        ]);
+
+        $data = CustomerRegisterData::from([
+            'name' => trim($pending['first_name'].' '.$pending['last_name']),
+            'email' => $pending['email'],
+            'password' => $pending['password'],
+            'phone' => $pending['phone'],
+            'birth_date' => $validated['birth_date'],
         ]);
 
         $user = app(CustomerService::class)->register($data);
+
+        $request->session()->forget('customer_register_pending');
 
         auth()->login($user);
         $request->session()->regenerate();
 
         return redirect()->route('home');
-    })->name('customer.register.store');
+    })->name('customer.register.birth.store');
 });
 
 Route::middleware('auth')->prefix('auth')->name('auth.')->group(function () {

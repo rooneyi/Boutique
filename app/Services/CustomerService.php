@@ -22,6 +22,7 @@ class CustomerService
             Customer::create([
                 'user_id' => $user->id,
                 'phone' => $data->phone,
+                'birth_date' => $data->birthDate,
             ]);
 
             return $user;

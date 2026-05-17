@@ -130,7 +130,7 @@ export default function RegisterCustomer() {
                                     disabled={processing}
                                 >
                                     {processing && <Spinner className="text-white" />}
-                                    INSCRIPTION
+                                    SUIVANT
                                 </Button>
                             </div>
 
