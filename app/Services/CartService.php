@@ -48,6 +48,11 @@ class CartService
         Session::put(self::SESSION_KEY, $items);
     }
 
+    public function clear(): void
+    {
+        Session::forget(self::SESSION_KEY);
+    }
+
     public function setQuantity(int $productId, int $quantity): void
     {
         if ($quantity <= 0) {
@@ -83,6 +88,7 @@ class CartService
      *   line_total: float,
      *   image_path: ?string,
      *   vendor_shop: string,
+     *   vendor_id: int,
      *   stock: int
      * }>
      */
@@ -118,6 +124,7 @@ class CartService
                     ? Storage::disk('public')->url($product->image)
                     : null,
                 'vendor_shop' => $product->vendor->shop_name,
+                'vendor_id' => $product->vendor_id,
                 'stock' => $product->stock,
             ];
         }

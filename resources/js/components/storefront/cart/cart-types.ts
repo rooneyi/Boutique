@@ -6,6 +6,7 @@ export type CartLine = {
     line_total: number;
     image_path: string | null;
     vendor_shop: string;
+    vendor_id: number;
     stock: number;
     is_favorite?: boolean;
 };

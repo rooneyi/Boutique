@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Http\Controllers\Customer;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Order\StoreCheckoutRequest;
+use App\Models\Product;
+use App\Data\OrderData;
+use App\Services\CartService;
+use App\Services\OrderService;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response;
+use Laravel\Fortify\Features;
+
+class CheckoutController extends Controller
+{
+    public function __construct(
+        private CartService $cartService,
+        private OrderService $orderService,
+    ) {}
+
+    public function create(): Response|RedirectResponse
+    {
+        $this->cartService->reconcile();
+        $lines = $this->cartService->lines();
+
+        if ($lines === []) {
+            return redirect()->route('customer.cart')->with('error', 'Votre panier est vide.');
+        }
+
+        $user = auth()->user();
+        $subtotal = $this->cartService->total();
+
+        return Inertia::render('customer/checkout', [
+            'lines' => $lines,
+            'subtotal' => $subtotal,
+            'shipping' => 0,
+            'total' => $subtotal,
+            'canRegister' => Features::enabled(Features::registration()),
+            'defaults' => [
+                'shipping_full_name' => $user->name ?? '',
+                'shipping_whatsapp' => '',
+                'shipping_address' => '',
+                'shipping_city' => '',
+                'shipping_district' => '',
+                'payment_method' => 'cash_on_delivery',
+                'customer_note' => '',
+            ],
+            'whatsappPhone' => '243991934590',
+        ]);
+    }
+
+    public function store(StoreCheckoutRequest $request): RedirectResponse
+    {
+        $this->cartService->reconcile();
+        $lines = $this->cartService->lines();
+
+        if ($lines === []) {
+            return redirect()->route('customer.cart')->with('error', 'Votre panier est vide.');
+        }
+
+        $customer = auth()->user()->customer;
+        $validated = $request->validated();
+
+        $grouped = [];
+        foreach ($lines as $line) {
+            $vendorId = (int) $line['vendor_id'];
+            $grouped[$vendorId][] = $line;
+        }
+
+        $orderIds = [];
+
+        foreach ($grouped as $vendorId => $vendorLines) {
+            $items = [];
+            $total = 0.0;
+
+            foreach ($vendorLines as $line) {
+                $product = Product::query()->findOrFail($line['product_id']);
+
+                if ($product->status === 'DISCONTINUED') {
+                    return back()->withErrors([
+                        'cart' => "Le produit « {$product->name} » n'est plus disponible.",
+                    ]);
+                }
+
+                $qty = (int) $line['quantity'];
+                if ($product->stock < $qty) {
+                    return back()->withErrors([
+                        'cart' => "Stock insuffisant pour « {$product->name} ».",
+                    ]);
+                }
+
+                $unit = (float) $product->price;
+                $items[] = [
+                    'product_id' => $product->id,
+                    'quantity' => $qty,
+                    'price' => $unit,
+                ];
+                $total += $unit * $qty;
+            }
+
+            $order = $this->orderService->createOrder($customer, OrderData::from([
+                'customer_id' => $customer->id,
+                'vendor_id' => (int) $vendorId,
+                'items' => $items,
+                'total' => $total,
+                'status' => 'PENDING',
+                'shipping_full_name' => $validated['shipping_full_name'],
+                'shipping_whatsapp' => $validated['shipping_whatsapp'],
+                'shipping_address' => $validated['shipping_address'],
+                'shipping_city' => $validated['shipping_city'],
+                'shipping_district' => $validated['shipping_district'],
+                'payment_method' => $validated['payment_method'],
+                'customer_note' => $validated['customer_note'] ?? null,
+            ]));
+
+            $orderIds[] = $order->id;
+        }
+
+        $this->cartService->clear();
+
+        $redirectOrderId = $orderIds[0];
+
+        return redirect()
+            ->route('customer.orders.show', $redirectOrderId)
+            ->with('success', count($orderIds) > 1
+                ? count($orderIds).' commandes ont été enregistrées.'
+                : 'Votre commande a été enregistrée.');
+    }
+}

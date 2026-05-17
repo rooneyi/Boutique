@@ -25,6 +25,13 @@ class OrderService
                 'vendor_id' => $data->vendor_id,
                 'total' => $data->total,
                 'status' => $data->status,
+                'shipping_full_name' => $data->shipping_full_name,
+                'shipping_whatsapp' => $data->shipping_whatsapp,
+                'shipping_address' => $data->shipping_address,
+                'shipping_city' => $data->shipping_city,
+                'shipping_district' => $data->shipping_district,
+                'payment_method' => $data->payment_method,
+                'customer_note' => $data->customer_note,
             ]);
 
             // Créer les items de commande et décrémenter le stock
