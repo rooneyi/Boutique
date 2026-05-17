@@ -1,13 +1,16 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { AdminBadge } from '@/components/admin/admin-badge';
+import {
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminStatCard } from '@/components/admin/admin-stat-card';
 import { route } from '@/lib/route';
 import {
-    ADMIN_BADGE_BLUE,
     ADMIN_BTN_PILL_OUTLINE,
-    ADMIN_CARD,
     ADMIN_FILTER_PILL,
     ADMIN_FILTER_PILL_ACTIVE,
     ADMIN_H3,
@@ -87,6 +90,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                         value={`€${Number(analytics.total_sales).toFixed(2)}`}
                         hint={`Période : ${periodLabels[period]}`}
                         icon={Wallet}
+                        accent
                     />
                     <AdminStatCard
                         label="Commandes"
@@ -103,14 +107,14 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                 </div>
 
                 <div className="grid gap-6 xl:grid-cols-2">
-                    <Card className={ADMIN_CARD}>
-                        <CardHeader>
+                    <AdminCard>
+                        <AdminCardHeader>
                             <h3 className={ADMIN_H3}>Période la plus forte</h3>
-                            <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
+                            <AdminCardDescription>
                                 Journée avec le plus de CA sur l&apos;intervalle
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="font-poppins text-sm text-black">
+                            </AdminCardDescription>
+                        </AdminCardHeader>
+                        <AdminCardContent className="font-poppins text-sm text-black">
                             {analytics.best_sales_day ? (
                                 <ul className="space-y-2">
                                     <li>
@@ -129,17 +133,17 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                             ) : (
                                 <p className={ADMIN_MUTED}>Pas assez de données sur cette période.</p>
                             )}
-                        </CardContent>
-                    </Card>
+                        </AdminCardContent>
+                    </AdminCard>
 
-                    <Card className={ADMIN_CARD}>
-                        <CardHeader>
+                    <AdminCard>
+                        <AdminCardHeader>
                             <h3 className={ADMIN_H3}>Ruptures à forte demande</h3>
-                            <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
+                            <AdminCardDescription>
                                 Produits en rupture les plus vendus sur la période
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
+                            </AdminCardDescription>
+                        </AdminCardHeader>
+                        <AdminCardContent>
                             {analytics.high_demand_out_of_stock.length > 0 ? (
                                 <ul className="space-y-2 font-poppins text-sm">
                                     {analytics.high_demand_out_of_stock.map((row) => (
@@ -157,8 +161,8 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                             ) : (
                                 <p className={ADMIN_MUTED}>Aucune rupture avec ventes sur cette période.</p>
                             )}
-                        </CardContent>
-                    </Card>
+                        </AdminCardContent>
+                    </AdminCard>
                 </div>
 
                 <div className="grid gap-6 xl:grid-cols-3">
@@ -166,34 +170,36 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                         { title: 'Produits les plus vendus', rows: analytics.top_products, render: (p: TopProduct) => (
                             <li key={p.id} className="flex justify-between gap-2">
                                 <span>{p.name}</span>
-                                <span className={ADMIN_BADGE_BLUE}>{p.total_sold}</span>
+                                <AdminBadge variant="blue">{p.total_sold}</AdminBadge>
                             </li>
                         )},
                         { title: 'Vendeurs les plus actifs', rows: analytics.top_vendors, render: (v: TopVendor) => (
                             <li key={v.id} className="flex justify-between gap-2">
                                 <span>{v.shop_name}</span>
-                                <Badge variant="outline" className="font-poppins">{v.orders_count}</Badge>
+                                <AdminBadge variant="outline">{v.orders_count}</AdminBadge>
                             </li>
                         )},
                         { title: 'Clients les plus actifs', rows: analytics.top_customers, render: (c: TopCustomer) => (
                             <li key={c.id} className="flex justify-between gap-2">
                                 <span className="truncate">{c.name}</span>
-                                <Badge variant="outline" className="font-poppins">{c.orders_count}</Badge>
+                                <AdminBadge variant="outline">{c.orders_count}</AdminBadge>
                             </li>
                         )},
                     ].map((block) => (
-                        <Card key={block.title} className={ADMIN_CARD}>
-                            <CardHeader>
+                        <AdminCard key={block.title}>
+                            <AdminCardHeader>
                                 <h3 className={ADMIN_H3}>{block.title}</h3>
-                            </CardHeader>
-                            <CardContent className="max-h-80 overflow-auto font-poppins text-sm">
+                            </AdminCardHeader>
+                            <AdminCardContent className="max-h-80 overflow-auto font-poppins text-sm">
                                 {block.rows.length > 0 ? (
-                                    <ul className="space-y-2">{block.rows.map((row) => block.render(row as never))}</ul>
+                                    <ul className="space-y-3">
+                                        {block.rows.map((row) => block.render(row as never))}
+                                    </ul>
                                 ) : (
                                     <p className={ADMIN_MUTED}>—</p>
                                 )}
-                            </CardContent>
-                        </Card>
+                            </AdminCardContent>
+                        </AdminCard>
                     ))}
                 </div>
             </div>

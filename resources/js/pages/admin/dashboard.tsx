@@ -1,19 +1,22 @@
 import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Package, Plus, ShoppingCart, TrendingUp, Users } from 'lucide-react';
+import { AdminBadge, orderStatusBadgeVariant } from '@/components/admin/admin-badge';
+import {
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminStatCard } from '@/components/admin/admin-stat-card';
 import { route } from '@/lib/route';
 import {
-    ADMIN_BADGE_BLUE,
     ADMIN_BTN_PILL_DARK,
     ADMIN_BTN_PILL_OUTLINE,
-    ADMIN_CARD,
     ADMIN_H3,
     ADMIN_MUTED,
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
+import { Package, Plus, ShoppingCart, TrendingUp, Users } from 'lucide-react';
 
 type AdminStats = {
     total_vendors: number;
@@ -104,85 +107,77 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                 </div>
 
                 <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
-                    <Card className={ADMIN_CARD}>
-                        <CardHeader>
+                    <AdminCard>
+                        <AdminCardHeader>
                             <h3 className={ADMIN_H3}>Produits populaires</h3>
-                            <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
-                                Top ventes sur la plateforme
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
+                            <AdminCardDescription>Top ventes sur la plateforme</AdminCardDescription>
+                        </AdminCardHeader>
+                        <AdminCardContent className="space-y-3">
                             {stats.top_products.length > 0 ? (
                                 stats.top_products.map((product) => (
                                     <div
                                         key={product.id}
-                                        className="flex items-center justify-between gap-4 rounded-sm border border-neutral-200 p-3"
+                                        className="flex items-center justify-between gap-4 rounded-sm border border-neutral-200 bg-[#fafafa] p-4"
                                     >
                                         <div>
-                                            <p className="font-poppins font-medium text-black">
+                                            <p className="font-poppins font-semibold text-black">
                                                 {product.name}
                                             </p>
                                             <p className={cn(ADMIN_MUTED, 'text-sm')}>
                                                 Stock : {product.stock}
                                             </p>
                                         </div>
-                                        <span className={ADMIN_BADGE_BLUE}>
-                                            {product.total_sold} vendus
-                                        </span>
+                                        <AdminBadge variant="blue">{product.total_sold} vendus</AdminBadge>
                                     </div>
                                 ))
                             ) : (
                                 <p className={ADMIN_MUTED}>Aucun produit pour le moment.</p>
                             )}
-                        </CardContent>
-                    </Card>
+                        </AdminCardContent>
+                    </AdminCard>
 
-                    <Card className={ADMIN_CARD}>
-                        <CardHeader>
+                    <AdminCard>
+                        <AdminCardHeader>
                             <h3 className={ADMIN_H3}>Indicateurs</h3>
-                            <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
-                                Panier moyen et répartition
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="rounded-sm border border-neutral-200 bg-neutral-50 p-4">
+                            <AdminCardDescription>Panier moyen et répartition</AdminCardDescription>
+                        </AdminCardHeader>
+                        <AdminCardContent className="space-y-4">
+                            <div className="rounded-sm border border-neutral-200 bg-[#fafafa] p-4">
                                 <p className={ADMIN_MUTED}>Panier moyen</p>
                                 <p className="font-poppins text-2xl font-semibold text-[#0059DD]">
                                     €{stats.avg_order_value.toFixed(2)}
                                 </p>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="rounded-sm border border-neutral-200 p-3 text-center">
+                                <div className="rounded-sm border border-neutral-200 bg-white p-4 text-center">
                                     <p className="font-poppins text-2xl font-semibold text-black">
                                         {stats.total_vendors}
                                     </p>
                                     <p className={cn(ADMIN_MUTED, 'text-sm')}>Vendeurs</p>
                                 </div>
-                                <div className="rounded-sm border border-neutral-200 p-3 text-center">
+                                <div className="rounded-sm border border-neutral-200 bg-white p-4 text-center">
                                     <p className="font-poppins text-2xl font-semibold text-black">
                                         {stats.total_customers}
                                     </p>
                                     <p className={cn(ADMIN_MUTED, 'text-sm')}>Clients</p>
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
+                        </AdminCardContent>
+                    </AdminCard>
                 </div>
 
-                <Card className={ADMIN_CARD}>
-                    <CardHeader>
+                <AdminCard>
+                    <AdminCardHeader>
                         <h3 className={ADMIN_H3}>Commandes récentes</h3>
-                        <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
-                            Dernières transactions enregistrées
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                        <AdminCardDescription>Dernières transactions enregistrées</AdminCardDescription>
+                    </AdminCardHeader>
+                    <AdminCardContent>
                         {stats.recent_orders.length > 0 ? (
                             <div className="space-y-3">
                                 {stats.recent_orders.map((order) => (
                                     <div
                                         key={order.id}
-                                        className="grid grid-cols-2 gap-3 rounded-sm border border-neutral-200 p-4 text-sm md:grid-cols-12 md:items-center"
+                                        className="grid grid-cols-2 gap-3 rounded-sm border border-neutral-200 bg-[#fafafa] p-4 text-sm md:grid-cols-12 md:items-center"
                                     >
                                         <div className="font-poppins font-semibold text-black md:col-span-2">
                                             #{order.id}
@@ -193,16 +188,13 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                         <div className={cn(ADMIN_MUTED, 'md:col-span-3')}>
                                             {order.created_at}
                                         </div>
-                                        <div className="font-poppins font-medium text-black md:col-span-2">
+                                        <div className="font-poppins font-semibold text-black md:col-span-2">
                                             €{order.total.toFixed(2)}
                                         </div>
                                         <div className="md:col-span-2">
-                                            <Badge
-                                                variant="outline"
-                                                className="font-poppins border-neutral-300"
-                                            >
+                                            <AdminBadge variant={orderStatusBadgeVariant(order.status)}>
                                                 {order.status}
-                                            </Badge>
+                                            </AdminBadge>
                                         </div>
                                     </div>
                                 ))}
@@ -210,8 +202,8 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                         ) : (
                             <p className={ADMIN_MUTED}>Aucune commande récente.</p>
                         )}
-                    </CardContent>
-                </Card>
+                    </AdminCardContent>
+                </AdminCard>
             </div>
         </>
     );

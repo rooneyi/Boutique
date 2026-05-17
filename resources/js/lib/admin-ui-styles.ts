@@ -33,8 +33,9 @@ export const ADMIN_BTN_PILL_DARK = SF_PILL_BTN_DARK;
 export const ADMIN_BTN_PILL_OUTLINE =
     'font-poppins inline-flex items-center justify-center gap-2 rounded-[32px] border border-black bg-white px-[18px] py-[15px] text-[15px] font-semibold text-black transition-colors hover:bg-neutral-100';
 
+/** Carte admin — écrase les styles shadcn (rounded-xl, ring, card-foreground). */
 export const ADMIN_CARD =
-    `${SF_CARD} text-black ring-0 [&_[data-slot=card-description]]:text-[#747474]`;
+    'rounded-sm border border-neutral-200 bg-white text-black shadow-sm !rounded-sm ring-0 !bg-white !text-black [&_[data-slot=card-description]]:font-poppins [&_[data-slot=card-description]]:text-base [&_[data-slot=card-description]]:text-[#747474]';
 
 export const ADMIN_PAGE_BG = 'bg-[#f0f0f0]';
 

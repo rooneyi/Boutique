@@ -1,5 +1,4 @@
 import { Head, usePage } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -8,17 +7,17 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { AdminBadge, type AdminBadgeVariant } from '@/components/admin/admin-badge';
+import {
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
 import { AdminFilterTabs } from '@/components/admin/admin-filter-tabs';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { route } from '@/lib/route';
-import {
-    ADMIN_BADGE_BLUE,
-    ADMIN_CARD,
-    ADMIN_H3,
-    ADMIN_MUTED,
-    ADMIN_TABLE_CELL,
-    ADMIN_TABLE_HEAD,
-} from '@/lib/admin-ui-styles';
+import { ADMIN_H3, ADMIN_MUTED, ADMIN_TABLE_CELL, ADMIN_TABLE_HEAD } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Product = {
@@ -65,29 +64,30 @@ function getFilterLabel(filter?: Props['filter']) {
     }
 }
 
-function stockBadge(product: Product) {
+function stockBadgeVariant(product: Product): AdminBadgeVariant {
     if (product.status === 'DISCONTINUED') {
-        return (
-            <span className="font-poppins rounded-full border border-neutral-300 px-3 py-1 text-sm text-[#747474]">
-                Terminé
-            </span>
-        );
+        return 'muted';
     }
     if (product.quantity === 0) {
-        return (
-            <span className="font-poppins rounded-full border-0 bg-[#dc0000] px-3 py-1 text-sm font-medium text-white">
-                Rupture
-            </span>
-        );
+        return 'danger';
     }
     if (product.quantity < 10) {
-        return (
-            <span className="font-poppins rounded-full border border-black bg-white px-3 py-1 text-sm font-medium text-black">
-                Faible
-            </span>
-        );
+        return 'warning';
     }
-    return <span className={ADMIN_BADGE_BLUE}>En stock</span>;
+    return 'blue';
+}
+
+function stockBadgeLabel(product: Product): string {
+    if (product.status === 'DISCONTINUED') {
+        return 'Terminé';
+    }
+    if (product.quantity === 0) {
+        return 'Rupture';
+    }
+    if (product.quantity < 10) {
+        return 'Faible';
+    }
+    return 'En stock';
 }
 
 export default function AdminProducts() {
@@ -116,14 +116,14 @@ export default function AdminProducts() {
                     <AdminFilterTabs tabs={tabs} />
                 </div>
 
-                <Card className={ADMIN_CARD}>
-                    <CardHeader>
+                <AdminCard>
+                    <AdminCardHeader>
                         <h3 className={ADMIN_H3}>{title}</h3>
-                        <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
+                        <AdminCardDescription>
                             {products.data.length} produit(s) affiché(s)
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                        </AdminCardDescription>
+                    </AdminCardHeader>
+                    <AdminCardContent>
                         {products.data.length > 0 ? (
                             <div className="overflow-x-auto rounded-sm border border-neutral-200">
                                 <Table>
@@ -159,7 +159,11 @@ export default function AdminProducts() {
                                                 <TableCell className={ADMIN_TABLE_CELL}>
                                                     {categoryLabel(product.category)}
                                                 </TableCell>
-                                                <TableCell>{stockBadge(product)}</TableCell>
+                                                <TableCell>
+                                                    <AdminBadge variant={stockBadgeVariant(product)}>
+                                                        {stockBadgeLabel(product)}
+                                                    </AdminBadge>
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -168,8 +172,8 @@ export default function AdminProducts() {
                         ) : (
                             <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>Aucun produit à afficher</p>
                         )}
-                    </CardContent>
-                </Card>
+                    </AdminCardContent>
+                </AdminCard>
             </div>
         </>
     );
