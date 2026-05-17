@@ -1,4 +1,6 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { AccountDrawer } from '@/components/storefront/account/account-drawer';
+import { AccountDrawerProvider } from '@/components/storefront/account/account-drawer-context';
 import { CartDrawer } from '@/components/storefront/cart/cart-drawer';
 import { CartDrawerProvider } from '@/components/storefront/cart/cart-drawer-context';
 import { FavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer';
@@ -23,6 +25,8 @@ createInertiaApp({
             case name === 'welcome':
             case name === 'customer/products/index':
             case name === 'customer/products/show':
+            case name === 'customer/cart':
+            case name === 'customer/favorites/index':
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
@@ -44,9 +48,12 @@ createInertiaApp({
             <TooltipProvider delayDuration={0}>
                 <CartDrawerProvider>
                     <FavoritesDrawerProvider>
-                        {app}
-                        <CartDrawer />
-                        <FavoritesDrawer />
+                        <AccountDrawerProvider>
+                            {app}
+                            <CartDrawer />
+                            <FavoritesDrawer />
+                            <AccountDrawer />
+                        </AccountDrawerProvider>
                     </FavoritesDrawerProvider>
                 </CartDrawerProvider>
                 <Toaster />

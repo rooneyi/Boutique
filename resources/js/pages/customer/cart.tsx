@@ -1,116 +1,128 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { FlashToaster } from '@/components/flash-toaster';
+import { CartPageLine } from '@/components/storefront/cart/cart-page-line';
+import { CartSummaryPanel } from '@/components/storefront/cart/cart-summary-panel';
+import type { CartLine } from '@/components/storefront/cart/cart-types';
+import { HomeFooter } from '@/components/storefront/home/home-footer';
+import { HomeHeader } from '@/components/storefront/home/home-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Trash2 } from 'lucide-react';
-import { destroy as deleteCartItem } from '@/routes/customer/cart/items';
 import { route } from '@/lib/route';
-import { SF_BTN_PRIMARY, SF_CARD, SF_MUTED, SF_H3, SF_BRAND } from '@/lib/storefront-ui-styles';
+import { SF_BTN_PRIMARY } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
+import { destroy as deleteCartItem, update as patchCartItem } from '@/routes/customer/cart/items';
 
-type Line = {
-    product_id: number;
-    quantity: number;
-    name: string;
-    price: number;
-    line_total: number;
-    image_path: string | null;
-    vendor_shop: string;
-    stock: number;
+type AuthUser = {
+    id: number;
+    name?: string;
+    role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
 };
 
-type Props = {
-    lines: Line[];
+type PageProps = {
+    lines: CartLine[];
+    subtotal: number;
+    shipping: number;
     total: number;
+    canRegister: boolean;
+    auth?: { user?: AuthUser | null };
 };
 
-export default function CustomerCart({ lines, total }: Props) {
-    function remove(productId: number) {
-        if (confirm('Retirer cet article du panier ?')) {
-            router.delete(deleteCartItem.url(productId), { preserveScroll: true });
-        }
+export default function CustomerCart() {
+    const { auth, canRegister, lines, subtotal, shipping, total } = usePage<PageProps>().props;
+    const [busyProductId, setBusyProductId] = useState<number | null>(null);
+
+    function mutate(productId: number, request: () => void) {
+        setBusyProductId(productId);
+        request();
+    }
+
+    function syncCartCount() {
+        router.reload({ only: ['lines', 'subtotal', 'total', 'cartCount'] });
+    }
+
+    function setQuantity(productId: number, quantity: number) {
+        mutate(productId, () => {
+            router.patch(
+                patchCartItem.url(productId),
+                { quantity },
+                {
+                    preserveScroll: true,
+                    onSuccess: syncCartCount,
+                    onError: (errors) => {
+                        const message =
+                            (typeof errors.quantity === 'string' && errors.quantity) ||
+                            'Impossible de mettre à jour la quantité.';
+                        toast.error(message);
+                    },
+                    onFinish: () => setBusyProductId(null),
+                },
+            );
+        });
+    }
+
+    function removeLine(productId: number) {
+        mutate(productId, () => {
+            router.delete(deleteCartItem.url(productId), {
+                preserveScroll: true,
+                onSuccess: syncCartCount,
+                onFinish: () => setBusyProductId(null),
+            });
+        });
     }
 
     return (
         <>
-            <Head title="Panier" />
+            <Head title="Mon panier · PCJ" />
 
-            <div className="space-y-8">
-                <div>
-                    <h1 className="font-poppins text-3xl font-semibold tracking-tight text-black md:text-4xl">Panier</h1>
-                    <p className={cn(SF_MUTED, 'mt-2')}>Articles prêts à être commandés sur {SF_BRAND}.</p>
-                </div>
+            <div className="min-h-screen bg-white font-poppins text-black antialiased">
+                <HomeHeader user={auth?.user} canRegister={canRegister} />
 
-                {lines.length === 0 ? (
-                    <Card className={cn(SF_CARD, 'p-8 text-center')}>
-                        <p className="text-[#747474]">Votre panier est vide.</p>
-                        <Button className={cn(SF_BTN_PRIMARY, 'mt-6')} asChild>
-                            <Link href={route('customer.products.index')}>Parcourir le catalogue</Link>
-                        </Button>
-                    </Card>
-                ) : (
-                    <div className="grid gap-6 lg:grid-cols-3">
-                        <div className="space-y-4 lg:col-span-2">
-                            {lines.map((line) => (
-                                <Card key={line.product_id} className={SF_CARD}>
-                                    <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
-                                        <div className="h-24 w-24 shrink-0 overflow-hidden rounded-sm border border-neutral-200 bg-neutral-100">
-                                            {line.image_path ? (
-                                                <img src={line.image_path} alt="" className="h-full w-full object-cover" />
-                                            ) : (
-                                                <div className="flex h-full items-center justify-center text-xs text-[#747474]">—</div>
-                                            )}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="text-xs text-[#747474]">{line.vendor_shop}</p>
-                                            <Link
-                                                href={route('customer.products.show', line.product_id)}
-                                                className="font-poppins font-semibold text-black hover:text-[#0059DD]"
-                                            >
-                                                {line.name}
-                                            </Link>
-                                            <p className="mt-1 text-sm text-[#747474]">
-                                                Qté {line.quantity} · €{line.price.toFixed(2)} l’unité
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
-                                            <p className="font-poppins text-lg font-semibold">€{line.line_total.toFixed(2)}</p>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="icon"
-                                                className="shrink-0 rounded-sm"
-                                                onClick={() => remove(line.product_id)}
-                                                aria-label="Retirer"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                        <Card className={cn(SF_CARD, 'h-fit lg:sticky lg:top-24')}>
-                            <CardHeader>
-                                <h2 className={SF_H3}>Récapitulatif</h2>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <p className="font-poppins text-2xl font-semibold text-black">€{total.toFixed(2)}</p>
-                                <p className="text-sm text-[#747474]">
-                                    Le paiement sécurisé et la validation de commande arrivent dans une prochaine étape.
+                <main className="px-4 pb-16 sm:px-8 lg:px-7">
+                    <div className="mx-auto max-w-[1440px]">
+                        <h1 className="font-poppins pt-8 pb-10 text-[36px] font-semibold leading-normal text-black">
+                            Mon panier
+                        </h1>
+
+                        {lines.length === 0 ? (
+                            <div className="py-24 text-center">
+                                <p className="font-poppins text-xl font-medium text-[#737373]">
+                                    Votre panier est vide.
                                 </p>
-                                <Button className={cn(SF_BTN_PRIMARY, 'w-full')} disabled>
-                                    Commander
+                                <Button className={cn(SF_BTN_PRIMARY, 'mt-6')} asChild>
+                                    <Link href={route('customer.products.index')}>
+                                        Parcourir la collection
+                                    </Link>
                                 </Button>
-                                <Link
-                                    href={route('customer.products.index')}
-                                    className="block text-center text-sm font-semibold text-[#0059DD] hover:underline"
-                                >
-                                    Continuer les achats
-                                </Link>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12">
+                                <div className="min-w-0 flex-1">
+                                    {lines.map((line) => (
+                                        <CartPageLine
+                                            key={line.product_id}
+                                            line={line}
+                                            busy={busyProductId === line.product_id}
+                                            onQuantityChange={(quantity) =>
+                                                setQuantity(line.product_id, quantity)
+                                            }
+                                            onRemove={() => removeLine(line.product_id)}
+                                        />
+                                    ))}
+                                </div>
+
+                                <CartSummaryPanel
+                                    subtotal={subtotal}
+                                    shipping={shipping}
+                                    total={total}
+                                />
+                            </div>
+                        )}
                     </div>
-                )}
+                </main>
+
+                <HomeFooter />
+                <FlashToaster />
             </div>
         </>
     );

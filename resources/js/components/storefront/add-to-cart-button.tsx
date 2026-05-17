@@ -1,25 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
-import { router, usePage } from '@inertiajs/react';
+import { useStorefrontAuth } from '@/hooks/use-storefront-auth';
+import { router } from '@inertiajs/react';
 import { ShoppingCart } from 'lucide-react';
 import { store as postCartItem } from '@/routes/customer/cart/items';
 import { toast } from 'sonner';
 import { route } from '@/lib/route';
 import { SF_BTN_PRIMARY } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
-
-type AuthUser = {
-    id: number;
-    name: string;
-    email: string;
-    role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
-};
-
-type PageProps = {
-    auth?: {
-        user?: AuthUser | null;
-    };
-};
 
 type Props = {
     productId: number;
@@ -38,12 +26,12 @@ export function AddToCartButton({
     label = 'Ajouter au panier',
     size = 'default',
 }: Props) {
-    const { auth } = usePage<PageProps>().props;
+    const user = useStorefrontAuth();
     const cartDrawer = useOptionalCartDrawer();
 
     function handleClick(e: React.MouseEvent) {
         e.preventDefault();
-        if (!auth?.user) {
+        if (!user) {
             toast.info('Connectez-vous pour ajouter des articles au panier.', {
                 action: {
                     label: 'Connexion',
@@ -52,7 +40,7 @@ export function AddToCartButton({
             });
             return;
         }
-        if (auth.user.role !== 'CUSTOMER') {
+        if (user.role !== 'CUSTOMER') {
             toast.message('Compte client requis', {
                 description: 'Les achats en ligne sont réservés aux comptes clients.',
             });

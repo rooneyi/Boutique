@@ -18,11 +18,20 @@ type Product = {
 
 type Props = {
     product: Product;
+    size?: 'default' | 'compact';
 };
 
-export function HomeProductShowcaseCard({ product }: Props) {
+export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
+    const isCompact = size === 'compact';
+
     return (
-        <article className="relative flex h-[503px] w-full max-w-[343px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]">
+        <article
+            className={
+                isCompact
+                    ? 'relative flex h-[428px] w-full max-w-[322px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]'
+                    : 'relative flex h-[503px] w-full max-w-[343px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]'
+            }
+        >
             <Link
                 href={route('customer.products.show', product.id)}
                 className="absolute inset-0 z-0"

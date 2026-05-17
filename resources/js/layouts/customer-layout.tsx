@@ -1,4 +1,6 @@
 import { FlashToaster } from '@/components/flash-toaster';
+import { InertiaPropsSync } from '@/components/storefront/inertia-props-sync';
+import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
 import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
 import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
 import { ReactNode, useMemo } from 'react';
@@ -35,6 +37,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
     const isCustomer = user?.role === 'CUSTOMER';
     const cartDrawer = useOptionalCartDrawer();
     const favoritesDrawer = useOptionalFavoritesDrawer();
+    const accountDrawer = useOptionalAccountDrawer();
 
     const headerBrand = useMemo(
         () => (
@@ -48,6 +51,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
 
     return (
         <div className="flex min-h-screen flex-col bg-white font-poppins text-black antialiased">
+            <InertiaPropsSync />
             <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white">
                 <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
                     {headerBrand}
@@ -133,6 +137,10 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                                     <DropdownMenuItem disabled className="flex flex-col items-start gap-0.5">
                                         <span className="font-medium">{user.name}</span>
                                         <span className="text-xs font-normal text-muted-foreground">{user.email}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => accountDrawer?.openAccount()}>
+                                        Mon compte
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>

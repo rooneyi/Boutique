@@ -2,6 +2,7 @@
 
 use App\Data\CustomerRegisterData;
 use App\Data\VendorRegisterData;
+use App\Http\Controllers\Customer\AccountController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
@@ -200,6 +201,8 @@ Route::middleware(['auth', 'verified', 'customer'])->prefix('customer')->name('c
     Route::post('cart/items', [CartController::class, 'store'])->name('cart.items.store');
     Route::patch('cart/items/{product}', [CartController::class, 'update'])->name('cart.items.update');
     Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+
+    Route::get('account/preview', [AccountController::class, 'preview'])->name('account.preview');
 
     Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::get('favorites/preview', [FavoriteController::class, 'preview'])->name('favorites.preview');

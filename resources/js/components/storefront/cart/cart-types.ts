@@ -7,6 +7,7 @@ export type CartLine = {
     image_path: string | null;
     vendor_shop: string;
     stock: number;
+    is_favorite?: boolean;
 };
 
 export type CartPreview = {

@@ -66,11 +66,20 @@ export function FavoritesDrawer() {
                                 </Link>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 justify-items-center gap-5 sm:grid-cols-2">
-                                {products.map((product) => (
-                                    <HomeProductShowcaseCard key={product.id} product={product} />
-                                ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-1 justify-items-center gap-5 sm:grid-cols-2">
+                                    {products.map((product) => (
+                                        <HomeProductShowcaseCard key={product.id} product={product} />
+                                    ))}
+                                </div>
+                                <Link
+                                    href={route('customer.favorites.index')}
+                                    className="font-poppins mt-6 inline-block w-full text-center text-lg font-semibold text-[#0059DD] hover:underline"
+                                    onClick={closeFavorites}
+                                >
+                                    Voir tous mes favoris
+                                </Link>
+                            </>
                         )}
                     </div>
                 </div>

@@ -1,25 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
-import { router, usePage } from '@inertiajs/react';
+import { useStorefrontAuth } from '@/hooks/use-storefront-auth';
+import { router } from '@inertiajs/react';
 import { Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { destroy as deleteFavorite, store as postFavorite } from '@/routes/customer/favorites';
 import { route } from '@/lib/route';
 import { cn } from '@/lib/utils';
-
-type AuthUser = {
-    id: number;
-    name: string;
-    email: string;
-    role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
-};
-
-type PageProps = {
-    auth?: {
-        user?: AuthUser | null;
-    };
-};
 
 type Props = {
     productId: number;
@@ -35,6 +23,8 @@ const FAVORITE_RELOAD_PROPS = [
     'featuredProducts',
     'products',
     'product',
+    'lines',
+    'suggestedProducts',
 ] as const;
 
 export function FavoriteButton({
@@ -44,7 +34,7 @@ export function FavoriteButton({
     className,
     openDrawerOnAdd = true,
 }: Props) {
-    const { auth } = usePage<PageProps>().props;
+    const user = useStorefrontAuth();
     const favoritesDrawer = useOptionalFavoritesDrawer();
     const [liked, setLiked] = useState(favorited);
 
@@ -64,7 +54,7 @@ export function FavoriteButton({
         e.preventDefault();
         e.stopPropagation();
 
-        if (!auth?.user) {
+        if (!user) {
             toast.info('Connectez-vous pour enregistrer des favoris.', {
                 action: {
                     label: 'Connexion',
@@ -73,7 +63,7 @@ export function FavoriteButton({
             });
             return;
         }
-        if (auth.user.role !== 'CUSTOMER') {
+        if (user.role !== 'CUSTOMER') {
             toast.message('Compte client requis', {
                 description: 'Les favoris sont disponibles pour les comptes clients.',
             });

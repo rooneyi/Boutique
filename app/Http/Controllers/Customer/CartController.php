@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Fortify\Features;
 
 class CartController extends Controller
 {
@@ -22,9 +23,25 @@ class CartController extends Controller
     {
         $this->cartService->reconcile();
 
+        $favoriteIdSet = [];
+        if (auth()->check() && auth()->user()->role === 'CUSTOMER' && auth()->user()->customer) {
+            $favoriteIdSet = auth()->user()->customer->favoriteProducts()->pluck('products.id')->flip()->all();
+        }
+
+        $lines = array_map(function (array $line) use ($favoriteIdSet) {
+            return array_merge($line, [
+                'is_favorite' => isset($favoriteIdSet[$line['product_id']]),
+            ]);
+        }, $this->cartService->lines());
+
+        $subtotal = $this->cartService->total();
+
         return Inertia::render('customer/cart', [
-            'lines' => $this->cartService->lines(),
-            'total' => $this->cartService->total(),
+            'lines' => $lines,
+            'subtotal' => $subtotal,
+            'shipping' => 0,
+            'total' => $subtotal,
+            'canRegister' => Features::enabled(Features::registration()),
         ]);
     }
 

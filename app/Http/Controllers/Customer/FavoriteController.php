@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Fortify\Features;
 
 class FavoriteController extends Controller
 {
@@ -37,8 +38,26 @@ class FavoriteController extends Controller
 
         $products->through(fn (Product $product) => $this->productPayload($product, true));
 
+        $favoriteIds = $customer->favoriteProducts()->pluck('products.id');
+
+        $suggestedProducts = Product::query()
+            ->where('status', '!=', 'DISCONTINUED')
+            ->when($favoriteIds->isNotEmpty(), fn ($q) => $q->whereNotIn('id', $favoriteIds))
+            ->with(['category', 'vendor'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->orderByDesc('reviews_count')
+            ->orderByDesc('reviews_avg_rating')
+            ->limit(8)
+            ->get()
+            ->map(fn (Product $product) => $this->productPayload($product, false))
+            ->values()
+            ->all();
+
         return Inertia::render('customer/favorites/index', [
             'products' => $products,
+            'suggestedProducts' => $suggestedProducts,
+            'canRegister' => Features::enabled(Features::registration()),
         ]);
     }
 

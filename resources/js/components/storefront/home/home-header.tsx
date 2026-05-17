@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { InertiaPropsSync } from '@/components/storefront/inertia-props-sync';
+import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
 import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
 import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
 import { HOME_ASSETS } from '@/lib/home-assets';
@@ -44,6 +46,16 @@ const NAV_ITEMS = [
 export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const cartDrawer = useOptionalCartDrawer();
+    const favoritesDrawer = useOptionalFavoritesDrawer();
+    const accountDrawer = useOptionalAccountDrawer();
+
+    function openAccount() {
+        if (user?.role === 'CUSTOMER') {
+            accountDrawer?.openAccount();
+        } else {
+            router.visit(route('login'));
+        }
+    }
 
     const accountHref =
         user?.role === 'ADMIN'
@@ -55,7 +67,9 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                 : route('login');
 
     return (
-        <header className="sticky top-0 z-50">
+        <>
+            <InertiaPropsSync />
+            <header className="sticky top-0 z-50">
             <div className="bg-black text-white">
                 <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-8 lg:px-[102px]">
                     <div className="flex items-center gap-3">
@@ -131,17 +145,30 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                                 className="font-poppins w-full border-0 bg-transparent text-base text-black placeholder:text-[#999] focus:outline-none"
                             />
                         </div>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="hidden rounded-full text-black lg:inline-flex"
-                            asChild
-                        >
-                            <Link href={accountHref} aria-label="Notifications">
-                                <Bell className="size-6" strokeWidth={1.25} />
-                            </Link>
-                        </Button>
+                        {user?.role === 'CUSTOMER' ? (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="hidden rounded-full text-black lg:inline-flex"
+                                onClick={openAccount}
+                                aria-label="Mon compte"
+                            >
+                                <User className="size-6" strokeWidth={1.25} />
+                            </Button>
+                        ) : (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="hidden rounded-full text-black lg:inline-flex"
+                                asChild
+                            >
+                                <Link href={accountHref} aria-label="Notifications">
+                                    <Bell className="size-6" strokeWidth={1.25} />
+                                </Link>
+                            </Button>
+                        )}
                         <Button
                             type="button"
                             variant="ghost"
@@ -212,16 +239,31 @@ export function HomeHeader({ user, canRegister, activeNav = 'home' }: Props) {
                                 Mes favoris
                             </button>
                         )}
-                        <Link
-                            href={accountHref}
-                            className="font-poppins mt-2 block py-2 text-base"
-                            onClick={() => setMobileOpen(false)}
-                        >
-                            {user ? 'Mon compte' : 'Connexion'}
-                        </Link>
+                        {user?.role === 'CUSTOMER' ? (
+                            <button
+                                type="button"
+                                className="font-poppins mt-2 block w-full py-2 text-left text-base"
+                                onClick={() => {
+                                    setMobileOpen(false);
+                                    openAccount();
+                                }}
+                            >
+                                Mon compte
+                            </button>
+                        ) : (
+                            <Link
+                                href={accountHref}
+                                className="font-poppins mt-2 block py-2 text-base"
+                                onClick={() => setMobileOpen(false)}
+                            >
+                                {user ? 'Mon compte' : 'Connexion'}
+                            </Link>
+                        )}
                     </nav>
                 )}
             </div>
         </header>
+        </>
     );
 }
+
