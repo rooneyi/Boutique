@@ -5,10 +5,11 @@ import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminStatCard } from '@/components/admin/admin-stat-card';
 import { route } from '@/lib/route';
 import {
-    ADMIN_BTN_SECONDARY,
+    ADMIN_BADGE_BLUE,
+    ADMIN_BTN_PILL_OUTLINE,
     ADMIN_CARD,
-    ADMIN_FILTER_TAB,
-    ADMIN_FILTER_TAB_ACTIVE,
+    ADMIN_FILTER_PILL,
+    ADMIN_FILTER_PILL_ACTIVE,
     ADMIN_H3,
     ADMIN_MUTED,
 } from '@/lib/admin-ui-styles';
@@ -61,7 +62,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                     title="Analyse des ventes"
                     description="Indicateurs globaux, période et analyses avancées de la plateforme."
                     actions={
-                        <Link href={route('admin.dashboard')} className={ADMIN_BTN_SECONDARY}>
+                        <Link href={route('admin.dashboard')} className={ADMIN_BTN_PILL_OUTLINE}>
                             Tableau de bord
                         </Link>
                     }
@@ -73,7 +74,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                             key={p}
                             type="button"
                             onClick={() => setPeriod(p)}
-                            className={period === p ? ADMIN_FILTER_TAB_ACTIVE : ADMIN_FILTER_TAB}
+                            className={period === p ? ADMIN_FILTER_PILL_ACTIVE : ADMIN_FILTER_PILL}
                         >
                             {periodLabels[p]}
                         </button>
@@ -165,7 +166,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                         { title: 'Produits les plus vendus', rows: analytics.top_products, render: (p: TopProduct) => (
                             <li key={p.id} className="flex justify-between gap-2">
                                 <span>{p.name}</span>
-                                <Badge className="bg-[#0059DD] font-poppins text-white">{p.total_sold}</Badge>
+                                <span className={ADMIN_BADGE_BLUE}>{p.total_sold}</span>
                             </li>
                         )},
                         { title: 'Vendeurs les plus actifs', rows: analytics.top_vendors, render: (v: TopVendor) => (

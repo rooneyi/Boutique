@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import {
+    ADMIN_BADGE_BLUE,
     ADMIN_CARD,
     ADMIN_H3,
     ADMIN_MUTED,
@@ -147,11 +148,7 @@ export default function AdminUsers({ users, role }: Props) {
                                                           {formatDate(user.created_at)}
                                                       </TableCell>
                                                       <TableCell>
-                                                          <Badge
-                                                              className="font-poppins border-0 bg-[#0059DD] text-white"
-                                                          >
-                                                              Actif
-                                                          </Badge>
+                                                          <span className={ADMIN_BADGE_BLUE}>Actif</span>
                                                       </TableCell>
                                                   </TableRow>
                                               ))

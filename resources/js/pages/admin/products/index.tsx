@@ -1,6 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     Table,
     TableBody,
@@ -12,7 +11,14 @@ import {
 import { AdminFilterTabs } from '@/components/admin/admin-filter-tabs';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { route } from '@/lib/route';
-import { ADMIN_CARD, ADMIN_H3, ADMIN_MUTED, ADMIN_TABLE_CELL, ADMIN_TABLE_HEAD } from '@/lib/admin-ui-styles';
+import {
+    ADMIN_BADGE_BLUE,
+    ADMIN_CARD,
+    ADMIN_H3,
+    ADMIN_MUTED,
+    ADMIN_TABLE_CELL,
+    ADMIN_TABLE_HEAD,
+} from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Product = {
@@ -61,15 +67,27 @@ function getFilterLabel(filter?: Props['filter']) {
 
 function stockBadge(product: Product) {
     if (product.status === 'DISCONTINUED') {
-        return <Badge variant="outline" className="font-poppins">Terminé</Badge>;
+        return (
+            <span className="font-poppins rounded-full border border-neutral-300 px-3 py-1 text-sm text-[#747474]">
+                Terminé
+            </span>
+        );
     }
     if (product.quantity === 0) {
-        return <Badge className="font-poppins border-0 bg-red-600 text-white">Rupture</Badge>;
+        return (
+            <span className="font-poppins rounded-full border-0 bg-[#dc0000] px-3 py-1 text-sm font-medium text-white">
+                Rupture
+            </span>
+        );
     }
     if (product.quantity < 10) {
-        return <Badge className="font-poppins border-0 bg-amber-500 text-white">Faible</Badge>;
+        return (
+            <span className="font-poppins rounded-full border border-black bg-white px-3 py-1 text-sm font-medium text-black">
+                Faible
+            </span>
+        );
     }
-    return <Badge className="font-poppins border-0 bg-[#0059DD] text-white">En stock</Badge>;
+    return <span className={ADMIN_BADGE_BLUE}>En stock</span>;
 }
 
 export default function AdminProducts() {
@@ -94,7 +112,9 @@ export default function AdminProducts() {
                     description="Supervision de l'inventaire sur toute la plateforme."
                 />
 
-                <AdminFilterTabs tabs={tabs} />
+                <div className="md:hidden">
+                    <AdminFilterTabs tabs={tabs} />
+                </div>
 
                 <Card className={ADMIN_CARD}>
                     <CardHeader>

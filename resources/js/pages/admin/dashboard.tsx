@@ -6,8 +6,9 @@ import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminStatCard } from '@/components/admin/admin-stat-card';
 import { route } from '@/lib/route';
 import {
-    ADMIN_BTN_PRIMARY,
-    ADMIN_BTN_SECONDARY,
+    ADMIN_BADGE_BLUE,
+    ADMIN_BTN_PILL_DARK,
+    ADMIN_BTN_PILL_OUTLINE,
     ADMIN_CARD,
     ADMIN_H3,
     ADMIN_MUTED,
@@ -63,10 +64,10 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                     description="Vue d'ensemble de la plateforme PCJ — ventes, catalogue et utilisateurs."
                     actions={
                         <>
-                            <Link href={route('admin.analytics.sales')} className={ADMIN_BTN_SECONDARY}>
+                            <Link href={route('admin.analytics.sales')} className={ADMIN_BTN_PILL_OUTLINE}>
                                 Analyse des ventes
                             </Link>
-                            <Link href={route('admin.products.index')} className={ADMIN_BTN_PRIMARY}>
+                            <Link href={route('admin.products.index')} className={ADMIN_BTN_PILL_DARK}>
                                 <Plus className="size-5" />
                                 Catalogue produits
                             </Link>
@@ -80,6 +81,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                         value={`€${stats.total_sales.toFixed(2)}`}
                         hint="Total plateforme"
                         icon={TrendingUp}
+                        accent
                     />
                     <AdminStatCard
                         label="Commandes"
@@ -124,9 +126,9 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                                 Stock : {product.stock}
                                             </p>
                                         </div>
-                                        <Badge className="border-0 bg-[#0059DD] font-poppins text-white hover:bg-[#0047b0]">
+                                        <span className={ADMIN_BADGE_BLUE}>
                                             {product.total_sold} vendus
-                                        </Badge>
+                                        </span>
                                     </div>
                                 ))
                             ) : (

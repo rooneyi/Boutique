@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ADMIN_FILTER_TAB, ADMIN_FILTER_TAB_ACTIVE } from '@/lib/admin-ui-styles';
+import { ADMIN_FILTER_PILL, ADMIN_FILTER_PILL_ACTIVE } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 export type AdminFilterTab = {
@@ -19,7 +19,7 @@ export function AdminFilterTabs({ tabs }: Props) {
                 <Link
                     key={tab.href}
                     href={tab.href}
-                    className={cn(tab.active ? ADMIN_FILTER_TAB_ACTIVE : ADMIN_FILTER_TAB)}
+                    className={cn(tab.active ? ADMIN_FILTER_PILL_ACTIVE : ADMIN_FILTER_PILL)}
                 >
                     {tab.label}
                 </Link>
