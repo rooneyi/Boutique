@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { route } from '@/lib/route';
 import { SF_PILL_BTN_DARK, SF_PILL_BTN_LIGHT } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
@@ -70,14 +71,9 @@ export function CartSummaryPanel({ subtotal, shipping, total }: Props) {
                 <Button
                     type="button"
                     className={cn(SF_PILL_BTN_DARK, 'h-14 w-full text-sm uppercase')}
-                    onClick={() =>
-                        toast.message('Paiement à venir', {
-                            description:
-                                'Le passage de commande sécurisé sera disponible dans une prochaine étape.',
-                        })
-                    }
+                    asChild
                 >
-                    Passer la commande
+                    <Link href={route('customer.checkout')}>Passer la commande</Link>
                 </Button>
                 <Button
                     type="button"

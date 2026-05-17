@@ -1,22 +1,16 @@
-import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { route } from '@/lib/route';
+import { Head, usePage } from '@inertiajs/react';
+import { CheckCircle2 } from 'lucide-react';
+import { FlashToaster } from '@/components/flash-toaster';
+import { OrderConfirmationPanel } from '@/components/storefront/orders/order-confirmation-panel';
+import { OrderRecapPanel } from '@/components/storefront/orders/order-recap-panel';
+import { HomeFooter } from '@/components/storefront/home/home-footer';
+import { HomeHeader } from '@/components/storefront/home/home-header';
 
-type Item = {
+type OrderItem = {
     product_name: string;
     quantity: number;
-    unit_price: number;
     line_total: number;
+    image_path: string | null;
 };
 
 type Order = {
@@ -24,79 +18,92 @@ type Order = {
     total_amount: number;
     status: string;
     created_at: string;
+    shipping_full_name?: string | null;
+    shipping_whatsapp?: string | null;
+    shipping_address?: string | null;
+    shipping_city?: string | null;
+    shipping_district?: string | null;
+    payment_method?: string | null;
+    customer_note?: string | null;
     vendor: { shop_name: string };
-    items: Item[];
+    items: OrderItem[];
 };
 
-type Props = {
+type AuthUser = {
+    id: number;
+    role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
+};
+
+type PageProps = {
     order: Order;
+    subtotal: number;
+    shipping: number;
+    canRegister: boolean;
+    whatsappPhone: string;
+    supportPhone: string;
+    supportEmail: string;
+    auth?: { user?: AuthUser | null };
 };
 
-function statusVariant(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
-    switch (status) {
-        case 'PAID':
-            return 'default';
-        case 'PENDING':
-            return 'secondary';
-        case 'CANCELLED':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
+export default function CustomerOrderShow() {
+    const {
+        auth,
+        canRegister,
+        order,
+        subtotal,
+        shipping,
+        whatsappPhone,
+        supportPhone,
+        supportEmail,
+    } = usePage<PageProps>().props;
 
-export default function CustomerOrderShow({ order }: Props) {
     return (
         <>
-            <Head title={`Commande #${order.id}`} />
+            <Head title="Commande confirmée · PCJ" />
 
-            <div className="mx-auto max-w-3xl space-y-8">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Commande #{order.id}</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                            {order.vendor.shop_name} ·{' '}
-                            {new Date(order.created_at).toLocaleString('fr-FR')}
+            <div className="min-h-screen bg-[#f8f7f9] font-poppins text-black antialiased">
+                <HomeHeader user={auth?.user} canRegister={canRegister} />
+
+                <main className="px-4 pb-16">
+                    <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-4 py-10 text-center">
+                        <CheckCircle2
+                            className="size-[78px] text-[#068130]"
+                            strokeWidth={1.25}
+                            aria-hidden
+                        />
+                        <h1 className="font-poppins max-w-2xl text-[36px] font-semibold leading-tight text-black">
+                            Commande enregistrée avec succès !
+                        </h1>
+                        <div className="max-w-xl text-sm leading-relaxed text-black">
+                            <p>Merci pour votre confiance.</p>
+                            <p>
+                                Nous avons bien reçu votre commande et nous vous contacterons
+                                bientôt.
+                            </p>
+                        </div>
+                        <p className="text-sm text-[rgba(91,94,100,0.62)]">
+                            Commande #{order.id} · {order.vendor.shop_name}
                         </p>
-                    </div>
-                    <Badge variant={statusVariant(order.status)}>{order.status}</Badge>
-                </div>
+                    </section>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Articles</CardTitle>
-                        <CardDescription>Détail des produits achetés</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Produit</TableHead>
-                                    <TableHead className="text-right">Prix unit.</TableHead>
-                                    <TableHead className="text-right">Qté</TableHead>
-                                    <TableHead className="text-right">Sous-total</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {order.items.map((item, idx) => (
-                                    <TableRow key={idx}>
-                                        <TableCell className="font-medium">{item.product_name}</TableCell>
-                                        <TableCell className="text-right">€{item.unit_price.toFixed(2)}</TableCell>
-                                        <TableCell className="text-right">{item.quantity}</TableCell>
-                                        <TableCell className="text-right">€{item.line_total.toFixed(2)}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        <p className="mt-6 text-right text-lg font-semibold">
-                            Total : €{order.total_amount.toFixed(2)}
-                        </p>
-                    </CardContent>
-                </Card>
+                    <section className="mx-auto flex max-w-[1100px] flex-col items-center justify-center gap-8 lg:flex-row lg:items-start lg:gap-12">
+                        <OrderRecapPanel
+                            items={order.items}
+                            subtotal={subtotal}
+                            shipping={shipping}
+                            total={order.total_amount}
+                        />
+                        <OrderConfirmationPanel
+                            order={order}
+                            whatsappPhone={whatsappPhone}
+                            supportPhone={supportPhone}
+                            supportEmail={supportEmail}
+                        />
+                    </section>
+                </main>
 
-                <Button variant="outline" asChild>
-                    <Link href={route('customer.orders.index')}>Retour aux commandes</Link>
-                </Button>
+                <HomeFooter />
+                <FlashToaster />
             </div>
         </>
     );

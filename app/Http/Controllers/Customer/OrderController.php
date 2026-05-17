@@ -9,8 +9,10 @@ use App\Models\Product;
 use App\Data\OrderData;
 use App\Services\OrderService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Fortify\Features;
 
 class OrderController extends Controller
 {
@@ -98,22 +100,41 @@ class OrderController extends Controller
 
         $order->load(['items.product', 'vendor']);
 
+        $items = $order->items->map(fn ($item) => [
+            'product_name' => $item->product?->name ?? '—',
+            'quantity' => $item->quantity,
+            'line_total' => (float) ($item->price * $item->quantity),
+            'image_path' => $item->product?->image
+                ? Storage::disk('public')->url($item->product->image)
+                : null,
+        ])->all();
+
+        $subtotal = array_sum(array_column($items, 'line_total'));
+
         return Inertia::render('customer/orders/show', [
             'order' => [
                 'id' => $order->id,
                 'total_amount' => (float) $order->total,
                 'status' => $order->status,
                 'created_at' => $order->created_at?->toIso8601String() ?? '',
+                'shipping_full_name' => $order->shipping_full_name,
+                'shipping_whatsapp' => $order->shipping_whatsapp,
+                'shipping_address' => $order->shipping_address,
+                'shipping_city' => $order->shipping_city,
+                'shipping_district' => $order->shipping_district,
+                'payment_method' => $order->payment_method,
+                'customer_note' => $order->customer_note,
                 'vendor' => [
                     'shop_name' => $order->vendor->shop_name,
                 ],
-                'items' => $order->items->map(fn ($item) => [
-                    'product_name' => $item->product?->name ?? '—',
-                    'quantity' => $item->quantity,
-                    'unit_price' => (float) $item->price,
-                    'line_total' => (float) ($item->price * $item->quantity),
-                ])->all(),
+                'items' => $items,
             ],
+            'subtotal' => $subtotal,
+            'shipping' => 0,
+            'canRegister' => Features::enabled(Features::registration()),
+            'whatsappPhone' => '243991934590',
+            'supportPhone' => '+243 991 934 590',
+            'supportEmail' => 'posecommejamais@gmail.com',
         ]);
     }
 }

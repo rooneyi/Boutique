@@ -147,7 +147,7 @@ export function CartDrawer() {
                                 onClick={closeCart}
                                 asChild
                             >
-                                <Link href={route('customer.cart')}>PASSER LA COMMANDE</Link>
+                                <Link href={route('customer.checkout')}>PASSER LA COMMANDE</Link>
                             </Button>
                         </footer>
                     )}
