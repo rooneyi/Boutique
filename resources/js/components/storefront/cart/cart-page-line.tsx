@@ -47,7 +47,7 @@ export function CartPageLine({ line, busy, onQuantityChange, onRemove }: Props) 
             <div className="flex min-w-0 flex-1 flex-col gap-3">
                 <Link
                     href={route('customer.products.show', line.product_id)}
-                    className="font-poppins text-2xl font-bold leading-snug text-black hover:text-[#0059DD]"
+                    className="font-poppins text-xl font-bold leading-snug text-black hover:text-[#0059DD] sm:text-2xl"
                 >
                     {line.name}
                 </Link>

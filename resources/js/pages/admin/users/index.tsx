@@ -19,7 +19,13 @@ import {
     AdminCardHeader,
 } from '@/components/admin/admin-card';
 import { AdminPageHero } from '@/components/admin/admin-page-hero';
-import { ADMIN_H3, ADMIN_MUTED } from '@/lib/admin-ui-styles';
+import {
+    ADMIN_H3,
+    ADMIN_MOBILE_META,
+    ADMIN_MUTED,
+    ADMIN_PAGE_SECTION,
+    ADMIN_TABLE_COL_MD,
+} from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type VendorRow = {
@@ -74,7 +80,7 @@ export default function AdminUsers({ users, role }: Props) {
         <>
             <Head title={title} />
 
-            <div className="space-y-8">
+            <div className={ADMIN_PAGE_SECTION}>
                 <AdminPageHero title={title} description={description} />
 
                 <AdminCard>
@@ -90,9 +96,13 @@ export default function AdminUsers({ users, role }: Props) {
                                     <TableHeader>
                                         <TableRow className={ADMIN_TABLE_HEADER_ROW}>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Nom</TableHead>
-                                            <TableHead className={ADMIN_TABLE_HEAD}>Email</TableHead>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
+                                                Email
+                                            </TableHead>
                                             {role === 'vendor' && (
-                                                <TableHead className={ADMIN_TABLE_HEAD}>Boutique</TableHead>
+                                                <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
+                                                    Boutique
+                                                </TableHead>
                                             )}
                                             {role === 'customer' && (
                                                 <>
@@ -102,17 +112,25 @@ export default function AdminUsers({ users, role }: Props) {
                                                         Commandes
                                                     </TableHead>
                                                     <TableHead
-                                                        className={cn(ADMIN_TABLE_HEAD, 'text-right')}
+                                                        className={cn(
+                                                            ADMIN_TABLE_HEAD,
+                                                            ADMIN_TABLE_COL_MD,
+                                                            'text-right',
+                                                        )}
                                                     >
-                                                        Total dépensé
+                                                        Total
                                                     </TableHead>
-                                                    <TableHead className={ADMIN_TABLE_HEAD}>
-                                                        Dernière commande
+                                                    <TableHead
+                                                        className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
+                                                    >
+                                                        Dernière cmd.
                                                     </TableHead>
                                                     <TableHead className={ADMIN_TABLE_HEAD}>Profil</TableHead>
                                                 </>
                                             )}
-                                            <TableHead className={ADMIN_TABLE_HEAD}>Inscription</TableHead>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
+                                                Inscription
+                                            </TableHead>
                                             {role === 'vendor' && (
                                                 <TableHead className={ADMIN_TABLE_HEAD}>Statut</TableHead>
                                             )}
@@ -126,14 +144,22 @@ export default function AdminUsers({ users, role }: Props) {
                                                           className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}
                                                       >
                                                           {user.name}
+                                                          <span className={ADMIN_MOBILE_META}>
+                                                              {user.email}
+                                                          </span>
+                                                          {user.shop_name ? (
+                                                              <span className={ADMIN_MOBILE_META}>
+                                                                  {user.shop_name}
+                                                              </span>
+                                                          ) : null}
                                                       </TableCell>
-                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                           {user.email}
                                                       </TableCell>
-                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                           {user.shop_name || '—'}
                                                       </TableCell>
-                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                           {formatDate(user.created_at)}
                                                       </TableCell>
                                                       <TableCell>
@@ -147,8 +173,16 @@ export default function AdminUsers({ users, role }: Props) {
                                                           className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}
                                                       >
                                                           {user.name}
+                                                          <span className={ADMIN_MOBILE_META}>{user.email}</span>
+                                                          <span className={ADMIN_MOBILE_META}>
+                                                              {user.orders_count} cmd. · €
+                                                              {Number(user.total_spent).toFixed(2)}
+                                                              {user.last_order_at
+                                                                  ? ` · ${formatDate(user.last_order_at)}`
+                                                                  : ''}
+                                                          </span>
                                                       </TableCell>
-                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                           {user.email}
                                                       </TableCell>
                                                       <TableCell
@@ -157,11 +191,15 @@ export default function AdminUsers({ users, role }: Props) {
                                                           {user.orders_count}
                                                       </TableCell>
                                                       <TableCell
-                                                          className={cn(ADMIN_TABLE_CELL, 'text-right')}
+                                                          className={cn(
+                                                              ADMIN_TABLE_CELL,
+                                                              ADMIN_TABLE_COL_MD,
+                                                              'text-right',
+                                                          )}
                                                       >
                                                           €{Number(user.total_spent).toFixed(2)}
                                                       </TableCell>
-                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                           {user.last_order_at
                                                               ? formatDate(user.last_order_at)
                                                               : '—'}
@@ -175,7 +213,7 @@ export default function AdminUsers({ users, role }: Props) {
                                                               {segmentLabel(user.segment)}
                                                           </AdminBadge>
                                                       </TableCell>
-                                                      <TableCell className={ADMIN_TABLE_CELL}>
+                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                           {formatDate(user.created_at)}
                                                       </TableCell>
                                                   </TableRow>

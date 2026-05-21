@@ -27,12 +27,12 @@ export function HomeAbout() {
                         </p>
                     </div>
 
-                    <div className="grid w-full max-w-[578px] grid-cols-3 gap-0 overflow-hidden pr-5">
+                    <div className="grid w-full max-w-[578px] grid-cols-1 gap-4 overflow-hidden sm:grid-cols-3 sm:gap-0 sm:pr-5">
                         {FEATURES.map(({ icon: Icon, label }, index) => (
                             <div
                                 key={label}
-                                className={`flex flex-col items-center gap-2.5 px-2.5 pt-11 pb-2.5 text-center ${
-                                    index === 1 ? 'border-x border-black' : ''
+                                className={`flex flex-col items-center gap-2.5 px-2.5 py-6 text-center sm:pt-11 sm:pb-2.5 ${
+                                    index === 1 ? 'sm:border-x sm:border-black' : ''
                                 }`}
                             >
                                 <Icon className="size-[54px] text-black" strokeWidth={1.25} />

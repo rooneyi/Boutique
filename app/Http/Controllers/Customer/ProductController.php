@@ -28,9 +28,19 @@ class ProductController extends Controller
             ->withAvg('reviews', 'rating')
             ->withCount('reviews');
 
+        $search = $request->string('q')->trim()->toString();
+
         $categoryFilter = $request->string('category')->toString();
         if ($categoryFilter !== '' && $categoryFilter !== 'all') {
             $query->whereHas('category', fn ($q) => $q->where('name', $categoryFilter));
+        }
+
+        if ($search !== '') {
+            $term = '%'.addcslashes($search, '%_\\').'%';
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', $term)
+                    ->orWhere('description', 'like', $term);
+            });
         }
 
         $minPrice = $request->has('min_price') ? (float) $request->input('min_price') : null;

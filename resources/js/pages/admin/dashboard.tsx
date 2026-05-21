@@ -14,7 +14,10 @@ import {
     ADMIN_BTN_PILL_OUTLINE,
     ADMIN_H3,
     ADMIN_LIST_ROW,
+    ADMIN_LIST_ROW_STACKED,
+    ADMIN_MOBILE_META,
     ADMIN_MUTED,
+    ADMIN_PAGE_SECTION,
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 import { Package, Plus, ShoppingCart, TrendingUp, Users } from 'lucide-react';
@@ -62,7 +65,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
         <>
             <Head title="Tableau de bord" />
 
-            <div className="space-y-10">
+            <div className={ADMIN_PAGE_SECTION}>
                 <AdminPageHero
                     title="Tableau de bord"
                     description="Vue d'ensemble de la plateforme PCJ — ventes, catalogue et utilisateurs."
@@ -118,9 +121,12 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                 stats.top_products.map((product) => (
                                     <div
                                         key={product.id}
-                                        className={cn(ADMIN_LIST_ROW, 'flex items-center justify-between gap-4')}
+                                        className={cn(
+                                            ADMIN_LIST_ROW,
+                                            'flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4',
+                                        )}
                                     >
-                                        <div>
+                                        <div className="min-w-0 flex-1">
                                             <p className="font-poppins font-semibold text-black">
                                                 {product.name}
                                             </p>
@@ -128,7 +134,9 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                                 Stock : {product.stock}
                                             </p>
                                         </div>
-                                        <AdminBadge variant="blue">{product.total_sold} vendus</AdminBadge>
+                                        <AdminBadge className="self-start sm:self-center" variant="blue">
+                                            {product.total_sold} vendus
+                                        </AdminBadge>
                                     </div>
                                 ))
                             ) : (
@@ -178,21 +186,34 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                 {stats.recent_orders.map((order) => (
                                     <div
                                         key={order.id}
-                                        className={cn(ADMIN_LIST_ROW, 'grid grid-cols-2 gap-3 text-sm md:grid-cols-12 md:items-center')}
+                                        className={ADMIN_LIST_ROW_STACKED}
                                     >
-                                        <div className="font-poppins font-semibold text-black md:col-span-2">
-                                            #{order.id}
+                                        <div className="flex items-center justify-between gap-2 md:col-span-2 md:block">
+                                            <span className={ADMIN_MOBILE_META}>Commande</span>
+                                            <span className="font-poppins font-semibold text-black">
+                                                #{order.id}
+                                            </span>
                                         </div>
-                                        <div className={cn(ADMIN_MUTED, 'md:col-span-3')}>
-                                            {order.customer_name}
+                                        <div className="min-w-0 md:col-span-3">
+                                            <span className={ADMIN_MOBILE_META}>Client</span>
+                                            <span className={cn(ADMIN_MUTED, 'md:text-sm')}>
+                                                {order.customer_name}
+                                            </span>
                                         </div>
-                                        <div className={cn(ADMIN_MUTED, 'md:col-span-3')}>
-                                            {order.created_at}
+                                        <div className="md:col-span-3">
+                                            <span className={ADMIN_MOBILE_META}>Date</span>
+                                            <span className={cn(ADMIN_MUTED, 'md:text-sm')}>
+                                                {order.created_at}
+                                            </span>
                                         </div>
-                                        <div className="font-poppins font-semibold text-black md:col-span-2">
-                                            €{order.total.toFixed(2)}
+                                        <div className="flex items-center justify-between gap-2 md:col-span-2 md:block">
+                                            <span className={ADMIN_MOBILE_META}>Montant</span>
+                                            <span className="font-poppins font-semibold text-black">
+                                                €{order.total.toFixed(2)}
+                                            </span>
                                         </div>
-                                        <div className="md:col-span-2">
+                                        <div className="flex items-center justify-between gap-2 md:col-span-2 md:block">
+                                            <span className={ADMIN_MOBILE_META}>Statut</span>
                                             <AdminBadge variant={orderStatusBadgeVariant(order.status)}>
                                                 {order.status}
                                             </AdminBadge>

@@ -32,7 +32,7 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
     const lineTotal = product.price * quantity;
 
     return (
-        <div className="flex w-full max-w-[542px] flex-col gap-9">
+        <div className="flex w-full max-w-[542px] flex-col gap-6 sm:gap-9 lg:mx-auto">
             <div className="space-y-2.5">
                 <h1 className="font-poppins text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold text-black">
                     {product.name}
@@ -42,13 +42,13 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
                     count={product.reviews_count}
                     size="md"
                 />
-                <p className="font-poppins text-[28px] font-medium text-[#0059DD]">
+                <p className="font-poppins text-2xl font-medium text-[#0059DD] sm:text-[28px]">
                     {product.price.toFixed(2)} $
                 </p>
             </div>
 
             <div className="space-y-2.5">
-                <p className="font-poppins text-[28px] font-semibold text-black">
+                <p className="font-poppins text-lg font-semibold text-black sm:text-xl lg:text-[28px]">
                     Couleur :
                 </p>
                 <div className="flex gap-3">
@@ -72,7 +72,7 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
             </div>
 
             <div className="space-y-2.5">
-                <p className="font-poppins text-[28px] font-semibold text-black">
+                <p className="font-poppins text-lg font-semibold text-black sm:text-xl lg:text-[28px]">
                     Taille :
                 </p>
                 <div className="flex flex-wrap gap-4">
@@ -95,11 +95,11 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
             </div>
 
             <div className="space-y-2.5">
-                <p className="font-poppins text-[28px] font-semibold text-black">
+                <p className="font-poppins text-lg font-semibold text-black sm:text-xl lg:text-[28px]">
                     Quantité :
                 </p>
-                <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-12 rounded-[20px] border border-[#5B5E64]/60 px-3 py-2">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                    <div className="flex items-center justify-center gap-8 rounded-[20px] border border-[#5B5E64]/60 px-3 py-2 sm:justify-start sm:gap-12">
                         <button
                             type="button"
                             onClick={() =>
@@ -122,7 +122,7 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
                             <Plus className="size-6" />
                         </button>
                     </div>
-                    <p className="font-poppins text-[28px] font-medium text-black">
+                    <p className="font-poppins text-xl font-medium text-black sm:text-2xl lg:text-[28px]">
                         {lineTotal.toFixed(2)} $
                     </p>
                 </div>

@@ -7,7 +7,7 @@ import { HomeHeader } from '@/components/storefront/home/home-header';
 import { HomeProductShowcaseCard } from '@/components/storefront/home/home-product-showcase-card';
 import { Button } from '@/components/ui/button';
 import { route } from '@/lib/route';
-import { SF_BTN_PRIMARY } from '@/lib/storefront-ui-styles';
+import { SF_BTN_PRIMARY, SF_PAGE_TITLE } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Product = {
@@ -52,9 +52,7 @@ export default function CustomerFavorites() {
                 <main>
                     <section className="px-4 py-9 sm:px-8 lg:px-[100px]">
                         <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-8">
-                            <h1 className="font-poppins text-[36px] font-semibold leading-normal text-black">
-                                Mes favoris
-                            </h1>
+                            <h1 className={SF_PAGE_TITLE}>Mes favoris</h1>
 
                             {items.length === 0 ? (
                                 <div className="py-16 text-center">

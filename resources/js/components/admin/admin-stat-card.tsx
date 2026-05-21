@@ -23,7 +23,7 @@ export function AdminStatCard({ label, value, hint, icon: Icon, accent }: Props)
             <AdminCardContent className="!py-5">
                 <p
                     className={cn(
-                        'font-poppins text-3xl font-semibold tracking-tight',
+                        'font-poppins text-2xl font-semibold tracking-tight sm:text-3xl',
                         accent ? 'text-[#0059DD]' : 'text-black',
                     )}
                 >

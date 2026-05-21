@@ -71,8 +71,8 @@ export default function BrowseProducts() {
                     <CollectionHero />
                     <CollectionToolbar filters={filters} />
 
-                    <section className="px-4 pb-16 sm:px-8 lg:px-7">
-                        <div className="mx-auto flex max-w-[1440px] flex-col gap-8 lg:flex-row lg:gap-3">
+                    <section className="px-4 pb-12 sm:px-8 sm:pb-16 lg:px-7">
+                        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 lg:flex-row lg:gap-3">
                             <CollectionFilters
                                 categories={categories}
                                 totalProducts={totalProducts}

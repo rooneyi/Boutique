@@ -5,12 +5,14 @@ export type AdminNavKey = 'dashboard' | 'analytics' | 'products' | 'vendors' | '
 export const ADMIN_MAIN_NAV: {
     key: AdminNavKey;
     label: string;
+    shortLabel?: string;
     href: string;
     match: (path: string) => boolean;
 }[] = [
     {
         key: 'dashboard',
         label: 'Tableau de bord',
+        shortLabel: 'Tableau',
         href: route('admin.dashboard'),
         match: (path) => path === '/admin/dashboard',
     },

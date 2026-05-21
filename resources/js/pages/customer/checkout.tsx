@@ -10,6 +10,8 @@ import { CheckoutSummary } from '@/components/storefront/checkout/checkout-summa
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { route } from '@/lib/route';
+import { SF_PAGE_MAIN, SF_PAGE_TITLE } from '@/lib/storefront-ui-styles';
+import { cn } from '@/lib/utils';
 
 type AuthUser = {
     id: number;
@@ -72,9 +74,9 @@ export default function CustomerCheckout() {
             <div className="min-h-screen bg-[#f8f7f9] font-poppins text-black antialiased">
                 <HomeHeader user={auth?.user} canRegister={canRegister} />
 
-                <main className="px-4 pb-16 sm:px-8 lg:px-[100px]">
+                <main className={SF_PAGE_MAIN}>
                     <div className="mx-auto max-w-[1440px]">
-                        <h1 className="font-poppins pt-6 pb-2 text-[36px] font-semibold text-black">
+                        <h1 className={cn(SF_PAGE_TITLE, 'pt-4 pb-2 sm:pt-6')}>
                             Commande
                         </h1>
                         <CheckoutBreadcrumbs />

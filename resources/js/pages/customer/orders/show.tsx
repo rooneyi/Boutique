@@ -5,6 +5,8 @@ import { OrderConfirmationPanel } from '@/components/storefront/orders/order-con
 import { OrderRecapPanel } from '@/components/storefront/orders/order-recap-panel';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
+import { SF_PAGE_MAIN, SF_PAGE_TITLE } from '@/lib/storefront-ui-styles';
+import { cn } from '@/lib/utils';
 
 type OrderItem = {
     product_name: string;
@@ -64,14 +66,14 @@ export default function CustomerOrderShow() {
             <div className="min-h-screen bg-[#f8f7f9] font-poppins text-black antialiased">
                 <HomeHeader user={auth?.user} canRegister={canRegister} />
 
-                <main className="px-4 pb-16">
-                    <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-4 py-10 text-center">
+                <main className={SF_PAGE_MAIN}>
+                    <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-4 px-2 py-8 text-center sm:py-10">
                         <CheckCircle2
-                            className="size-[78px] text-[#068130]"
+                            className="size-14 text-[#068130] sm:size-[78px]"
                             strokeWidth={1.25}
                             aria-hidden
                         />
-                        <h1 className="font-poppins max-w-2xl text-[36px] font-semibold leading-tight text-black">
+                        <h1 className={cn(SF_PAGE_TITLE, 'max-w-2xl')}>
                             Commande enregistrée avec succès !
                         </h1>
                         <div className="max-w-xl text-sm leading-relaxed text-black">

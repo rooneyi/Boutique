@@ -11,7 +11,7 @@ export function CollectionHero() {
                         className="h-full max-h-[575px] w-auto max-w-full object-contain object-bottom"
                     />
                 </div>
-                <div className="flex flex-1 flex-col justify-center gap-4 bg-[#292d32] px-8 py-12 lg:px-12">
+                <div className="flex flex-1 flex-col justify-center gap-3 bg-[#292d32] px-4 py-8 sm:gap-4 sm:px-8 sm:py-12 lg:px-12">
                     <h1 className="font-poppins text-[clamp(2rem,5vw,4rem)] font-black uppercase leading-tight tracking-tight text-white">
                         GARDONS NOTRE ATTITUDE
                     </h1>

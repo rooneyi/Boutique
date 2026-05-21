@@ -38,12 +38,12 @@ export function HomeCategories() {
                     </p>
                 </div>
 
-                <div className="flex w-full flex-col items-center justify-center gap-[18px] md:flex-row md:items-end">
+                <div className="flex w-full flex-col items-stretch justify-center gap-[18px] sm:items-center md:flex-row md:items-end">
                     {CATEGORIES.map((cat) => (
                         <Link
                             key={cat.title}
                             href={route('customer.products.index')}
-                            className={`relative flex ${cat.height} ${cat.width} shrink-0 flex-col items-center justify-center overflow-hidden rounded-[23px]`}
+                            className={`relative mx-auto flex ${cat.height} w-full ${cat.width} shrink-0 flex-col items-center justify-center overflow-hidden rounded-[23px]`}
                         >
                             <img
                                 src={cat.image}
@@ -51,7 +51,7 @@ export function HomeCategories() {
                                 className="absolute inset-0 size-full object-cover"
                             />
                             <div className="relative z-10 flex w-full flex-1 flex-col items-center justify-center gap-2.5 bg-black/30 px-5 py-4">
-                                <p className="font-poppins text-[32px] font-bold text-white">
+                                <p className="font-poppins text-2xl font-bold text-white sm:text-[32px]">
                                     {cat.title}
                                 </p>
                                 <span className={SF_PILL_BTN_LIGHT}>{cat.cta}</span>

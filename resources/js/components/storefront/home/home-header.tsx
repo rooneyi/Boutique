@@ -95,7 +95,7 @@ export function HomeHeader({
                             <Instagram className="size-7" strokeWidth={1.5} />
                         </a>
                         {isAdmin ? (
-                            <span className="font-poppins text-sm font-medium text-white/90">
+                            <span className="hidden font-poppins text-sm font-medium text-white/90 sm:inline">
                                 Administration PCJ
                             </span>
                         ) : null}
@@ -120,7 +120,12 @@ export function HomeHeader({
                                 </span>
                             </Link>
                         ) : null}
-                        <div className="flex items-center gap-2 text-white/90">
+                        <div
+                            className={cn(
+                                'flex items-center gap-2 text-white/90',
+                                isAdmin && 'hidden sm:flex',
+                            )}
+                        >
                             <Globe className="size-5" strokeWidth={1.5} />
                             <span className="font-poppins font-normal">
                                 Lubumbashi
@@ -131,7 +136,7 @@ export function HomeHeader({
             </div>
 
             <div className="border-b border-neutral-200 bg-white">
-                <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-4 sm:px-8 lg:px-[100px]">
+                <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:py-4 sm:px-8 lg:px-[100px]">
                     <Link
                         href={isAdmin ? route('admin.dashboard') : route('home')}
                         className="shrink-0"
@@ -143,7 +148,13 @@ export function HomeHeader({
                         />
                     </Link>
 
-                    <nav className="hidden items-center gap-1 lg:flex">
+                    <nav
+                        className={cn(
+                            'hidden items-center gap-1 lg:flex',
+                            isAdmin &&
+                                'min-w-0 flex-1 justify-center gap-0.5 overflow-x-auto xl:gap-1 [scrollbar-width:thin]',
+                        )}
+                    >
                         {isAdmin
                             ? ADMIN_MAIN_NAV.map((item) => {
                                   const isActive = item.match(path);
@@ -153,10 +164,11 @@ export function HomeHeader({
                                           href={item.href}
                                           className={cn(
                                               isActive ? SF_NAV_ITEM_ACTIVE : SF_NAV_ITEM,
-                                              'flex flex-col items-center px-4',
+                                              'flex shrink-0 flex-col items-center px-2 text-sm xl:px-4 xl:text-base',
                                           )}
                                       >
-                                          {item.label}
+                                          <span className="xl:hidden">{item.shortLabel ?? item.label}</span>
+                                          <span className="hidden xl:inline">{item.label}</span>
                                           {isActive ? (
                                               <span className="mt-0.5 size-1.5 rounded-full bg-[#0059DD]" />
                                           ) : null}
@@ -276,8 +288,8 @@ export function HomeHeader({
                 </div>
 
                 {isAdmin && path.startsWith('/admin/products') && (
-                    <div className="hidden border-t border-neutral-100 bg-[#f0f0f0] md:block">
-                        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-6 px-4 py-3 sm:px-8 lg:px-[100px]">
+                    <div className="hidden overflow-x-auto border-t border-neutral-100 bg-[#f0f0f0] md:block [scrollbar-width:thin]">
+                        <div className="mx-auto flex max-w-[1440px] flex-nowrap items-center gap-4 px-4 py-3 sm:gap-6 sm:px-8 lg:flex-wrap lg:px-[100px]">
                             {ADMIN_STOCK_NAV.map((item) => {
                                 const active = item.match(path);
                                 return (

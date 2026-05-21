@@ -21,7 +21,14 @@ import {
 import { AdminFilterTabs } from '@/components/admin/admin-filter-tabs';
 import { AdminPageHero } from '@/components/admin/admin-page-hero';
 import { route } from '@/lib/route';
-import { ADMIN_H3, ADMIN_MUTED } from '@/lib/admin-ui-styles';
+import {
+    ADMIN_H3,
+    ADMIN_MOBILE_META,
+    ADMIN_MUTED,
+    ADMIN_PAGE_SECTION,
+    ADMIN_TABLE_COL_LG,
+    ADMIN_TABLE_COL_MD,
+} from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Product = {
@@ -110,7 +117,7 @@ export default function AdminProducts() {
         <>
             <Head title={title} />
 
-            <div className="space-y-8">
+            <div className={ADMIN_PAGE_SECTION}>
                 <AdminPageHero
                     title={title}
                     description="Supervision de l'inventaire sur toute la plateforme."
@@ -133,33 +140,64 @@ export default function AdminProducts() {
                                     <TableHeader>
                                         <TableRow className={ADMIN_TABLE_HEADER_ROW}>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Produit</TableHead>
-                                            <TableHead className={ADMIN_TABLE_HEAD}>Vendeur</TableHead>
-                                            <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
+                                                Vendeur
+                                            </TableHead>
+                                            <TableHead
+                                                className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD, 'text-right')}
+                                            >
                                                 Prix
                                             </TableHead>
-                                            <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
+                                            <TableHead
+                                                className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD, 'text-right')}
+                                            >
                                                 Stock
                                             </TableHead>
-                                            <TableHead className={ADMIN_TABLE_HEAD}>Catégorie</TableHead>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_LG)}>
+                                                Catégorie
+                                            </TableHead>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Statut</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {products.data.map((product) => (
                                             <TableRow key={product.id} className={ADMIN_TABLE_ROW}>
-                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}>
-                                                    {product.name}
+                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'max-w-[12rem] font-medium text-neutral-900 sm:max-w-none')}>
+                                                    <span className="line-clamp-2 sm:line-clamp-none">
+                                                        {product.name}
+                                                    </span>
+                                                    <span className={ADMIN_MOBILE_META}>
+                                                        {product.vendor?.shop_name ?? '—'}
+                                                        {' · '}
+                                                        {categoryLabel(product.category)}
+                                                    </span>
+                                                    <span className={ADMIN_MOBILE_META}>
+                                                        €{Number(product.price).toFixed(2)} · Stock{' '}
+                                                        {product.quantity}
+                                                    </span>
                                                 </TableCell>
-                                                <TableCell className={ADMIN_TABLE_CELL}>
+                                                <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                     {product.vendor?.shop_name}
                                                 </TableCell>
-                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'text-right')}>
+                                                <TableCell
+                                                    className={cn(
+                                                        ADMIN_TABLE_CELL,
+                                                        ADMIN_TABLE_COL_MD,
+                                                        'text-right',
+                                                    )}
+                                                >
                                                     €{Number(product.price).toFixed(2)}
                                                 </TableCell>
-                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'text-right')}>
+                                                <TableCell
+                                                    className={cn(
+                                                        ADMIN_TABLE_CELL,
+                                                        ADMIN_TABLE_COL_MD,
+                                                        'text-right',
+                                                    )}
+                                                >
                                                     {product.quantity}
                                                 </TableCell>
-                                                <TableCell className={ADMIN_TABLE_CELL}>
+                                                <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_LG)}>
                                                     {categoryLabel(product.category)}
                                                 </TableCell>
                                                 <TableCell>

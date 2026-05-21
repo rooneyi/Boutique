@@ -53,10 +53,10 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
         <div className="flex min-h-screen flex-col bg-white font-poppins text-black antialiased">
             <InertiaPropsSync />
             <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white">
-                <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+                <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
                     {headerBrand}
 
-                    <nav className="flex max-w-[55%] flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm sm:max-w-none sm:flex-1 sm:justify-center md:gap-8 md:text-base">
+                    <nav className="order-3 flex w-full basis-full flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm sm:order-none sm:w-auto sm:flex-1 sm:basis-auto md:gap-6 md:text-base">
                         <Link href={route('customer.products.index')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
                             <Store className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
                             Catalogue
@@ -156,7 +156,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                 </div>
             </header>
 
-            <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">{children}</main>
+            <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
 
             <footer className="mt-auto border-t border-neutral-100 bg-neutral-50">
                 <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">

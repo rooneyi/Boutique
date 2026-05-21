@@ -37,9 +37,9 @@ export function CollectionToolbar({ filters }: Props) {
     };
 
     return (
-        <div className="flex flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-8 lg:px-12">
+        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:px-8 lg:px-12">
             <nav
-                className="flex items-center gap-2.5 font-poppins text-base font-medium"
+                className="flex min-w-0 flex-wrap items-center gap-2 font-poppins text-sm font-medium sm:gap-2.5 sm:text-base"
                 aria-label="Fil d'Ariane"
             >
                 <Link
@@ -53,7 +53,7 @@ export function CollectionToolbar({ filters }: Props) {
             </nav>
 
             <Select value={filters.sort} onValueChange={onSortChange}>
-                <SelectTrigger className="h-12 min-w-[220px] rounded-[20px] border-black font-poppins text-[13px] font-semibold">
+                <SelectTrigger className="font-poppins h-12 w-full rounded-[20px] border-black text-xs font-semibold sm:min-w-[220px] sm:w-auto sm:text-[13px]">
                     <span>
                         TRIER PAR :{' '}
                         <span className="text-[#999]">

@@ -9,7 +9,7 @@ import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { Button } from '@/components/ui/button';
 import { route } from '@/lib/route';
-import { SF_BTN_PRIMARY } from '@/lib/storefront-ui-styles';
+import { SF_BTN_PRIMARY, SF_PAGE_MAIN, SF_PAGE_TITLE } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 import { destroy as deleteCartItem, update as patchCartItem } from '@/routes/customer/cart/items';
 
@@ -78,9 +78,9 @@ export default function CustomerCart() {
             <div className="min-h-screen bg-white font-poppins text-black antialiased">
                 <HomeHeader user={auth?.user} canRegister={canRegister} />
 
-                <main className="px-4 pb-16 sm:px-8 lg:px-7">
+                <main className={SF_PAGE_MAIN}>
                     <div className="mx-auto max-w-[1440px]">
-                        <h1 className="font-poppins pt-8 pb-10 text-[36px] font-semibold leading-normal text-black">
+                        <h1 className={cn(SF_PAGE_TITLE, 'pt-6 pb-8 sm:pt-8 sm:pb-10')}>
                             Mon panier
                         </h1>
 

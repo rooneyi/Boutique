@@ -22,7 +22,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     return (
         <div className="admin-ui flex min-h-screen flex-col bg-[#f8f7f9] font-poppins text-black antialiased scheme-light">
             <HomeHeader chrome="admin" adminPath={page.url} user={user} />
-            <main className={cn(ADMIN_SHELL_MAX, 'w-full flex-1 px-4 py-10 sm:px-8 lg:px-[100px]')}>
+            <main
+                className={cn(
+                    ADMIN_SHELL_MAX,
+                    'w-full flex-1 px-4 py-6 sm:px-8 sm:py-8 lg:px-[100px] lg:py-10',
+                )}
+            >
                 {children}
             </main>
             <HomeFooter />

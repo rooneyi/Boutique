@@ -15,6 +15,7 @@ import {
     ADMIN_FILTER_PILL_ACTIVE,
     ADMIN_H3,
     ADMIN_MUTED,
+    ADMIN_PAGE_SECTION,
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 import { BarChart3, ShoppingCart, Wallet } from 'lucide-react';
@@ -60,7 +61,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
         <>
             <Head title="Analyse des ventes" />
 
-            <div className="space-y-10">
+            <div className={ADMIN_PAGE_SECTION}>
                 <AdminPageHero
                     title="Analyse des ventes"
                     description="Indicateurs globaux, période et analyses avancées de la plateforme."
@@ -84,7 +85,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                     ))}
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <AdminStatCard
                         label="Chiffre d'affaires"
                         value={`€${Number(analytics.total_sales).toFixed(2)}`}
@@ -106,7 +107,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                     />
                 </div>
 
-                <div className="grid gap-6 xl:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <AdminCard>
                         <AdminCardHeader>
                             <h3 className={ADMIN_H3}>Période la plus forte</h3>
@@ -149,10 +150,10 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                                     {analytics.high_demand_out_of_stock.map((row) => (
                                         <li
                                             key={row.id}
-                                            className="flex justify-between gap-2 border-b border-neutral-100 pb-2 last:border-0"
+                                            className="flex flex-col gap-1 border-b border-neutral-100 pb-2 last:border-0 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
                                         >
                                             <span className="font-medium text-black">{row.name}</span>
-                                            <span className={ADMIN_MUTED}>
+                                            <span className={cn(ADMIN_MUTED, 'shrink-0 text-sm')}>
                                                 {row.units_sold} unités · {row.vendor}
                                             </span>
                                         </li>
@@ -165,24 +166,39 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                     </AdminCard>
                 </div>
 
-                <div className="grid gap-6 xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                     {[
                         { title: 'Produits les plus vendus', rows: analytics.top_products, render: (p: TopProduct) => (
-                            <li key={p.id} className="flex justify-between gap-2">
-                                <span>{p.name}</span>
-                                <AdminBadge variant="blue">{p.total_sold}</AdminBadge>
+                            <li
+                                key={p.id}
+                                className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
+                            >
+                                <span className="min-w-0 truncate">{p.name}</span>
+                                <AdminBadge className="self-start sm:self-center" variant="blue">
+                                    {p.total_sold}
+                                </AdminBadge>
                             </li>
                         )},
                         { title: 'Vendeurs les plus actifs', rows: analytics.top_vendors, render: (v: TopVendor) => (
-                            <li key={v.id} className="flex justify-between gap-2">
-                                <span>{v.shop_name}</span>
-                                <AdminBadge variant="outline">{v.orders_count}</AdminBadge>
+                            <li
+                                key={v.id}
+                                className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
+                            >
+                                <span className="min-w-0 truncate">{v.shop_name}</span>
+                                <AdminBadge className="self-start sm:self-center" variant="outline">
+                                    {v.orders_count}
+                                </AdminBadge>
                             </li>
                         )},
                         { title: 'Clients les plus actifs', rows: analytics.top_customers, render: (c: TopCustomer) => (
-                            <li key={c.id} className="flex justify-between gap-2">
-                                <span className="truncate">{c.name}</span>
-                                <AdminBadge variant="outline">{c.orders_count}</AdminBadge>
+                            <li
+                                key={c.id}
+                                className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
+                            >
+                                <span className="min-w-0 truncate">{c.name}</span>
+                                <AdminBadge className="self-start sm:self-center" variant="outline">
+                                    {c.orders_count}
+                                </AdminBadge>
                             </li>
                         )},
                     ].map((block) => (

@@ -5,8 +5,8 @@ import { SF_HERO_CTA } from '@/lib/storefront-ui-styles';
 
 export function HomeHero() {
     return (
-        <section className="relative flex h-[min(929px,100dvh)] flex-col items-center justify-end overflow-hidden bg-gradient-to-b from-[#303030] via-[#4a4a4a] via-[50%] to-[#1d1d1d] pb-20 pt-16">
-            <p className="relative z-10 mb-2 font-poppins text-[36px] font-extrabold leading-[65px] text-white">
+        <section className="relative flex min-h-[min(640px,92dvh)] flex-col items-center justify-end overflow-hidden bg-gradient-to-b from-[#303030] via-[#4a4a4a] via-[50%] to-[#1d1d1d] pb-12 pt-12 sm:min-h-[min(760px,95dvh)] sm:pb-16 sm:pt-16 lg:min-h-[min(929px,100dvh)] lg:pb-20">
+            <p className="relative z-10 mb-2 px-4 text-center font-poppins text-2xl font-extrabold leading-tight text-white sm:text-[36px] sm:leading-[65px]">
                 Gardons notre attitude
             </p>
 
@@ -37,7 +37,10 @@ export function HomeHero() {
                 />
             </div>
 
-            <Link href={route('customer.products.index')} className={`${SF_HERO_CTA} relative z-10`}>
+            <Link
+                href={route('customer.products.index')}
+                className={`${SF_HERO_CTA} relative z-10 mx-4 mb-2 w-[calc(100%-2rem)] max-w-md text-center sm:mx-0 sm:w-auto`}
+            >
                 DECOUVRIR NOTRE COLLECTION
             </Link>
         </section>
