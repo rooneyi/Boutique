@@ -76,12 +76,15 @@ export default function CustomerCheckout() {
 
                 <main className={SF_PAGE_MAIN}>
                     <div className="mx-auto max-w-[1440px]">
-                        <h1 className={cn(SF_PAGE_TITLE, 'pt-4 pb-2 sm:pt-6')}>
-                            Commande
+                        <h1 className={cn(SF_PAGE_TITLE, 'pt-4 pb-2 text-center sm:pt-6 sm:text-left')}>
+                            Finaliser la commande
                         </h1>
                         <CheckoutBreadcrumbs />
 
-                        <form onSubmit={submit} className="mt-8 flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12">
+                        <form
+                            onSubmit={submit}
+                            className="mt-6 flex flex-col gap-8 lg:mt-8 lg:flex-row lg:items-start lg:gap-12"
+                        >
                             <div className="min-w-0 flex-1 max-w-[765px]">
                                 <CheckoutFormFields
                                     data={data}

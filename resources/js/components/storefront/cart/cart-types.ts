@@ -9,6 +9,9 @@ export type CartLine = {
     vendor_shop: string;
     vendor_id: number;
     stock: number;
+    color?: string | null;
+    size?: string | null;
+    sku?: string | null;
     is_favorite?: boolean;
 };
 

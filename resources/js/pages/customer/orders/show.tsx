@@ -67,16 +67,16 @@ export default function CustomerOrderShow() {
                 <HomeHeader user={auth?.user} canRegister={canRegister} />
 
                 <main className={SF_PAGE_MAIN}>
-                    <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-4 px-2 py-8 text-center sm:py-10">
+                    <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-4 px-4 py-8 text-center sm:px-2 sm:py-10">
                         <CheckCircle2
                             className="size-14 text-[#068130] sm:size-[78px]"
                             strokeWidth={1.25}
                             aria-hidden
                         />
-                        <h1 className={cn(SF_PAGE_TITLE, 'max-w-2xl')}>
+                        <h1 className={cn(SF_PAGE_TITLE, 'max-w-2xl text-[clamp(1.5rem,5vw,2.25rem)]')}>
                             Commande enregistrée avec succès !
                         </h1>
-                        <div className="max-w-xl text-sm leading-relaxed text-black">
+                        <div className="max-w-xl text-sm leading-relaxed text-black sm:text-base">
                             <p>Merci pour votre confiance.</p>
                             <p>
                                 Nous avons bien reçu votre commande et nous vous contacterons
@@ -88,7 +88,7 @@ export default function CustomerOrderShow() {
                         </p>
                     </section>
 
-                    <section className="mx-auto flex max-w-[1100px] flex-col items-center justify-center gap-8 lg:flex-row lg:items-start lg:gap-12">
+                    <section className="mx-auto flex w-full max-w-[1100px] flex-col gap-6 px-4 sm:gap-8 lg:flex-row lg:items-start lg:justify-center lg:gap-12">
                         <OrderRecapPanel
                             items={order.items}
                             subtotal={subtotal}

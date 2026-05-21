@@ -28,8 +28,8 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
         <article
             className={
                 isCompact
-                    ? 'relative flex h-[428px] w-full max-w-[322px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]'
-                    : 'relative flex h-[503px] w-full max-w-[343px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]'
+                    ? 'relative flex aspect-[161/214] h-auto w-full max-w-none shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)] sm:aspect-auto sm:h-[428px] sm:max-w-[322px]'
+                    : 'relative flex h-[min(503px,70vh)] w-full max-w-[343px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]'
             }
         >
             <Link

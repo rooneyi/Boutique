@@ -6,16 +6,16 @@ import { SF_PILL_BTN_DARK } from '@/lib/storefront-ui-styles';
 export function HomeBrandCta() {
     return (
         <section className="bg-[#f0f0f0] py-12 lg:px-[100px] lg:py-[100px]">
-            <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 sm:px-8 lg:grid-cols-2 lg:px-0">
-                <div className="overflow-hidden bg-[#bfbfbf] lg:min-h-[619px]">
+            <div className="mx-auto flex max-w-[1440px] flex-col gap-8 px-4 sm:gap-10 sm:px-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-10 lg:px-0">
+                <div className="overflow-hidden rounded-[20px] bg-[#bfbfbf] lg:min-h-[619px] lg:rounded-none">
                     <img
                         src={HOME_ASSETS.brandCta}
                         alt="Collection PCJ"
-                        className="mx-auto h-full max-h-[620px] w-full max-w-md object-cover object-top"
+                        className="mx-auto h-full max-h-[min(342px,45vh)] w-full object-cover object-top lg:max-h-[620px] lg:max-w-md"
                     />
                 </div>
 
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-5 sm:gap-6">
                     <h2 className="font-poppins text-[clamp(2.5rem,5vw,6rem)] font-bold leading-[1.1] text-black">
                         I&apos;AM THE
                         <br />

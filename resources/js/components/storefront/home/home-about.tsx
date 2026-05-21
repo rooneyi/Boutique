@@ -10,8 +10,8 @@ const FEATURES = [
 export function HomeAbout() {
     return (
         <section id="pourquoi-nous" className="bg-white px-4 py-16 sm:px-8 lg:px-[100px] lg:py-[100px]">
-            <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-6 lg:flex-row lg:items-start lg:justify-center">
-                <div className="flex max-w-[578px] flex-col justify-center gap-7 py-5">
+            <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-8 lg:flex-row lg:items-start lg:justify-center lg:gap-6">
+                <div className="flex w-full max-w-[578px] flex-col justify-center gap-7 py-2 lg:py-5">
                     <div>
                         <h2 className="font-poppins text-[clamp(2.5rem,6vw,5.25rem)] font-extrabold leading-tight text-black">
                             Pourquoi
@@ -27,16 +27,16 @@ export function HomeAbout() {
                         </p>
                     </div>
 
-                    <div className="grid w-full max-w-[578px] grid-cols-1 gap-4 overflow-hidden sm:grid-cols-3 sm:gap-0 sm:pr-5">
+                    <div className="grid w-full max-w-[578px] grid-cols-3 gap-2 overflow-hidden sm:gap-0 sm:pr-5">
                         {FEATURES.map(({ icon: Icon, label }, index) => (
                             <div
                                 key={label}
-                                className={`flex flex-col items-center gap-2.5 px-2.5 py-6 text-center sm:pt-11 sm:pb-2.5 ${
-                                    index === 1 ? 'sm:border-x sm:border-black' : ''
+                                className={`flex flex-col items-center gap-2 px-1 py-4 text-center sm:gap-2.5 sm:px-2.5 sm:py-6 sm:pt-11 sm:pb-2.5 ${
+                                    index === 1 ? 'border-x border-black' : ''
                                 }`}
                             >
-                                <Icon className="size-[54px] text-black" strokeWidth={1.25} />
-                                <p className="font-poppins text-xl font-medium text-black">
+                                <Icon className="size-9 text-black sm:size-[54px]" strokeWidth={1.25} />
+                                <p className="font-poppins text-xs font-medium text-black sm:text-xl">
                                     {label}
                                 </p>
                             </div>
@@ -44,7 +44,7 @@ export function HomeAbout() {
                     </div>
                 </div>
 
-                <div className="h-[min(720px,70vh)] w-full max-w-[600px] overflow-hidden rounded-br-[20px] rounded-tr-[20px] lg:shrink-0">
+                <div className="h-[min(367px,55vh)] w-full max-w-[600px] overflow-hidden rounded-[20px] lg:h-[min(720px,70vh)] lg:rounded-br-[20px] lg:rounded-tr-[20px] lg:shrink-0">
                     <img
                         src={HOME_ASSETS.aboutModels}
                         alt="Modèles PCJ"

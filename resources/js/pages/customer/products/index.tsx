@@ -83,7 +83,7 @@ export default function BrowseProducts() {
 
                             <div className="min-w-0 flex-1">
                                 {items.length > 0 ? (
-                                    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                                    <div className="grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-3">
                                         {items.map((product) => (
                                             <HomeProductShowcaseCard
                                                 key={product.id}

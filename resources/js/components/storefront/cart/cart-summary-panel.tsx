@@ -17,7 +17,7 @@ function formatMoney(amount: number): string {
 
 export function CartSummaryPanel({ subtotal, shipping, total }: Props) {
     return (
-        <aside className="h-fit w-full shrink-0 rounded-sm border border-[#e8e8e8] bg-white p-6 lg:sticky lg:top-28 lg:w-[471px] lg:p-8">
+        <aside className="h-fit w-full shrink-0 rounded-[20px] border border-[#e8e8e8] bg-white p-5 shadow-[0_0_2px_rgba(0,0,0,0.12)] sm:p-6 lg:sticky lg:top-28 lg:w-[471px] lg:rounded-sm lg:p-8 lg:shadow-none">
             <div className="space-y-4 border-b border-[#e8e8e8] pb-6">
                 <div className="flex items-center justify-between gap-4">
                     <span className="font-poppins text-lg font-medium text-[#737373]">

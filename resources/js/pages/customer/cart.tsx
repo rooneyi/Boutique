@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { FlashToaster } from '@/components/flash-toaster';
 import { CartPageLine } from '@/components/storefront/cart/cart-page-line';
 import { CartSummaryPanel } from '@/components/storefront/cart/cart-summary-panel';
+import { StorefrontBreadcrumbs } from '@/components/storefront/storefront-breadcrumbs';
 import type { CartLine } from '@/components/storefront/cart/cart-types';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
@@ -81,7 +82,7 @@ export default function CustomerCart() {
 
                 <main className={SF_PAGE_MAIN}>
                     <div className="mx-auto max-w-[1440px]">
-                        <h1 className={cn(SF_PAGE_TITLE, 'pt-6 pb-8 sm:pt-8 sm:pb-10')}>
+                        <h1 className={cn(SF_PAGE_TITLE, 'pt-6 pb-4 text-center sm:pt-8 sm:pb-6 sm:text-left')}>
                             Mon panier
                         </h1>
 
@@ -97,8 +98,14 @@ export default function CustomerCart() {
                                 </Button>
                             </div>
                         ) : (
-                            <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12">
-                                <div className="min-w-0 flex-1">
+                            <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
+                                <div className="min-w-0 flex-1 space-y-4">
+                                    <StorefrontBreadcrumbs
+                                        items={[
+                                            { label: 'Accueil', href: route('home') },
+                                            { label: 'Panier' },
+                                        ]}
+                                    />
                                     {lines.map((line) => (
                                         <CartPageLine
                                             key={`${line.product_id}-${line.variant_id ?? 0}`}

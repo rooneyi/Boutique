@@ -92,7 +92,7 @@ export default function ProductDetail() {
                 <main>
                     <ProductBreadcrumbs productName={product.name} />
 
-                    <section className="px-4 pb-12 sm:px-14">
+                    <section className="px-4 pb-12 sm:px-8 lg:px-14">
                         <div className="mx-auto flex max-w-[1440px] flex-col gap-8 lg:flex-row lg:gap-7">
                             <div className="min-w-0 flex-1">
                                 <ProductGallery images={images} alt={product.name} />

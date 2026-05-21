@@ -3,15 +3,15 @@ import { HOME_ASSETS } from '@/lib/home-assets';
 export function CollectionHero() {
     return (
         <section className="px-4 sm:px-8 lg:px-[62px]">
-            <div className="flex min-h-[min(575px,70vh)] flex-col overflow-hidden rounded-sm lg:flex-row lg:items-stretch">
-                <div className="relative flex min-h-[280px] flex-1 items-end justify-center bg-[#c07f12] lg:max-w-[45%]">
+            <div className="flex min-h-0 flex-col overflow-hidden rounded-sm lg:min-h-[min(575px,70vh)] lg:flex-row lg:items-stretch">
+                <div className="relative flex min-h-[min(451px,55vh)] flex-1 items-end justify-center bg-[#c07f12] lg:max-w-[45%] lg:min-h-[280px]">
                     <img
                         src={HOME_ASSETS.collectionHero}
                         alt=""
-                        className="h-full max-h-[575px] w-auto max-w-full object-contain object-bottom"
+                        className="h-full max-h-[min(451px,55vh)] w-auto max-w-full object-contain object-bottom lg:max-h-[575px]"
                     />
                 </div>
-                <div className="flex flex-1 flex-col justify-center gap-3 bg-[#292d32] px-4 py-8 sm:gap-4 sm:px-8 sm:py-12 lg:px-12">
+                <div className="flex flex-1 flex-col justify-center gap-3 bg-[#292d32] px-4 py-8 sm:gap-4 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
                     <h1 className="font-poppins text-[clamp(2rem,5vw,4rem)] font-black uppercase leading-tight tracking-tight text-white">
                         GARDONS NOTRE ATTITUDE
                     </h1>

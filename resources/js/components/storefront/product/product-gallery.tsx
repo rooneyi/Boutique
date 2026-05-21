@@ -22,29 +22,7 @@ export function ProductGallery({ images, alt }: Props) {
 
     return (
         <div className="flex flex-col gap-3 lg:flex-row lg:gap-2.5">
-            <div className="flex flex-row gap-2.5 overflow-x-auto lg:flex-col lg:overflow-visible">
-                {galleryImages.map((src, index) => (
-                    <button
-                        key={`${src}-${index}`}
-                        type="button"
-                        onClick={() => setActiveIndex(index)}
-                        className={cn(
-                            'h-24 w-28 shrink-0 overflow-hidden rounded-[20px] border-2 transition-colors sm:h-[124px] sm:w-[140px]',
-                            activeIndex === index
-                                ? 'border-black'
-                                : 'border-transparent opacity-70 hover:opacity-100',
-                        )}
-                    >
-                        <img
-                            src={src}
-                            alt=""
-                            className="size-full object-cover"
-                        />
-                    </button>
-                ))}
-            </div>
-
-            <div className="relative flex min-h-[min(400px,50vh)] flex-1 items-end justify-end overflow-hidden rounded-xl p-4 lg:min-h-[754px]">
+            <div className="relative order-1 flex min-h-[min(400px,55vh)] flex-1 items-end justify-end overflow-hidden rounded-xl p-4 lg:order-2 lg:min-h-[754px]">
                 {mainSrc ? (
                     <img
                         src={mainSrc}
@@ -80,6 +58,28 @@ export function ProductGallery({ images, alt }: Props) {
                         </Button>
                     </div>
                 )}
+            </div>
+
+            <div className="order-2 flex flex-row gap-2.5 overflow-x-auto pb-1 lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0">
+                {galleryImages.map((src, index) => (
+                    <button
+                        key={`${src}-${index}`}
+                        type="button"
+                        onClick={() => setActiveIndex(index)}
+                        className={cn(
+                            'h-24 w-28 shrink-0 overflow-hidden rounded-[20px] border-2 transition-colors sm:h-[124px] sm:w-[140px]',
+                            activeIndex === index
+                                ? 'border-black'
+                                : 'border-transparent opacity-70 hover:opacity-100',
+                        )}
+                    >
+                        <img
+                            src={src}
+                            alt=""
+                            className="size-full object-cover"
+                        />
+                    </button>
+                ))}
             </div>
         </div>
     );

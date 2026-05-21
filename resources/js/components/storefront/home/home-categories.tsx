@@ -38,12 +38,16 @@ export function HomeCategories() {
                     </p>
                 </div>
 
-                <div className="flex w-full flex-col items-stretch justify-center gap-[18px] sm:items-center md:flex-row md:items-end">
-                    {CATEGORIES.map((cat) => (
+                <div className="flex w-full flex-col items-stretch justify-center gap-[18px] md:flex-row md:items-end">
+                    {CATEGORIES.map((cat, index) => (
                         <Link
                             key={cat.title}
                             href={route('customer.products.index')}
-                            className={`relative mx-auto flex ${cat.height} w-full ${cat.width} shrink-0 flex-col items-center justify-center overflow-hidden rounded-[23px]`}
+                            className={`relative mx-auto flex w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-[23px] ${
+                                index === 1
+                                    ? 'h-[min(350px,55vh)] max-w-none md:h-[min(570px,70vh)] md:max-w-[400px]'
+                                    : 'h-[240px] max-w-none md:h-[390px] md:max-w-[320px]'
+                            }`}
                         >
                             <img
                                 src={cat.image}

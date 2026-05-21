@@ -6,7 +6,7 @@ import { route } from '@/lib/route';
 export function HomeFooter() {
     return (
         <footer className="bg-black text-white">
-            <div className="mx-auto flex max-w-[1440px] flex-col gap-12 px-6 py-16 sm:px-12 md:flex-row md:flex-wrap md:justify-between lg:px-[92px] lg:pb-24 lg:pt-16">
+            <div className="mx-auto flex max-w-[1440px] flex-col gap-10 px-4 py-14 sm:gap-12 sm:px-8 md:flex-row md:flex-wrap md:justify-between lg:px-[92px] lg:pb-24 lg:pt-16">
                 <div className="max-w-xs space-y-5">
                     <img
                         src={HOME_ASSETS.logo}

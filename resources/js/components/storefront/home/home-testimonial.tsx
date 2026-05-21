@@ -15,8 +15,8 @@ export function HomeTestimonial() {
                         <ChevronLeft className="size-10" />
                     </button>
 
-                    <div className="grid flex-1 items-center gap-8 lg:grid-cols-2">
-                        <div className="space-y-6">
+                    <div className="grid flex-1 grid-cols-1 items-center gap-8 lg:grid-cols-2">
+                        <div className="order-1 space-y-6 lg:order-none">
                             <h2 className="font-poppins text-[clamp(2.5rem,6vw,5.25rem)] font-bold leading-tight text-black">
                                 On en parle
                             </h2>
@@ -32,7 +32,7 @@ export function HomeTestimonial() {
                             </div>
                         </div>
 
-                        <div className="overflow-hidden rounded-lg lg:h-[min(733px,70vh)]">
+                        <div className="order-2 overflow-hidden rounded-lg lg:order-none lg:h-[min(733px,70vh)]">
                             <img
                                 src={HOME_ASSETS.testimonial}
                                 alt="Cliente satisfaite"
