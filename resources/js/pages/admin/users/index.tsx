@@ -1,12 +1,16 @@
 import { Head } from '@inertiajs/react';
 import {
-    Table,
+    AdminDataTable,
     TableBody,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table';
+    ADMIN_TABLE_CELL,
+    ADMIN_TABLE_HEAD,
+    ADMIN_TABLE_HEADER_ROW,
+    ADMIN_TABLE_ROW,
+} from '@/components/admin/admin-table';
 import { AdminBadge, customerSegmentBadgeVariant } from '@/components/admin/admin-badge';
 import {
     AdminCard,
@@ -14,8 +18,8 @@ import {
     AdminCardDescription,
     AdminCardHeader,
 } from '@/components/admin/admin-card';
-import { AdminPageHeader } from '@/components/admin/admin-page-header';
-import { ADMIN_H3, ADMIN_MUTED, ADMIN_TABLE_CELL, ADMIN_TABLE_HEAD } from '@/lib/admin-ui-styles';
+import { AdminPageHero } from '@/components/admin/admin-page-hero';
+import { ADMIN_H3, ADMIN_MUTED } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type VendorRow = {
@@ -71,7 +75,7 @@ export default function AdminUsers({ users, role }: Props) {
             <Head title={title} />
 
             <div className="space-y-8">
-                <AdminPageHeader title={title} description={description} />
+                <AdminPageHero title={title} description={description} />
 
                 <AdminCard>
                     <AdminCardHeader>
@@ -82,10 +86,9 @@ export default function AdminUsers({ users, role }: Props) {
                     </AdminCardHeader>
                     <AdminCardContent>
                         {users.data.length > 0 ? (
-                            <div className="overflow-x-auto rounded-sm border border-neutral-200">
-                                <Table>
+                            <AdminDataTable>
                                     <TableHeader>
-                                        <TableRow className="hover:bg-transparent">
+                                        <TableRow className={ADMIN_TABLE_HEADER_ROW}>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Nom</TableHead>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Email</TableHead>
                                             {role === 'vendor' && (
@@ -118,9 +121,9 @@ export default function AdminUsers({ users, role }: Props) {
                                     <TableBody>
                                         {role === 'vendor'
                                             ? (users.data as VendorRow[]).map((user) => (
-                                                  <TableRow key={user.id}>
+                                                  <TableRow key={user.id} className={ADMIN_TABLE_ROW}>
                                                       <TableCell
-                                                          className={cn(ADMIN_TABLE_CELL, 'font-medium')}
+                                                          className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}
                                                       >
                                                           {user.name}
                                                       </TableCell>
@@ -134,14 +137,14 @@ export default function AdminUsers({ users, role }: Props) {
                                                           {formatDate(user.created_at)}
                                                       </TableCell>
                                                       <TableCell>
-                                                          <AdminBadge variant="blue">Actif</AdminBadge>
+                                                          <AdminBadge variant="muted">Actif</AdminBadge>
                                                       </TableCell>
                                                   </TableRow>
                                               ))
                                             : (users.data as CustomerRow[]).map((user) => (
-                                                  <TableRow key={user.id}>
+                                                  <TableRow key={user.id} className={ADMIN_TABLE_ROW}>
                                                       <TableCell
-                                                          className={cn(ADMIN_TABLE_CELL, 'font-medium')}
+                                                          className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}
                                                       >
                                                           {user.name}
                                                       </TableCell>
@@ -178,8 +181,7 @@ export default function AdminUsers({ users, role }: Props) {
                                                   </TableRow>
                                               ))}
                                     </TableBody>
-                                </Table>
-                            </div>
+                            </AdminDataTable>
                         ) : (
                             <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>
                                 Aucun {title.toLowerCase()} enregistré

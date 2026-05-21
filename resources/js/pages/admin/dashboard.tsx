@@ -13,6 +13,7 @@ import {
     ADMIN_BTN_PILL_DARK,
     ADMIN_BTN_PILL_OUTLINE,
     ADMIN_H3,
+    ADMIN_LIST_ROW,
     ADMIN_MUTED,
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
@@ -117,7 +118,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                 stats.top_products.map((product) => (
                                     <div
                                         key={product.id}
-                                        className="flex items-center justify-between gap-4 rounded-sm border border-neutral-200 bg-[#fafafa] p-4"
+                                        className={cn(ADMIN_LIST_ROW, 'flex items-center justify-between gap-4')}
                                     >
                                         <div>
                                             <p className="font-poppins font-semibold text-black">
@@ -142,20 +143,20 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                             <AdminCardDescription>Panier moyen et répartition</AdminCardDescription>
                         </AdminCardHeader>
                         <AdminCardContent className="space-y-4">
-                            <div className="rounded-sm border border-neutral-200 bg-[#fafafa] p-4">
+                            <div className={ADMIN_LIST_ROW}>
                                 <p className={ADMIN_MUTED}>Panier moyen</p>
                                 <p className="font-poppins text-2xl font-semibold text-[#0059DD]">
                                     €{stats.avg_order_value.toFixed(2)}
                                 </p>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="rounded-sm border border-neutral-200 bg-white p-4 text-center">
+                                <div className="rounded-sm border border-neutral-100 bg-white p-4 text-center">
                                     <p className="font-poppins text-2xl font-semibold text-black">
                                         {stats.total_vendors}
                                     </p>
                                     <p className={cn(ADMIN_MUTED, 'text-sm')}>Vendeurs</p>
                                 </div>
-                                <div className="rounded-sm border border-neutral-200 bg-white p-4 text-center">
+                                <div className="rounded-sm border border-neutral-100 bg-white p-4 text-center">
                                     <p className="font-poppins text-2xl font-semibold text-black">
                                         {stats.total_customers}
                                     </p>
@@ -177,7 +178,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                 {stats.recent_orders.map((order) => (
                                     <div
                                         key={order.id}
-                                        className="grid grid-cols-2 gap-3 rounded-sm border border-neutral-200 bg-[#fafafa] p-4 text-sm md:grid-cols-12 md:items-center"
+                                        className={cn(ADMIN_LIST_ROW, 'grid grid-cols-2 gap-3 text-sm md:grid-cols-12 md:items-center')}
                                     >
                                         <div className="font-poppins font-semibold text-black md:col-span-2">
                                             #{order.id}

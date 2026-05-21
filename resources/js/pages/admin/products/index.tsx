@@ -1,12 +1,16 @@
 import { Head, usePage } from '@inertiajs/react';
 import {
-    Table,
+    AdminDataTable,
     TableBody,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table';
+    ADMIN_TABLE_CELL,
+    ADMIN_TABLE_HEAD,
+    ADMIN_TABLE_HEADER_ROW,
+    ADMIN_TABLE_ROW,
+} from '@/components/admin/admin-table';
 import { AdminBadge, type AdminBadgeVariant } from '@/components/admin/admin-badge';
 import {
     AdminCard,
@@ -17,7 +21,7 @@ import {
 import { AdminFilterTabs } from '@/components/admin/admin-filter-tabs';
 import { AdminPageHero } from '@/components/admin/admin-page-hero';
 import { route } from '@/lib/route';
-import { ADMIN_H3, ADMIN_MUTED, ADMIN_TABLE_CELL, ADMIN_TABLE_HEAD } from '@/lib/admin-ui-styles';
+import { ADMIN_H3, ADMIN_MUTED } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Product = {
@@ -125,10 +129,9 @@ export default function AdminProducts() {
                     </AdminCardHeader>
                     <AdminCardContent>
                         {products.data.length > 0 ? (
-                            <div className="overflow-x-auto rounded-sm border border-neutral-200">
-                                <Table>
+                            <AdminDataTable>
                                     <TableHeader>
-                                        <TableRow className="hover:bg-transparent">
+                                        <TableRow className={ADMIN_TABLE_HEADER_ROW}>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Produit</TableHead>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Vendeur</TableHead>
                                             <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
@@ -143,8 +146,8 @@ export default function AdminProducts() {
                                     </TableHeader>
                                     <TableBody>
                                         {products.data.map((product) => (
-                                            <TableRow key={product.id}>
-                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'font-medium')}>
+                                            <TableRow key={product.id} className={ADMIN_TABLE_ROW}>
+                                                <TableCell className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}>
                                                     {product.name}
                                                 </TableCell>
                                                 <TableCell className={ADMIN_TABLE_CELL}>
@@ -167,8 +170,7 @@ export default function AdminProducts() {
                                             </TableRow>
                                         ))}
                                     </TableBody>
-                                </Table>
-                            </div>
+                            </AdminDataTable>
                         ) : (
                             <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>Aucun produit à afficher</p>
                         )}

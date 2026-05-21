@@ -35,7 +35,7 @@ export const ADMIN_BTN_PILL_OUTLINE =
 
 /** Carte admin — écrase les styles shadcn (rounded-xl, ring, card-foreground). */
 export const ADMIN_CARD =
-    'rounded-sm border border-neutral-200 bg-white text-black shadow-sm !rounded-sm ring-0 !bg-white !text-black [&_[data-slot=card-description]]:font-poppins [&_[data-slot=card-description]]:text-base [&_[data-slot=card-description]]:text-[#747474]';
+    'rounded-sm border border-neutral-100 bg-white text-black shadow-sm !rounded-sm ring-0 !bg-white !text-black [&_[data-slot=card-description]]:font-poppins [&_[data-slot=card-description]]:text-base [&_[data-slot=card-description]]:text-[#747474]';
 
 export const ADMIN_PAGE_BG = 'bg-[#f8f7f9]';
 
@@ -54,16 +54,31 @@ export const ADMIN_FILTER_PILL =
 export const ADMIN_FILTER_PILL_ACTIVE =
     'font-poppins inline-flex items-center justify-center rounded-[32px] border border-black bg-black px-4 py-2.5 text-sm font-semibold text-white';
 
-export const ADMIN_TABLE_HEAD =
-    'font-poppins text-sm font-semibold text-[#747474]';
+export const ADMIN_TABLE_WRAPPER =
+    'overflow-x-auto rounded-sm border border-neutral-100 bg-white';
 
-export const ADMIN_TABLE_CELL = 'font-poppins text-sm text-black';
+export const ADMIN_TABLE_INNER =
+    '[&_[data-slot=table-head]]:h-11 [&_[data-slot=table-head]]:px-4 [&_[data-slot=table-head]]:font-medium [&_[data-slot=table-head]]:text-[#8a8a8a] [&_[data-slot=table-cell]]:px-4 [&_[data-slot=table-cell]]:py-3.5 [&_[data-slot=table-row]]:border-neutral-100/80 [&_[data-slot=table-row]]:hover:bg-neutral-50/50';
+
+export const ADMIN_TABLE_HEADER_ROW =
+    'border-neutral-100/80 bg-[#fafafa] hover:bg-[#fafafa]';
+
+export const ADMIN_TABLE_ROW = 'border-neutral-100/80 hover:bg-neutral-50/50';
+
+export const ADMIN_TABLE_HEAD =
+    'font-poppins text-xs font-medium uppercase tracking-wide text-[#8a8a8a]';
+
+export const ADMIN_TABLE_CELL = 'font-poppins text-sm font-normal text-neutral-800';
+
+/** Ligne de liste (dashboard, analytics) — bordure légère */
+export const ADMIN_LIST_ROW =
+    'rounded-sm border border-neutral-100 bg-[#fafafa]/80 p-4';
 
 export const ADMIN_BADGE_BLUE =
-    'font-poppins rounded-full border-0 bg-[#0059DD] px-3 py-1 text-sm font-medium text-white';
+    'font-poppins rounded-full border border-[#0059DD]/15 bg-[#0059DD]/10 px-2.5 py-0.5 text-xs font-medium text-[#0059DD]';
 
 export const ADMIN_BADGE_DARK =
-    'font-poppins rounded-full border-0 bg-black px-3 py-1 text-sm font-medium text-white';
+    'font-poppins rounded-full border border-neutral-200 bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-600';
 
 /** @deprecated Utiliser ADMIN_BTN_PILL_OUTLINE */
 export const ADMIN_BTN_SECONDARY = ADMIN_BTN_PILL_OUTLINE;

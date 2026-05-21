@@ -9,12 +9,12 @@ export type AdminBadgeVariant =
     | 'warning';
 
 const VARIANT_CLASS: Record<AdminBadgeVariant, string> = {
-    blue: 'border-transparent bg-[#0059DD] text-white',
-    dark: 'border-black bg-black text-white',
-    outline: 'border-black bg-white text-black',
-    danger: 'border-transparent bg-[#dc0000] text-white',
-    muted: 'border-neutral-300 bg-white text-[#747474] font-medium',
-    warning: 'border-black bg-white text-black',
+    blue: 'border-[#0059DD]/15 bg-[#0059DD]/10 text-[#0059DD]',
+    dark: 'border-neutral-200 bg-neutral-100 text-neutral-600',
+    outline: 'border-neutral-200 bg-neutral-50 text-neutral-600',
+    danger: 'border-[#dc0000]/15 bg-[#dc0000]/8 text-[#c40000]',
+    muted: 'border-neutral-100 bg-neutral-50 text-[#8a8a8a]',
+    warning: 'border-amber-200/80 bg-amber-50 text-amber-800/90',
 };
 
 type Props = React.ComponentProps<'span'> & {
@@ -32,7 +32,7 @@ export function orderStatusBadgeVariant(status: string): AdminBadgeVariant {
     if (s.includes('attent') || s.includes('pend')) {
         return 'warning';
     }
-    return 'outline';
+    return 'muted';
 }
 
 export function customerSegmentBadgeVariant(
@@ -58,7 +58,7 @@ export function AdminBadge({
     return (
         <span
             className={cn(
-                'font-poppins inline-flex shrink-0 items-center justify-center rounded-full border px-3.5 py-1.5 text-[13px] font-semibold leading-none',
+                'font-poppins inline-flex shrink-0 items-center justify-center rounded-full border px-2.5 py-0.5 text-xs font-medium leading-snug',
                 VARIANT_CLASS[variant],
                 className,
             )}

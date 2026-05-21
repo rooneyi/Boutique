@@ -8,7 +8,11 @@ type AdminCardProps = {
 
 export function AdminCard({ className, children }: AdminCardProps) {
     return (
-        <article className={cn(SF_CARD, 'p-6 text-black md:p-8', className)}>{children}</article>
+        <article
+            className={cn(SF_CARD, 'border-neutral-100 shadow-sm hover:shadow-sm', 'p-6 text-black md:p-8', className)}
+        >
+            {children}
+        </article>
     );
 }
 
