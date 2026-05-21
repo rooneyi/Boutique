@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ChevronRight } from 'lucide-react';
+import { StorefrontHorizontalScroll } from '@/components/storefront/storefront-horizontal-scroll';
 import { HOME_ASSETS } from '@/lib/home-assets';
 import { route } from '@/lib/route';
 import { SF_SECTION_SUBTITLE, SF_SECTION_TITLE } from '@/lib/storefront-ui-styles';
@@ -42,34 +42,33 @@ export function HomeCurated() {
                     </Link>
                 </div>
 
-                <div className="relative">
-                    <div className="flex gap-1 overflow-x-auto pb-4">
-                        {ITEMS.map((item) => (
-                            <Link
-                                key={item.title}
-                                href={route('customer.products.index')}
-                                className="w-[min(492px,85vw)] shrink-0 p-2"
-                            >
-                                <div className="aspect-[492/682] overflow-hidden">
-                                    <img
-                                        src={item.image}
-                                        alt=""
-                                        className="size-full object-cover"
-                                    />
-                                </div>
-                                <p className="mt-2 font-poppins text-2xl font-semibold text-black">
-                                    {item.title}
-                                </p>
-                                <p className="font-poppins text-base font-medium text-[#737373]">
-                                    {item.description}
-                                </p>
-                            </Link>
-                        ))}
-                    </div>
-                    <div className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 md:block">
-                        <ChevronRight className="size-12 text-neutral-400" />
-                    </div>
-                </div>
+                <StorefrontHorizontalScroll
+                    showControls
+                    trackClassName="gap-1 pb-4"
+                    scrollStep={400}
+                >
+                    {ITEMS.map((item) => (
+                        <Link
+                            key={item.title}
+                            href={route('customer.products.index')}
+                            className="w-[min(492px,85vw)] shrink-0 p-2"
+                        >
+                            <div className="aspect-[492/682] overflow-hidden">
+                                <img
+                                    src={item.image}
+                                    alt=""
+                                    className="size-full object-cover"
+                                />
+                            </div>
+                            <p className="mt-2 font-poppins text-2xl font-semibold text-black">
+                                {item.title}
+                            </p>
+                            <p className="font-poppins text-base font-medium text-[#737373]">
+                                {item.description}
+                            </p>
+                        </Link>
+                    ))}
+                </StorefrontHorizontalScroll>
             </div>
         </section>
     );

@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { SF_SCROLL_X } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -60,7 +61,13 @@ export function ProductGallery({ images, alt }: Props) {
                 )}
             </div>
 
-            <div className="order-2 flex flex-row gap-2.5 overflow-x-auto pb-1 lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0">
+            <div
+                className={cn(
+                    'order-2 flex flex-row gap-2.5 pb-1',
+                    SF_SCROLL_X,
+                    'lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0',
+                )}
+            >
                 {galleryImages.map((src, index) => (
                     <button
                         key={`${src}-${index}`}

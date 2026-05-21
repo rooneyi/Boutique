@@ -71,6 +71,13 @@ export const SF_HERO_CTA =
 export const SF_PRODUCT_BUY_BTN =
     'font-poppins inline-flex items-center justify-center gap-1 rounded-full border border-white bg-white px-3.5 py-2.5 text-[15px] font-semibold text-black transition-colors hover:bg-neutral-100';
 
+/** Zone carrousel : scroll horizontal sans barre visible (comme Figma) */
+export const SF_SCROLL_X = 'sf-scroll-x';
+
+/** Boutons prev/next sous les carrousels produits */
+export const SF_CAROUSEL_NAV_BTN =
+    'size-[30px] rounded-full border border-neutral-300 bg-white text-black shadow-sm hover:bg-neutral-50';
+
 export const SF_NAV_ITEM =
     'font-poppins relative flex h-12 flex-col items-center justify-center px-5 text-base text-black transition-colors hover:text-[#0059DD]';
 

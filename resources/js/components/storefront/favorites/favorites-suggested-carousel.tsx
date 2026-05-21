@@ -1,7 +1,5 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useRef } from 'react';
 import { HomeProductShowcaseCard } from '@/components/storefront/home/home-product-showcase-card';
-import { Button } from '@/components/ui/button';
+import { StorefrontHorizontalScroll } from '@/components/storefront/storefront-horizontal-scroll';
 import { SF_SECTION_SUBTITLE, SF_SECTION_TITLE } from '@/lib/storefront-ui-styles';
 
 type Product = {
@@ -19,17 +17,6 @@ type Props = {
 };
 
 export function FavoritesSuggestedCarousel({ products }: Props) {
-    const scrollRef = useRef<HTMLDivElement>(null);
-
-    const scroll = (direction: 'left' | 'right') => {
-        const el = scrollRef.current;
-        if (!el) return;
-        el.scrollBy({
-            left: direction === 'left' ? -380 : 380,
-            behavior: 'smooth',
-        });
-    };
-
     if (products.length === 0) {
         return null;
     }
@@ -44,37 +31,17 @@ export function FavoritesSuggestedCarousel({ products }: Props) {
                     </p>
                 </div>
 
-                <div
-                    ref={scrollRef}
-                    className="flex gap-7 overflow-x-auto pb-4 pl-4 shadow-[0_4px_2px_rgba(0,0,0,0.25)] sm:pl-12 lg:pl-[50px] scrollbar-thin"
+                <StorefrontHorizontalScroll
+                    showControls
+                    className="shadow-[0_4px_2px_rgba(0,0,0,0.25)]"
+                    trackClassName="gap-7 pb-4 pl-4 sm:pl-12 lg:pl-[50px]"
+                    controlsClassName="mt-8"
+                    scrollStep={320}
                 >
                     {products.map((product) => (
                         <HomeProductShowcaseCard key={product.id} product={product} />
                     ))}
-                </div>
-
-                <div className="mt-8 flex items-center justify-center gap-8">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="size-10 rounded-full border-neutral-300"
-                        onClick={() => scroll('left')}
-                        aria-label="Précédent"
-                    >
-                        <ChevronLeft className="size-5" />
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        className="size-10 rounded-full border-neutral-300"
-                        onClick={() => scroll('right')}
-                        aria-label="Suivant"
-                    >
-                        <ChevronRight className="size-5" />
-                    </Button>
-                </div>
+                </StorefrontHorizontalScroll>
             </div>
         </section>
     );
