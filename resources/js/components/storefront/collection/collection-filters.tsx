@@ -156,6 +156,7 @@ export function CollectionFilters({ categories, totalProducts, filters }: Props)
                 sort: filters.sort,
                 min_price: minPrice,
                 max_price: maxPrice,
+                ...(filters.q ? { q: filters.q } : {}),
             },
             { preserveState: true, preserveScroll: true },
         );

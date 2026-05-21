@@ -14,6 +14,7 @@ type Filters = {
     sort: string;
     min_price: number;
     max_price: number;
+    q?: string;
 };
 
 const SORT_LABELS: Record<string, string> = {
@@ -31,7 +32,13 @@ export function CollectionToolbar({ filters }: Props) {
     const onSortChange = (sort: string) => {
         router.get(
             route('customer.products.index'),
-            { ...filters, sort },
+            {
+                category: filters.category,
+                sort,
+                min_price: filters.min_price,
+                max_price: filters.max_price,
+                ...(filters.q ? { q: filters.q } : {}),
+            },
             { preserveState: true, preserveScroll: true },
         );
     };
@@ -49,7 +56,14 @@ export function CollectionToolbar({ filters }: Props) {
                     Accueil
                 </Link>
                 <ArrowRight className="size-5 text-[#5B5E64]/60" aria-hidden />
-                <span className="text-black">Collection</span>
+                <span className="text-black">
+                    Collection
+                    {filters.q ? (
+                        <span className="ml-1 text-sm font-normal text-[#747474]">
+                            · « {filters.q} »
+                        </span>
+                    ) : null}
+                </span>
             </nav>
 
             <Select value={filters.sort} onValueChange={onSortChange}>

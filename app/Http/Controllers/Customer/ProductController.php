@@ -96,6 +96,7 @@ class ProductController extends Controller
                 'sort' => $sort,
                 'min_price' => (int) ($minPrice ?? 10),
                 'max_price' => (int) ($maxPrice ?? 50),
+                'q' => $search,
             ],
             'canRegister' => Features::enabled(Features::registration()),
         ]);

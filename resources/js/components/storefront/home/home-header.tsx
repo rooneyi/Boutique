@@ -1,14 +1,16 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import {
     Bell,
     Globe,
     Heart,
     Instagram,
+    Menu,
     Search,
     ShoppingCart,
     User,
+    X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { InertiaPropsSync } from '@/components/storefront/inertia-props-sync';
 import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
@@ -36,6 +38,14 @@ type Props = {
     adminPath?: string;
 };
 
+function parseSearchFromUrl(url: string): string {
+    const queryIndex = url.indexOf('?');
+    if (queryIndex === -1) {
+        return '';
+    }
+    return new URLSearchParams(url.slice(queryIndex + 1)).get('q') ?? '';
+}
+
 const NAV_ITEMS = [
     { key: 'home' as const, label: 'Accueil', href: route('home') },
     {
@@ -56,7 +66,9 @@ export function HomeHeader({
 }: Props) {
     const isAdmin = chrome === 'admin';
     const path = adminPath;
+    const page = usePage();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const cartDrawer = useOptionalCartDrawer();
     const favoritesDrawer = useOptionalFavoritesDrawer();
     const accountDrawer = useOptionalAccountDrawer();
@@ -77,6 +89,55 @@ export function HomeHeader({
               : user?.role === 'CUSTOMER'
                 ? route('customer.products.index')
                 : route('login');
+
+    useEffect(() => {
+        if (!isAdmin) {
+            setSearchQuery(parseSearchFromUrl(page.url));
+        }
+    }, [page.url, isAdmin]);
+
+    useEffect(() => {
+        if (!mobileOpen) {
+            return;
+        }
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = prev;
+        };
+    }, [mobileOpen]);
+
+    function closeMobileMenu() {
+        setMobileOpen(false);
+    }
+
+    function submitSearch(event?: FormEvent) {
+        event?.preventDefault();
+        if (isAdmin) {
+            return;
+        }
+        const q = searchQuery.trim();
+        router.get(
+            route('customer.products.index'),
+            q ? { q, category: 'all', sort: 'popular' } : { category: 'all', sort: 'popular' },
+        );
+        closeMobileMenu();
+    }
+
+    const searchField = (
+        <>
+            <Search className="size-5 shrink-0 text-[#999]" aria-hidden />
+            <input
+                type="search"
+                name="q"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Que recherchez-vous ?"
+                className="font-poppins w-full min-w-0 border-0 bg-transparent text-base text-black placeholder:text-[#999] focus:outline-none"
+                aria-label="Rechercher un produit"
+            />
+        </>
+    );
 
     return (
         <>
@@ -135,7 +196,7 @@ export function HomeHeader({
                 </div>
             </div>
 
-            <div className="border-b border-neutral-200 bg-white">
+            <div className="relative border-b border-neutral-200 bg-white">
                 <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:py-4 sm:px-8 lg:px-[100px]">
                     <Link
                         href={isAdmin ? route('admin.dashboard') : route('home')}
@@ -202,15 +263,13 @@ export function HomeHeader({
 
                     <div className="flex items-center gap-3 sm:gap-4">
                         {!isAdmin && (
-                            <div className="hidden min-w-[200px] items-center gap-3 border-b border-[#bfbfbf] pb-2 md:flex lg:min-w-[280px]">
-                                <Search className="size-5 shrink-0 text-[#999]" />
-                                <input
-                                    type="search"
-                                    readOnly
-                                    placeholder="Que recherchez-vous ?"
-                                    className="font-poppins w-full border-0 bg-transparent text-base text-black placeholder:text-[#999] focus:outline-none"
-                                />
-                            </div>
+                            <form
+                                onSubmit={submitSearch}
+                                className="hidden min-w-[200px] items-center gap-3 border-b border-[#bfbfbf] pb-2 md:flex lg:min-w-[280px]"
+                                role="search"
+                            >
+                                {searchField}
+                            </form>
                         )}
                         {user?.role === 'CUSTOMER' ? (
                             <Button
@@ -278,11 +337,18 @@ export function HomeHeader({
                         <Button
                             type="button"
                             variant="ghost"
-                            size="sm"
-                            className="font-poppins lg:hidden"
+                            size="icon"
+                            className="shrink-0 rounded-full text-black lg:hidden"
                             onClick={() => setMobileOpen((o) => !o)}
+                            aria-expanded={mobileOpen}
+                            aria-controls="home-header-mobile-menu"
+                            aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
                         >
-                            Menu
+                            {mobileOpen ? (
+                                <X className="size-6" strokeWidth={1.25} />
+                            ) : (
+                                <Menu className="size-6" strokeWidth={1.25} />
+                            )}
                         </Button>
                     </div>
                 </div>
@@ -312,7 +378,26 @@ export function HomeHeader({
                 )}
 
                 {mobileOpen && (
-                    <nav className="border-t border-neutral-100 bg-white px-4 py-4 lg:hidden">
+                    <>
+                        <button
+                            type="button"
+                            className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+                            aria-label="Fermer le menu"
+                            onClick={closeMobileMenu}
+                        />
+                        <nav
+                            id="home-header-mobile-menu"
+                            className="absolute inset-x-0 top-full z-50 max-h-[min(75dvh,28rem)] overflow-y-auto border-t border-neutral-100 bg-white px-4 py-4 shadow-xl lg:hidden"
+                        >
+                        {!isAdmin && (
+                            <form
+                                onSubmit={submitSearch}
+                                className="mb-4 flex items-center gap-3 border-b border-[#bfbfbf] pb-3"
+                                role="search"
+                            >
+                                {searchField}
+                            </form>
+                        )}
                         {isAdmin
                             ? ADMIN_MAIN_NAV.map((item) => {
                                   const isActive = item.match(path);
@@ -324,7 +409,7 @@ export function HomeHeader({
                                               'font-poppins block py-2 text-base',
                                               isActive && 'font-semibold text-[#0059DD]',
                                           )}
-                                          onClick={() => setMobileOpen(false)}
+                                          onClick={closeMobileMenu}
                                       >
                                           {item.label}
                                       </Link>
@@ -340,7 +425,7 @@ export function HomeHeader({
                                               'font-poppins block py-2 text-base',
                                               isActive && 'font-semibold text-[#0059DD]',
                                           )}
-                                          onClick={() => setMobileOpen(false)}
+                                          onClick={closeMobileMenu}
                                       >
                                           {item.label}
                                       </Link>
@@ -359,7 +444,7 @@ export function HomeHeader({
                                             'font-poppins block py-2 text-base',
                                             item.match(path) && 'font-semibold text-[#0059DD]',
                                         )}
-                                        onClick={() => setMobileOpen(false)}
+                                        onClick={closeMobileMenu}
                                     >
                                         {item.label}
                                     </Link>
@@ -371,7 +456,7 @@ export function HomeHeader({
                                 type="button"
                                 className="font-poppins block w-full py-2 text-left text-base"
                                 onClick={() => {
-                                    setMobileOpen(false);
+                                    closeMobileMenu();
                                     favoritesDrawer?.openFavorites();
                                 }}
                             >
@@ -384,7 +469,7 @@ export function HomeHeader({
                                     type="button"
                                     className="font-poppins mt-2 block w-full py-2 text-left text-base"
                                     onClick={() => {
-                                        setMobileOpen(false);
+                                        closeMobileMenu();
                                         openAccount();
                                     }}
                                 >
@@ -394,7 +479,7 @@ export function HomeHeader({
                                 <Link
                                     href={accountHref}
                                     className="font-poppins mt-2 block py-2 text-base"
-                                    onClick={() => setMobileOpen(false)}
+                                    onClick={closeMobileMenu}
                                 >
                                     {user ? 'Mon compte' : 'Connexion'}
                                 </Link>
@@ -403,12 +488,13 @@ export function HomeHeader({
                             <Link
                                 href={route('profile.edit')}
                                 className="font-poppins mt-2 block py-2 text-base"
-                                onClick={() => setMobileOpen(false)}
+                                onClick={closeMobileMenu}
                             >
                                 Paramètres
                             </Link>
                         )}
-                    </nav>
+                        </nav>
+                    </>
                 )}
             </div>
         </header>
