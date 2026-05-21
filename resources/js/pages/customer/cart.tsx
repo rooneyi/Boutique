@@ -32,8 +32,8 @@ export default function CustomerCart() {
     const { auth, canRegister, lines, subtotal, shipping, total } = usePage<PageProps>().props;
     const [busyProductId, setBusyProductId] = useState<number | null>(null);
 
-    function mutate(productId: number, request: () => void) {
-        setBusyProductId(productId);
+    function mutate(lineKey: number, request: () => void) {
+        setBusyProductId(lineKey);
         request();
     }
 
@@ -41,11 +41,11 @@ export default function CustomerCart() {
         router.reload({ only: ['lines', 'subtotal', 'total', 'cartCount'] });
     }
 
-    function setQuantity(productId: number, quantity: number) {
-        mutate(productId, () => {
+    function setQuantity(line: CartLine, quantity: number) {
+        mutate(line.variant_id ?? line.product_id, () => {
             router.patch(
-                patchCartItem.url(productId),
-                { quantity },
+                patchCartItem.url(line.product_id),
+                { quantity, variant_id: line.variant_id ?? undefined },
                 {
                     preserveScroll: true,
                     onSuccess: syncCartCount,
@@ -61,9 +61,10 @@ export default function CustomerCart() {
         });
     }
 
-    function removeLine(productId: number) {
-        mutate(productId, () => {
-            router.delete(deleteCartItem.url(productId), {
+    function removeLine(line: CartLine) {
+        mutate(line.variant_id ?? line.product_id, () => {
+            router.delete(deleteCartItem.url(line.product_id), {
+                data: { variant_id: line.variant_id ?? undefined },
                 preserveScroll: true,
                 onSuccess: syncCartCount,
                 onFinish: () => setBusyProductId(null),
@@ -100,13 +101,11 @@ export default function CustomerCart() {
                                 <div className="min-w-0 flex-1">
                                     {lines.map((line) => (
                                         <CartPageLine
-                                            key={line.product_id}
+                                            key={`${line.product_id}-${line.variant_id ?? 0}`}
                                             line={line}
-                                            busy={busyProductId === line.product_id}
-                                            onQuantityChange={(quantity) =>
-                                                setQuantity(line.product_id, quantity)
-                                            }
-                                            onRemove={() => removeLine(line.product_id)}
+                                            busy={busyProductId === (line.variant_id ?? line.product_id)}
+                                            onQuantityChange={(quantity) => setQuantity(line, quantity)}
+                                            onRemove={() => removeLine(line)}
                                         />
                                     ))}
                                 </div>

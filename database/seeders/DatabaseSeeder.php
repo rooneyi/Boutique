@@ -12,6 +12,7 @@ use App\Models\ProductReview;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Services\OrderService;
+use App\Services\ProductVariantService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
 
@@ -107,8 +108,24 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Jean slim indigo', 'description' => 'Denim stretch confortable.', 'price' => 79.0, 'stock' => 0, 'category_id' => $pantalon, 'status' => 'OUT_OF_STOCK'],
         ];
 
+        $variantService = app(ProductVariantService::class);
+
         foreach ($productsA as $row) {
-            Product::create(array_merge($row, ['vendor_id' => $vendorA->id]));
+            $product = Product::create(array_merge($row, ['vendor_id' => $vendorA->id, 'stock' => 0]));
+            $variantService->syncVariants($product, match ($product->name) {
+                'Robe midi lin' => [
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'ROBE-NOIR-M', 'stock' => 8],
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'L', 'sku' => 'ROBE-NOIR-L', 'stock' => 6],
+                    ['color' => 'Bleu', 'color_hex' => '#0059DD', 'size' => 'M', 'sku' => 'ROBE-BLEU-M', 'stock' => 10],
+                ],
+                'Chemise coton bio' => [
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'S', 'sku' => 'CHEM-BLANC-S', 'stock' => 2],
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'CHEM-BLANC-M', 'stock' => 3],
+                ],
+                default => [
+                    ['color' => 'Gris', 'color_hex' => '#BFBFBF', 'size' => 'M', 'sku' => 'SKU-'.$product->id.'-M', 'stock' => max(0, (int) $row['stock'])],
+                ],
+            });
         }
 
         $productsB = [
@@ -118,7 +135,21 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($productsB as $row) {
-            Product::create(array_merge($row, ['vendor_id' => $vendorB->id]));
+            $product = Product::create(array_merge($row, ['vendor_id' => $vendorB->id, 'stock' => 0]));
+            $variantService->syncVariants($product, match ($product->name) {
+                'Sneakers urbaines' => [
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => '40', 'sku' => 'SNK-NOIR-40', 'stock' => 5],
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => '42', 'sku' => 'SNK-NOIR-42', 'stock' => 10],
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => '42', 'sku' => 'SNK-BLANC-42', 'stock' => 0],
+                ],
+                'T-shirt oversize' => [
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'TEE-NOIR-M', 'stock' => 40],
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'L', 'sku' => 'TEE-NOIR-L', 'stock' => 40],
+                ],
+                default => [
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'SKU-'.$product->id.'-M', 'stock' => max(0, (int) $row['stock'])],
+                ],
+            });
         }
 
         $pEmmaRobe = Product::where('vendor_id', $vendorA->id)->where('name', 'Robe midi lin')->first();

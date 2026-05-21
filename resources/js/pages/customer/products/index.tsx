@@ -36,6 +36,7 @@ type Filters = {
     min_price: number;
     max_price: number;
     q?: string;
+    color?: string;
 };
 
 type AuthUser = {

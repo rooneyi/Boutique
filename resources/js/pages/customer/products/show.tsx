@@ -1,4 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
+import type { ProductVariantPayload } from '@/components/storefront/product/product-purchase-panel';
 import { FlashToaster } from '@/components/flash-toaster';
 import { HomeCurated } from '@/components/storefront/home/home-curated';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
@@ -20,6 +22,7 @@ type Product = {
     rating_avg: number | null;
     reviews_count: number;
     is_favorite: boolean;
+    variants: ProductVariantPayload[];
     vendor: {
         id: number;
         shop_name: string;
@@ -65,9 +68,15 @@ export default function ProductDetail() {
         can_review,
     } = usePage<PageProps>().props;
 
-    const images = product.image_path
-        ? Array.from({ length: 5 }, () => product.image_path as string)
-        : [];
+    const [galleryImage, setGalleryImage] = useState<string | null>(product.image_path ?? null);
+
+    const images = useMemo(() => {
+        const src = galleryImage ?? product.image_path;
+        if (!src) {
+            return [];
+        }
+        return Array.from({ length: 5 }, () => src);
+    }, [galleryImage, product.image_path]);
 
     return (
         <>
@@ -88,7 +97,10 @@ export default function ProductDetail() {
                             <div className="min-w-0 flex-1">
                                 <ProductGallery images={images} alt={product.name} />
                             </div>
-                            <ProductPurchasePanel product={product} />
+                            <ProductPurchasePanel
+                                product={product}
+                                onVariantImageChange={setGalleryImage}
+                            />
                         </div>
                     </section>
 

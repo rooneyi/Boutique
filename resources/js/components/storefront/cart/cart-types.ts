@@ -1,5 +1,6 @@
 export type CartLine = {
     product_id: number;
+    variant_id?: number | null;
     quantity: number;
     name: string;
     price: number;

@@ -62,18 +62,28 @@ class CartController extends Controller
     {
         $data = $request->validated();
         $product = Product::query()->findOrFail((int) $data['product_id']);
+        $variantId = (int) $data['variant_id'];
         $quantity = (int) $data['quantity'];
 
         if ($product->status === 'DISCONTINUED') {
             return back()->withErrors(['product_id' => 'Ce produit n’est plus disponible.']);
         }
 
-        $already = $this->cartService->quantityForProduct($product->id);
-        if ($already + $quantity > $product->stock) {
+        $variant = ProductVariant::query()->find($variantId);
+        if (! $variant || $variant->product_id !== $product->id) {
+            return back()->withErrors(['variant_id' => 'Article invalide.']);
+        }
+
+        if ($variant->stock <= 0) {
+            return back()->withErrors(['quantity' => 'Cet article est en rupture de stock.']);
+        }
+
+        $already = $this->cartService->quantityForLine($product->id, $variantId);
+        if ($already + $quantity > $variant->stock) {
             return back()->withErrors(['quantity' => 'Stock insuffisant pour cette quantité.']);
         }
 
-        $this->cartService->add($product->id, $quantity);
+        $this->cartService->add($product->id, $quantity, $variantId);
 
         return back()->with('success', 'Produit ajouté au panier.');
     }
@@ -82,7 +92,9 @@ class CartController extends Controller
     {
         $validated = $request->validated();
         $quantity = (int) $validated['quantity'];
-        $variantId = isset($validated['variant_id']) ? (int) $validated['variant_id'] : null;
+        $variantId = array_key_exists('variant_id', $validated) && $validated['variant_id'] !== null
+            ? (int) $validated['variant_id']
+            : null;
 
         if ($product->status === 'DISCONTINUED') {
             $this->cartService->remove($product->id, $variantId);

@@ -19,6 +19,7 @@ type Filters = {
     min_price: number;
     max_price: number;
     q?: string;
+    color?: string;
 };
 
 type Props = {
@@ -44,6 +45,8 @@ function FiltersPanel({
     setMinPrice,
     maxPrice,
     setMaxPrice,
+    color,
+    setColor,
     onApply,
 }: {
     categories: CategoryFilter[];
@@ -51,6 +54,8 @@ function FiltersPanel({
     filters: Filters;
     category: string;
     setCategory: (v: string) => void;
+    color: string;
+    setColor: (v: string) => void;
     minPrice: number;
     setMinPrice: (v: number) => void;
     maxPrice: number;
@@ -144,6 +149,7 @@ function FiltersPanel({
 
 export function CollectionFilters({ categories, totalProducts, filters }: Props) {
     const [category, setCategory] = useState(filters.category);
+    const [color, setColor] = useState(filters.color ?? '');
     const [minPrice, setMinPrice] = useState(filters.min_price);
     const [maxPrice, setMaxPrice] = useState(filters.max_price);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -157,6 +163,7 @@ export function CollectionFilters({ categories, totalProducts, filters }: Props)
                 min_price: minPrice,
                 max_price: maxPrice,
                 ...(filters.q ? { q: filters.q } : {}),
+                ...(color ? { color } : {}),
             },
             { preserveState: true, preserveScroll: true },
         );
@@ -169,6 +176,8 @@ export function CollectionFilters({ categories, totalProducts, filters }: Props)
         filters,
         category,
         setCategory,
+        color,
+        setColor,
         minPrice,
         setMinPrice,
         maxPrice,
@@ -206,15 +215,18 @@ function FilterRow({
     count,
     checked,
     onCheckedChange,
+    leading,
 }: {
     label: string;
     count: number;
     checked: boolean;
     onCheckedChange: () => void;
+    leading?: React.ReactNode;
 }) {
     return (
         <div className="flex items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-3">
+                {leading}
                 <Checkbox
                     id={`cat-${label}`}
                     checked={checked}
@@ -228,7 +240,9 @@ function FilterRow({
                     {label}
                 </Label>
             </div>
-            <span className="shrink-0 font-poppins text-sm font-medium text-[#5B5E64]/60">({count})</span>
+            {count > 0 ? (
+                <span className="shrink-0 font-poppins text-sm font-medium text-[#5B5E64]/60">({count})</span>
+            ) : null}
         </div>
     );
 }

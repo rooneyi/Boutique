@@ -50,7 +50,7 @@ class ProductController extends Controller
         return Inertia::render('vendor/products/create', [
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'product' => null,
-            'sizes' => ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+            'sizes' => ['XS', 'S', 'M', 'L', 'XL', 'XXL', '38', '39', '40', '41', '42', '43'],
         ]);
     }
 
@@ -62,7 +62,7 @@ class ProductController extends Controller
 
         return Inertia::render('vendor/products/create', [
             'categories' => Category::orderBy('name')->get(['id', 'name']),
-            'sizes' => ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+            'sizes' => ['XS', 'S', 'M', 'L', 'XL', 'XXL', '38', '39', '40', '41', '42', '43'],
             'product' => [
                 'id' => $product->id,
                 'name' => $product->name,

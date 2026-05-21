@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 
 type Props = {
     productId: number;
+    variantId?: number;
     quantity?: number;
     disabled?: boolean;
     className?: string;
@@ -20,6 +21,7 @@ type Props = {
 
 export function AddToCartButton({
     productId,
+    variantId,
     quantity = 1,
     disabled,
     className,
@@ -46,13 +48,13 @@ export function AddToCartButton({
             });
             return;
         }
-        if (disabled) {
+        if (disabled || !variantId) {
             return;
         }
 
         router.post(
             postCartItem.url(),
-            { product_id: productId, quantity },
+            { product_id: productId, variant_id: variantId, quantity },
             {
                 preserveScroll: true,
                 onSuccess: () => {

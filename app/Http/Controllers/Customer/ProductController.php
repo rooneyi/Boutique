@@ -16,6 +16,10 @@ use Laravel\Fortify\Features;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        private ProductVariantService $variantService,
+    ) {}
+
     public function index(Request $request): Response
     {
         $favoriteIdSet = [];
@@ -42,6 +46,11 @@ class ProductController extends Controller
                 $q->where('name', 'like', $term)
                     ->orWhere('description', 'like', $term);
             });
+        }
+
+        $colorFilter = $request->string('color')->trim()->toString();
+        if ($colorFilter !== '') {
+            $query->whereHas('variants', fn ($q) => $q->where('color', $colorFilter));
         }
 
         $minPrice = $request->has('min_price') ? (float) $request->input('min_price') : null;
@@ -98,6 +107,7 @@ class ProductController extends Controller
                 'min_price' => (int) ($minPrice ?? 10),
                 'max_price' => (int) ($maxPrice ?? 50),
                 'q' => $search,
+                'color' => $colorFilter,
             ],
             'canRegister' => Features::enabled(Features::registration()),
         ]);
@@ -108,6 +118,8 @@ class ProductController extends Controller
         if ($product->status === 'DISCONTINUED') {
             abort(404);
         }
+
+        $product->load(['category', 'vendor', 'variants']);
 
         $category = $product->category;
         $customer = auth()->user()?->customer;
@@ -169,6 +181,10 @@ class ProductController extends Controller
                 'rating_avg' => $ratingAvg,
                 'reviews_count' => $reviewsCount,
                 'is_favorite' => $favorited,
+                'variants' => $product->variants
+                    ->map(fn ($v) => $this->variantService->variantPayload($v))
+                    ->values()
+                    ->all(),
             ],
             'category_name' => $category?->name,
             'reviews' => $reviews,
