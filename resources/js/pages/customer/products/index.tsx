@@ -73,34 +73,38 @@ export default function BrowseProducts() {
                     <CollectionHero />
                     <CollectionToolbar filters={filters} />
 
-                    <section className="px-4 pb-12 sm:px-8 sm:pb-16 lg:px-7">
-                        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 lg:flex-row lg:gap-3">
-                            <CollectionFilters
-                                categories={categories}
-                                totalProducts={totalProducts}
-                                filters={filters}
-                            />
+                    <section className="pb-10 pt-2 sm:pb-12 lg:pb-16">
+                        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 lg:flex-row lg:gap-3 lg:px-7">
+                            <div className="hidden shrink-0 lg:block">
+                                <CollectionFilters
+                                    categories={categories}
+                                    totalProducts={totalProducts}
+                                    filters={filters}
+                                />
+                            </div>
 
-                            <div className="min-w-0 flex-1">
+                            <div className="min-w-0 flex-1 px-2 sm:px-4 lg:px-0">
                                 {items.length > 0 ? (
-                                    <div className="grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-3">
-                                        {items.map((product) => (
-                                            <HomeProductShowcaseCard
-                                                key={product.id}
-                                                product={product}
-                                            />
-                                        ))}
-                                    </div>
+                                    <>
+                                        <div className="grid grid-cols-2 justify-center gap-2.5 px-2 sm:gap-4 sm:px-4 xl:grid-cols-3 xl:gap-6">
+                                            {items.map((product) => (
+                                                <HomeProductShowcaseCard
+                                                    key={product.id}
+                                                    product={product}
+                                                    size="compact"
+                                                />
+                                            ))}
+                                        </div>
+                                        <CollectionPagination
+                                            links={products.links}
+                                            meta={products.meta}
+                                        />
+                                    </>
                                 ) : (
                                     <p className="py-16 text-center font-poppins text-lg text-[#747474]">
                                         Aucun produit ne correspond à vos filtres.
                                     </p>
                                 )}
-
-                                <CollectionPagination
-                                    links={products.links}
-                                    meta={products.meta}
-                                />
                             </div>
                         </div>
                     </section>

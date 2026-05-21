@@ -5,6 +5,7 @@ import { StarRatingDisplay } from '@/components/storefront/star-rating-display';
 import { AddToCartButton } from '@/components/storefront/add-to-cart-button';
 import { route } from '@/lib/route';
 import { SF_PRODUCT_BUY_BTN } from '@/lib/storefront-ui-styles';
+import { cn } from '@/lib/utils';
 
 type Product = {
     id: number;
@@ -28,7 +29,7 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
         <article
             className={
                 isCompact
-                    ? 'relative flex aspect-[161/214] h-auto w-full max-w-none shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)] sm:aspect-auto sm:h-[428px] sm:max-w-[322px]'
+                    ? 'relative flex h-[252px] w-full flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)] lg:h-[428px] lg:max-w-[322px]'
                     : 'relative flex h-[min(503px,70vh)] w-full max-w-[343px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]'
             }
         >
@@ -49,7 +50,12 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                 )}
             </Link>
 
-            <div className="pointer-events-auto absolute top-2 right-2 z-20 flex size-[50px] items-center justify-center rounded-[27px] border border-white bg-white shadow-sm">
+            <div
+                className={cn(
+                    'pointer-events-auto absolute top-2 right-2 z-20 flex items-center justify-center rounded-[27px] border border-white bg-white shadow-sm',
+                    isCompact ? 'size-[25px] p-1 lg:size-[50px] lg:p-0' : 'size-[50px]',
+                )}
+            >
                 <FavoriteButton
                     productId={product.id}
                     favorited={product.is_favorite}
@@ -59,24 +65,44 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                 />
             </div>
 
-            <div className="relative z-10 flex flex-col gap-1 bg-gradient-to-b from-transparent via-black/60 to-black px-5 pb-8 pt-16">
+            <div
+                className={cn(
+                    'relative z-10 flex flex-col bg-gradient-to-b from-transparent via-black/60 to-black',
+                    isCompact
+                        ? 'gap-0.5 px-2.5 pb-4 pt-10 lg:gap-1 lg:px-5 lg:pb-8 lg:pt-16'
+                        : 'gap-1 px-5 pb-8 pt-16',
+                )}
+            >
                 <Link href={route('customer.products.show', product.id)}>
-                    <h3 className="font-poppins text-2xl font-bold text-white">
+                    <h3
+                        className={cn(
+                            'font-poppins font-bold text-white',
+                            isCompact ? 'text-sm lg:text-2xl' : 'text-2xl',
+                        )}
+                    >
                         {product.name}
                     </h3>
                 </Link>
                 <StarRatingDisplay
                     value={product.rating_avg}
                     count={product.reviews_count}
-                    className="text-white"
+                    className={cn('text-white', isCompact && 'scale-75 origin-left lg:scale-100')}
                 />
-                <div className="mt-2 flex items-center justify-between gap-3">
-                    <p className="font-poppins text-2xl font-medium tracking-tight text-[#f5f5f5]">
+                <div className="mt-1 flex items-center justify-between gap-2 lg:mt-2 lg:gap-3">
+                    <p
+                        className={cn(
+                            'font-poppins font-medium tracking-tight text-[#f5f5f5]',
+                            isCompact ? 'text-xs lg:text-2xl' : 'text-2xl',
+                        )}
+                    >
                         {product.price.toFixed(2)} $
                     </p>
                     <AddToCartButton
                         productId={product.id}
-                        className={SF_PRODUCT_BUY_BTN}
+                        className={cn(
+                            SF_PRODUCT_BUY_BTN,
+                            isCompact && 'h-auto px-2 py-1 text-[7.5px] lg:px-4 lg:py-2.5 lg:text-sm',
+                        )}
                         label="ACHETER"
                     />
                 </div>

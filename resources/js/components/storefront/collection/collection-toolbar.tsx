@@ -1,5 +1,5 @@
-import { Link, router } from '@inertiajs/react';
-import { ArrowRight } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { SlidersHorizontal } from 'lucide-react';
 import {
     Select,
     SelectContent,
@@ -7,6 +7,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { StorefrontBreadcrumbs } from '@/components/storefront/storefront-breadcrumbs';
 import { route } from '@/lib/route';
 
 type Filters = {
@@ -43,31 +44,23 @@ export function CollectionToolbar({ filters }: Props) {
         );
     };
 
+    const breadcrumbItems = [
+        { label: 'Accueil', href: route('home') },
+        {
+            label: filters.q ? `Collection · « ${filters.q} »` : 'Collection',
+        },
+    ];
+
     return (
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:px-8 lg:px-12">
-            <nav
-                className="flex min-w-0 flex-wrap items-center gap-2 font-poppins text-sm font-medium sm:gap-2.5 sm:text-base"
-                aria-label="Fil d'Ariane"
-            >
-                <Link
-                    href={route('home')}
-                    className="text-[#5B5E64]/60 transition-colors hover:text-black"
-                >
-                    Accueil
-                </Link>
-                <ArrowRight className="size-5 text-[#5B5E64]/60" aria-hidden />
-                <span className="text-black">
-                    Collection
-                    {filters.q ? (
-                        <span className="ml-1 text-sm font-normal text-[#747474]">
-                            · « {filters.q} »
-                        </span>
-                    ) : null}
-                </span>
-            </nav>
+        <div className="flex items-center justify-between gap-3 px-4 py-4 sm:px-8 lg:px-12">
+            <StorefrontBreadcrumbs
+                className="font-poppins text-[11px] font-medium text-[rgba(91,94,100,0.62)] sm:text-base"
+                items={breadcrumbItems}
+            />
 
             <Select value={filters.sort} onValueChange={onSortChange}>
-                <SelectTrigger className="font-poppins h-12 w-full rounded-[20px] border-black text-xs font-semibold sm:min-w-[220px] sm:w-auto sm:text-[13px]">
+                <SelectTrigger className="font-poppins h-[34px] w-auto gap-1 rounded-[13px] border border-black px-2.5 text-[9px] font-semibold shadow-none sm:h-12 sm:min-w-[200px] sm:rounded-[20px] sm:px-4 sm:text-[13px]">
+                    <SlidersHorizontal className="size-3 shrink-0 sm:size-4" aria-hidden />
                     <span>
                         TRIER PAR :{' '}
                         <span className="text-[#999]">

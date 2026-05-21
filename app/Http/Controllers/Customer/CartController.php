@@ -11,6 +11,7 @@ use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -55,7 +56,7 @@ class CartController extends Controller
                     'name' => $product->name,
                     'price' => (float) $product->price,
                     'image_path' => $product->image
-                        ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->image)
+                        ? Storage::disk('public')->url($product->image)
                         : null,
                     'rating_avg' => $product->reviews_avg_rating !== null
                         ? round((float) $product->reviews_avg_rating, 1)
