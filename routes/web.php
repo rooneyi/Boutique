@@ -2,13 +2,13 @@
 
 use App\Data\CustomerRegisterData;
 use App\Data\VendorRegisterData;
+use App\Http\Controllers\Auth\PasswordResetOtpController;
 use App\Http\Controllers\Customer\AccountController;
-use App\Http\Controllers\Customer\ContactController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
+use App\Http\Controllers\Customer\ContactController;
 use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
-use App\Http\Controllers\Auth\PasswordResetOtpController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\Customer\ProductReviewController;
 use App\Http\Controllers\Vendor\CustomerController as VendorCustomerController;
@@ -20,9 +20,9 @@ use App\Services\AdminService;
 use App\Services\CustomerService;
 use App\Services\DashboardService;
 use App\Services\VendorService;
+use App\Support\CatalogProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
@@ -218,26 +218,19 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
         $featured = Product::query()
             ->where('status', '!=', 'DISCONTINUED')
-            ->with(['category', 'vendor'])
+            ->with(['category', 'vendor', 'variants' => fn ($q) => $q->orderBy('id')])
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
             ->latest()
             ->limit(4)
             ->get()
             ->map(function (Product $p) use ($favoriteIdSet) {
-                return [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'price' => (float) $p->price,
-                    'image_path' => $p->image
-                        ? Storage::disk('public')->url($p->image)
-                        : null,
+                $card = CatalogProduct::compactCardPayload($p, isset($favoriteIdSet[$p->id]));
+
+                return array_merge($card, [
                     'vendor_shop' => $p->vendor->shop_name,
                     'category' => $p->category?->name ?? '',
-                    'rating_avg' => $p->reviews_avg_rating !== null ? round((float) $p->reviews_avg_rating, 1) : null,
-                    'reviews_count' => (int) ($p->reviews_count ?? 0),
-                    'is_favorite' => isset($favoriteIdSet[$p->id]),
-                ];
+                ]);
             });
 
         $highlightCategories = Category::query()

@@ -6,7 +6,6 @@ import {
     Instagram,
     Menu,
     Search,
-    ShoppingCart,
     User,
     X,
 } from 'lucide-react';
@@ -14,8 +13,9 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { InertiaPropsSync } from '@/components/storefront/inertia-props-sync';
 import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
-import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
-import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
+import { HeaderCartButton } from '@/components/storefront/header/header-cart-button';
+import { HeaderFavoritesButton } from '@/components/storefront/header/header-favorites-button';
+import { HeaderIconPill } from '@/components/storefront/header/header-icon-pill';
 import { StorefrontLogo } from '@/components/storefront/storefront-logo';
 import { ADMIN_MAIN_NAV, ADMIN_STOCK_NAV } from '@/lib/admin-nav';
 import { route } from '@/lib/route';
@@ -69,8 +69,6 @@ export function HomeHeader({
     const page = usePage();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const cartDrawer = useOptionalCartDrawer();
-    const favoritesDrawer = useOptionalFavoritesDrawer();
     const accountDrawer = useOptionalAccountDrawer();
 
     function openAccount() {
@@ -283,48 +281,27 @@ export function HomeHeader({
                                 <User className="size-6" strokeWidth={1.25} />
                             </Button>
                         ) : !isAdmin ? (
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="hidden rounded-full text-black lg:inline-flex"
-                                asChild
+                            <HeaderIconPill
+                                href={accountHref}
+                                aria-label="Notifications"
+                                className="hidden lg:inline-flex"
                             >
-                                <Link href={accountHref} aria-label="Notifications">
-                                    <Bell className="size-6" strokeWidth={1.25} />
-                                </Link>
-                            </Button>
+                                <Bell className="size-5 text-black" strokeWidth={1.25} />
+                            </HeaderIconPill>
                         ) : null}
                         {!isAdmin && (
                             <>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="rounded-full text-black"
-                                    onClick={() => {
-                                        if (user?.role === 'CUSTOMER') {
-                                            favoritesDrawer?.openFavorites();
-                                        } else {
-                                            router.visit(route('login'));
-                                        }
-                                    }}
-                                    aria-label="Favoris"
-                                >
-                                    <Heart className="size-6 text-[#dc0000]" strokeWidth={1.25} />
-                                </Button>
-                                {user?.role === 'CUSTOMER' && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="icon"
-                                        className="rounded-full border-[#bfbfbf]"
-                                        onClick={() => cartDrawer?.openCart()}
-                                        aria-label="Panier"
+                                {user?.role === 'CUSTOMER' ? (
+                                    <HeaderFavoritesButton />
+                                ) : (
+                                    <HeaderIconPill
+                                        aria-label="Favoris"
+                                        onClick={() => router.visit(route('login'))}
                                     >
-                                        <ShoppingCart className="size-5" />
-                                    </Button>
+                                        <Heart className="size-5 text-[#dc0000]" strokeWidth={1.25} />
+                                    </HeaderIconPill>
                                 )}
+                                {user?.role === 'CUSTOMER' ? <HeaderCartButton /> : null}
                             </>
                         )}
                         {isAdmin && (
@@ -452,16 +429,22 @@ export function HomeHeader({
                             </>
                         )}
                         {!isAdmin && user?.role === 'CUSTOMER' && (
-                            <button
-                                type="button"
-                                className="font-poppins block w-full py-2 text-left text-base"
-                                onClick={() => {
-                                    closeMobileMenu();
-                                    favoritesDrawer?.openFavorites();
-                                }}
-                            >
-                                Mes favoris
-                            </button>
+                            <>
+                                <Link
+                                    href={route('customer.favorites.index')}
+                                    className="font-poppins block w-full py-2 text-base"
+                                    onClick={closeMobileMenu}
+                                >
+                                    Mes favoris
+                                </Link>
+                                <Link
+                                    href={route('customer.cart')}
+                                    className="font-poppins block w-full py-2 text-base"
+                                    onClick={closeMobileMenu}
+                                >
+                                    Mon panier
+                                </Link>
+                            </>
                         )}
                         {!isAdmin &&
                             (user?.role === 'CUSTOMER' ? (

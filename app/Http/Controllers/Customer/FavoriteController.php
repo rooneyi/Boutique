@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Support\CatalogProduct;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -30,27 +30,27 @@ class FavoriteController extends Controller
 
         $products = $customer->favoriteProducts()
             ->where('products.status', '!=', 'DISCONTINUED')
-            ->with(['category', 'vendor'])
+            ->with(['category', 'vendor', 'variants' => fn ($q) => $q->orderBy('id')])
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
             ->orderByPivot('created_at', 'desc')
             ->paginate(12);
 
-        $products->through(fn (Product $product) => $this->productPayload($product, true));
+        $products->through(fn (Product $product) => CatalogProduct::cardPayload($product, true));
 
         $favoriteIds = $customer->favoriteProducts()->pluck('products.id');
 
         $suggestedProducts = Product::query()
             ->where('status', '!=', 'DISCONTINUED')
             ->when($favoriteIds->isNotEmpty(), fn ($q) => $q->whereNotIn('id', $favoriteIds))
-            ->with(['category', 'vendor'])
+            ->with(['category', 'vendor', 'variants' => fn ($q) => $q->orderBy('id')])
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
             ->orderByDesc('reviews_count')
             ->orderByDesc('reviews_avg_rating')
             ->limit(8)
             ->get()
-            ->map(fn (Product $product) => $this->productPayload($product, false))
+            ->map(fn (Product $product) => CatalogProduct::cardPayload($product, false))
             ->values()
             ->all();
 
@@ -67,13 +67,13 @@ class FavoriteController extends Controller
 
         $products = $customer->favoriteProducts()
             ->where('products.status', '!=', 'DISCONTINUED')
-            ->with(['category', 'vendor'])
+            ->with(['category', 'vendor', 'variants' => fn ($q) => $q->orderBy('id')])
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
             ->orderByPivot('created_at', 'desc')
             ->limit(24)
             ->get()
-            ->map(fn (Product $product) => $this->productPayload($product, true))
+            ->map(fn (Product $product) => CatalogProduct::cardPayload($product, true))
             ->values();
 
         return response()->json([
@@ -101,29 +101,5 @@ class FavoriteController extends Controller
         $this->customer()->favoriteProducts()->detach($product->id);
 
         return back();
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function productPayload(Product $product, bool $isFavorite): array
-    {
-        return [
-            'id' => $product->id,
-            'name' => $product->name,
-            'description' => (string) ($product->description ?? ''),
-            'price' => (float) $product->price,
-            'quantity' => $product->stock,
-            'category' => $product->category?->name ?? '',
-            'image_path' => $product->image
-                ? Storage::disk('public')->url($product->image)
-                : null,
-            'vendor' => [
-                'shop_name' => $product->vendor->shop_name,
-            ],
-            'rating_avg' => $product->reviews_avg_rating !== null ? round((float) $product->reviews_avg_rating, 1) : null,
-            'reviews_count' => (int) ($product->reviews_count ?? 0),
-            'is_favorite' => $isFavorite,
-        ];
     }
 }

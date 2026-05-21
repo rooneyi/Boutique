@@ -18,6 +18,7 @@ type Product = {
     rating_avg: number | null;
     reviews_count: number;
     is_favorite: boolean;
+    default_variant_id?: number | null;
 };
 
 type PaginatedProducts = {
@@ -51,7 +52,7 @@ export default function CustomerFavorites() {
 
                 <main>
                     <section className="px-4 py-9 sm:px-8 lg:px-[100px]">
-                        <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-8">
+                        <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-[30px]">
                             <h1 className={cn(SF_PAGE_TITLE, 'text-center')}>Mes favoris</h1>
 
                             {items.length === 0 ? (
@@ -67,12 +68,12 @@ export default function CustomerFavorites() {
                                 </div>
                             ) : (
                                 <>
-                                    <div className="grid w-full grid-cols-2 justify-items-center gap-4 sm:gap-8 xl:grid-cols-3">
+                                    <div className="grid w-full grid-cols-1 justify-items-center gap-[30px] sm:grid-cols-2 xl:grid-cols-3">
                                         {items.map((product) => (
                                             <HomeProductShowcaseCard
                                                 key={product.id}
                                                 product={product}
-                                                size="compact"
+                                                size="favorites"
                                             />
                                         ))}
                                     </div>

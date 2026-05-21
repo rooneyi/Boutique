@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils';
 type Props = {
     productId: number;
     variantId?: number;
+    /** Variante par défaut (première en stock) — cartes catalogue */
+    defaultVariantId?: number | null;
     quantity?: number;
     disabled?: boolean;
     className?: string;
@@ -22,6 +24,7 @@ type Props = {
 export function AddToCartButton({
     productId,
     variantId,
+    defaultVariantId,
     quantity = 1,
     disabled,
     className,
@@ -30,9 +33,11 @@ export function AddToCartButton({
 }: Props) {
     const user = useStorefrontAuth();
     const cartDrawer = useOptionalCartDrawer();
+    const resolvedVariantId = variantId ?? defaultVariantId ?? undefined;
 
     function handleClick(e: React.MouseEvent) {
         e.preventDefault();
+        e.stopPropagation();
         if (!user) {
             toast.info('Connectez-vous pour ajouter des articles au panier.', {
                 action: {
@@ -48,13 +53,23 @@ export function AddToCartButton({
             });
             return;
         }
-        if (disabled || !variantId) {
+        if (disabled) {
+            return;
+        }
+        if (!resolvedVariantId) {
+            toast.error('Article indisponible.', {
+                description: 'Ouvrez la fiche produit pour choisir une variante.',
+                action: {
+                    label: 'Voir le produit',
+                    onClick: () => router.visit(route('customer.products.show', productId)),
+                },
+            });
             return;
         }
 
         router.post(
             postCartItem.url(),
-            { product_id: productId, variant_id: variantId, quantity },
+            { product_id: productId, variant_id: resolvedVariantId, quantity },
             {
                 preserveScroll: true,
                 onSuccess: () => {

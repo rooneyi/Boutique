@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Services\ProductVariantService;
+use App\Support\CatalogProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -29,7 +30,7 @@ class ProductController extends Controller
 
         $query = Product::query()
             ->where('status', '!=', 'DISCONTINUED')
-            ->with(['category', 'vendor'])
+            ->with(['category', 'vendor', 'variants' => fn ($q) => $q->orderBy('id')])
             ->withAvg('reviews', 'rating')
             ->withCount('reviews');
 
@@ -72,9 +73,10 @@ class ProductController extends Controller
 
         $products = $query->paginate(6)->withQueryString();
 
-        $products->through(function (Product $product) use ($favoriteIdSet) {
-            return $this->productListPayload($product, isset($favoriteIdSet[$product->id]));
-        });
+        $products->through(fn (Product $product) => CatalogProduct::cardPayload(
+            $product,
+            isset($favoriteIdSet[$product->id]),
+        ));
 
         $categories = Category::query()
             ->whereHas(
@@ -191,30 +193,6 @@ class ProductController extends Controller
             'user_review' => $userReview,
             'can_review' => $canReview,
         ]);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function productListPayload(Product $product, bool $isFavorite): array
-    {
-        return [
-            'id' => $product->id,
-            'name' => $product->name,
-            'description' => (string) ($product->description ?? ''),
-            'price' => (float) $product->price,
-            'quantity' => $product->stock,
-            'category' => $product->category?->name ?? '',
-            'image_path' => $product->image
-                ? Storage::disk('public')->url($product->image)
-                : null,
-            'vendor' => [
-                'shop_name' => $product->vendor->shop_name,
-            ],
-            'rating_avg' => $product->reviews_avg_rating !== null ? round((float) $product->reviews_avg_rating, 1) : null,
-            'reviews_count' => (int) ($product->reviews_count ?? 0),
-            'is_favorite' => $isFavorite,
-        ];
     }
 
     private function customerHasPurchasedProduct(int $customerId, int $productId): bool

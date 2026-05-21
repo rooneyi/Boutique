@@ -10,6 +10,7 @@ type Product = {
     rating_avg: number | null;
     reviews_count: number;
     is_favorite: boolean;
+    default_variant_id?: number | null;
 };
 
 type Props = {

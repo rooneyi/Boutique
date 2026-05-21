@@ -105,7 +105,7 @@ export function CartPageLine({ line, busy, onQuantityChange, onRemove }: Props) 
                     disabled={busy}
                     onClick={onRemove}
                 >
-                    Supprimer
+                    SUPPRIMER
                 </button>
             </div>
         </article>
