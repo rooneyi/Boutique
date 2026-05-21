@@ -9,7 +9,9 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\ProductService;
+use App\Services\ProductVariantService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -18,6 +20,7 @@ class ProductController extends Controller
 {
     public function __construct(
         private ProductService $productService,
+        private ProductVariantService $variantService,
     ) {}
 
     public function index(): Response
@@ -47,6 +50,7 @@ class ProductController extends Controller
         return Inertia::render('vendor/products/create', [
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'product' => null,
+            'sizes' => ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
         ]);
     }
 
@@ -54,17 +58,26 @@ class ProductController extends Controller
     {
         $this->authorize('update', $product);
 
+        $product->load('variants');
+
         return Inertia::render('vendor/products/create', [
             'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'sizes' => ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
             'product' => [
                 'id' => $product->id,
                 'name' => $product->name,
                 'description' => (string) ($product->description ?? ''),
                 'price' => (float) $product->price,
-                'stock' => $product->stock,
                 'category_id' => $product->category_id,
                 'status' => $product->status,
                 'image_path' => $product->image ? Storage::disk('public')->url($product->image) : null,
+                'variants' => $product->variants()
+                    ->orderBy('color')
+                    ->orderBy('size')
+                    ->get()
+                    ->map(fn ($v) => $this->variantService->variantPayload($v))
+                    ->values()
+                    ->all(),
             ],
         ]);
     }
@@ -76,16 +89,18 @@ class ProductController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'] ?? '',
             'price' => $validated['price'],
-            'stock' => $validated['stock'],
-            'category_id' => $validated['category_id'] ?? null,
+            'stock' => 0,
+            'category_id' => $validated['category_id'],
             'status' => $validated['status'] ?? null,
         ]);
 
-        $this->productService->createProduct(
+        $product = $this->productService->createProduct(
             auth()->user()->vendor,
             $data,
             $request->file('image')
         );
+
+        $this->productService->syncVariants($product, $this->parseVariants($request));
 
         return redirect()->route('vendor.products.index')->with('success', 'Produit créé.');
     }
@@ -101,7 +116,7 @@ class ProductController extends Controller
                 ? ($validated['description'] ?? '')
                 : (string) ($product->description ?? ''),
             'price' => isset($validated['price']) ? (float) $validated['price'] : (float) $product->price,
-            'stock' => isset($validated['stock']) ? (int) $validated['stock'] : (int) $product->stock,
+            'stock' => (int) $product->stock,
             'category_id' => array_key_exists('category_id', $validated)
                 ? $validated['category_id']
                 : $product->category_id,
@@ -114,6 +129,10 @@ class ProductController extends Controller
             $request->file('image')
         );
 
+        if ($request->has('variants')) {
+            $this->productService->syncVariants($product->fresh(), $this->parseVariants($request));
+        }
+
         return redirect()->route('vendor.products.index')->with('success', 'Produit mis à jour.');
     }
 
@@ -124,5 +143,32 @@ class ProductController extends Controller
         $this->productService->deleteProduct($product);
 
         return redirect()->route('vendor.products.index')->with('success', 'Produit supprimé.');
+    }
+
+    /**
+     * @return list<array{color: string, color_hex?: ?string, size: string, sku?: ?string, stock: int}>
+     */
+    private function parseVariants(Request $request): array
+    {
+        $rows = $request->input('variants', []);
+        if (! is_array($rows)) {
+            return [];
+        }
+
+        $parsed = [];
+        foreach ($rows as $row) {
+            if (! is_array($row) || empty(trim((string) ($row['color'] ?? '')))) {
+                continue;
+            }
+            $parsed[] = [
+                'color' => trim((string) $row['color']),
+                'color_hex' => ! empty($row['color_hex']) ? (string) $row['color_hex'] : null,
+                'size' => strtoupper(trim((string) ($row['size'] ?? 'M'))),
+                'sku' => ! empty($row['sku']) ? trim((string) $row['sku']) : null,
+                'stock' => (int) ($row['stock'] ?? 0),
+            ];
+        }
+
+        return $parsed;
     }
 }

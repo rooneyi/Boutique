@@ -20,6 +20,7 @@ class UpdateCartItemRequest extends FormRequest
     {
         return [
             'quantity' => ['required', 'integer', 'min:0', 'max:999'],
+            'variant_id' => ['nullable', 'integer', 'exists:product_variants,id'],
         ];
     }
 }

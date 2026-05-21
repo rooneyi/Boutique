@@ -42,6 +42,11 @@ class Product extends Model
         return $this->hasMany(ProductReview::class);
     }
 
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
     /** Clients qui ont mis ce produit en favori */
     public function favoritingCustomers(): BelongsToMany
     {

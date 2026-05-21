@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
+    public function __construct(
+        private ProductVariantService $variantService,
+    ) {}
+
     public function createProduct(Vendor $vendor, ProductData $data, ?UploadedFile $image = null): Product
     {
         $imagePath = null;
@@ -26,15 +30,23 @@ class ProductService
             'name' => $data->name,
             'description' => $data->description,
             'price' => $data->price,
-            'stock' => $data->stock,
+            'stock' => 0,
             'category_id' => $data->category_id,
             'status' => $status,
             'image' => $imagePath,
         ]);
 
-        $this->syncProductStockStatus($product);
-
         return $product->fresh();
+    }
+
+    /**
+     * @param  list<array{color: string, color_hex?: ?string, size: string, sku?: ?string, stock: int}>  $variantRows
+     */
+    public function syncVariants(Product $product, array $variantRows): Product
+    {
+        $this->variantService->syncVariants($product, $variantRows);
+
+        return $product->fresh(['variants']);
     }
 
     public function updateProduct(Product $product, ProductData $data, ?UploadedFile $image = null): Product
@@ -49,9 +61,15 @@ class ProductService
             $updateData['image'] = $image->store('products', 'public');
         }
 
+        unset($updateData['stock']);
         $product->update($updateData);
         $product->refresh();
-        $this->syncProductStockStatus($product);
+
+        if ($product->variants()->exists()) {
+            $this->variantService->refreshProductStockFromVariants($product);
+        } else {
+            $this->syncProductStockStatus($product);
+        }
 
         return $product;
     }

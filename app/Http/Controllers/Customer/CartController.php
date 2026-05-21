@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Cart\StoreCartItemRequest;
 use App\Http\Requests\Cart\UpdateCartItemRequest;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -78,26 +80,38 @@ class CartController extends Controller
 
     public function update(UpdateCartItemRequest $request, Product $product): RedirectResponse
     {
-        $quantity = (int) $request->validated()['quantity'];
+        $validated = $request->validated();
+        $quantity = (int) $validated['quantity'];
+        $variantId = isset($validated['variant_id']) ? (int) $validated['variant_id'] : null;
 
         if ($product->status === 'DISCONTINUED') {
-            $this->cartService->remove($product->id);
+            $this->cartService->remove($product->id, $variantId);
 
             return back()->withErrors(['quantity' => 'Ce produit n’est plus disponible.']);
         }
 
-        if ($quantity > $product->stock) {
+        $stock = $product->stock;
+        if ($variantId) {
+            $variant = ProductVariant::query()->find($variantId);
+            if (! $variant || $variant->product_id !== $product->id) {
+                return back()->withErrors(['quantity' => 'Article invalide.']);
+            }
+            $stock = $variant->stock;
+        }
+
+        if ($quantity > $stock) {
             return back()->withErrors(['quantity' => 'Stock insuffisant pour cette quantité.']);
         }
 
-        $this->cartService->setQuantity($product->id, $quantity);
+        $this->cartService->setQuantity($product->id, $quantity, $variantId);
 
         return back();
     }
 
-    public function destroy(Product $product): RedirectResponse
+    public function destroy(Request $request, Product $product): RedirectResponse
     {
-        $this->cartService->remove($product->id);
+        $variantId = $request->filled('variant_id') ? (int) $request->input('variant_id') : null;
+        $this->cartService->remove($product->id, $variantId);
 
         return back();
     }

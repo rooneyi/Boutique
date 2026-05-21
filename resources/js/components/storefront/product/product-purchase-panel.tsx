@@ -1,9 +1,19 @@
 import { MessageCircle, Minus, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AddToCartButton } from '@/components/storefront/add-to-cart-button';
 import { FavoriteButton } from '@/components/storefront/favorite-button';
 import { StarRatingDisplay } from '@/components/storefront/star-rating-display';
 import { cn } from '@/lib/utils';
+
+export type ProductVariantPayload = {
+    id: number;
+    color: string;
+    color_hex: string | null;
+    size: string;
+    sku: string | null;
+    stock: number;
+    image_path: string | null;
+};
 
 type Product = {
     id: number;
@@ -11,25 +21,105 @@ type Product = {
     description: string;
     price: number;
     stock: number;
+    category: string;
+    image_path?: string | null;
     rating_avg: number | null;
     reviews_count: number;
     is_favorite: boolean;
+    variants: ProductVariantPayload[];
 };
 
-const COLORS = [
-    { id: 'noir', label: 'Noir', className: 'bg-black' },
-    { id: 'jaune', label: 'Jaune', className: 'bg-[#E8C547]' },
-    { id: 'lilas', label: 'Lilas', className: 'bg-[#C4B5E8]' },
-] as const;
+const FALLBACK_COLORS: Record<string, string> = {
+    noir: '#000000',
+    black: '#000000',
+    blanc: '#ffffff',
+    white: '#ffffff',
+    bleu: '#0059DD',
+    jaune: '#E8C547',
+    lilas: '#C4B5E8',
+    gris: '#BFBFBF',
+};
 
-const SIZES = ['S', 'M', 'L', 'XL'] as const;
+function swatchClass(hex: string | null, colorName: string): string {
+    if (hex) {
+        return '';
+    }
+    const key = colorName.toLowerCase();
+    return FALLBACK_COLORS[key] ? '' : 'bg-neutral-300';
+}
 
-export function ProductPurchasePanel({ product }: { product: Product }) {
-    const [colorId, setColorId] = useState<(typeof COLORS)[number]['id']>('noir');
-    const [size, setSize] = useState<string>('S');
-    const [quantity, setQuantity] = useState(2);
+function swatchStyle(hex: string | null, colorName: string): React.CSSProperties {
+    if (hex) {
+        return { backgroundColor: hex };
+    }
+    const key = colorName.toLowerCase();
+    return { backgroundColor: FALLBACK_COLORS[key] ?? '#d4d4d4' };
+}
 
+type Props = {
+    product: Product;
+    onVariantImageChange?: (imageUrl: string | null) => void;
+};
+
+export function ProductPurchasePanel({ product, onVariantImageChange }: Props) {
+    const colors = useMemo(() => {
+        const seen = new Map<string, { name: string; hex: string | null }>();
+        for (const v of product.variants) {
+            if (!seen.has(v.color)) {
+                seen.set(v.color, { name: v.color, hex: v.color_hex });
+            }
+        }
+        return Array.from(seen.values());
+    }, [product.variants]);
+
+    const [colorName, setColorName] = useState(colors[0]?.name ?? '');
+    const [size, setSize] = useState('');
+    const [quantity, setQuantity] = useState(1);
+
+    const sizesForColor = useMemo(() => {
+        const set = new Set<string>();
+        product.variants
+            .filter((v) => v.color === colorName)
+            .forEach((v) => set.add(v.size));
+        return Array.from(set).sort();
+    }, [product.variants, colorName]);
+
+    const activeVariant = useMemo(
+        () => product.variants.find((v) => v.color === colorName && v.size === size) ?? null,
+        [product.variants, colorName, size],
+    );
+
+    useEffect(() => {
+        if (colors.length > 0 && !colors.some((c) => c.name === colorName)) {
+            setColorName(colors[0].name);
+        }
+    }, [colors, colorName]);
+
+    useEffect(() => {
+        if (sizesForColor.length > 0 && !sizesForColor.includes(size)) {
+            setSize(sizesForColor[0]);
+        }
+    }, [sizesForColor, size]);
+
+    useEffect(() => {
+        setQuantity(1);
+    }, [activeVariant?.id]);
+
+    useEffect(() => {
+        const url = activeVariant?.image_path ?? product.image_path ?? null;
+        onVariantImageChange?.(url);
+    }, [activeVariant?.image_path, product.image_path, onVariantImageChange]);
+
+    const maxQty = activeVariant?.stock ?? 0;
     const lineTotal = product.price * quantity;
+
+    if (product.variants.length === 0) {
+        return (
+            <div className="font-poppins text-[#747474]">
+                Aucun article disponible pour ce produit.
+            </div>
+        );
+    }
 
     return (
         <div className="flex w-full max-w-[542px] flex-col gap-6 sm:gap-9 lg:mx-auto">
@@ -37,6 +127,9 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
                 <h1 className="font-poppins text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold text-black">
                     {product.name}
                 </h1>
+                {product.category ? (
+                    <p className="font-poppins text-sm font-medium text-[#747474]">{product.category}</p>
+                ) : null}
                 <StarRatingDisplay
                     value={product.rating_avg}
                     count={product.reviews_count}
@@ -51,48 +144,72 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
                 <p className="font-poppins text-lg font-semibold text-black sm:text-xl lg:text-[28px]">
                     Couleur :
                 </p>
-                <div className="flex gap-3">
-                    {COLORS.map((c) => (
+                <div className="flex flex-wrap gap-3">
+                    {colors.map((c) => (
                         <button
-                            key={c.id}
+                            key={c.name}
                             type="button"
-                            title={c.label}
-                            onClick={() => setColorId(c.id)}
+                            title={c.name}
+                            onClick={() => setColorName(c.name)}
                             className={cn(
                                 'size-12 rounded-full border-2 transition-all',
-                                c.className,
-                                colorId === c.id
+                                swatchClass(c.hex, c.name),
+                                colorName === c.name
                                     ? 'border-black ring-2 ring-black ring-offset-2'
                                     : 'border-neutral-300',
                             )}
-                            aria-label={c.label}
+                            style={swatchStyle(c.hex, c.name)}
+                            aria-label={c.name}
+                            aria-pressed={colorName === c.name}
                         />
                     ))}
                 </div>
+                <p className="font-poppins text-sm text-[#747474]">{colorName}</p>
             </div>
 
             <div className="space-y-2.5">
                 <p className="font-poppins text-lg font-semibold text-black sm:text-xl lg:text-[28px]">
                     Taille :
                 </p>
-                <div className="flex flex-wrap gap-4">
-                    {SIZES.map((s) => (
-                        <button
-                            key={s}
-                            type="button"
-                            onClick={() => setSize(s)}
-                            className={cn(
-                                'rounded-full px-10 py-2.5 font-poppins text-2xl font-medium transition-colors',
-                                size === s
-                                    ? 'bg-black text-white'
-                                    : 'text-black hover:bg-neutral-100',
-                            )}
-                        >
-                            {s}
-                        </button>
-                    ))}
+                <div className="flex flex-wrap gap-3 sm:gap-4">
+                    {sizesForColor.map((s) => {
+                        const variant = product.variants.find(
+                            (v) => v.color === colorName && v.size === s,
+                        );
+                        const out = (variant?.stock ?? 0) <= 0;
+                        return (
+                            <button
+                                key={s}
+                                type="button"
+                                disabled={out}
+                                onClick={() => setSize(s)}
+                                className={cn(
+                                    'rounded-full px-6 py-2 font-poppins text-lg font-medium transition-colors sm:px-10 sm:text-2xl',
+                                    size === s
+                                        ? 'bg-black text-white'
+                                        : 'text-black hover:bg-neutral-100',
+                                    out && 'cursor-not-allowed opacity-40 line-through',
+                                )}
+                            >
+                                {s}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
+
+            {activeVariant?.sku ? (
+                <p className="font-poppins text-sm text-[#747474]">
+                    Réf. article : <span className="font-semibold text-black">{activeVariant.sku}</span>
+                </p>
+            ) : null}
+
+            <p className="font-poppins text-sm text-[#747474]">
+                Stock :{' '}
+                <span className={cn('font-semibold', maxQty > 0 ? 'text-black' : 'text-[#c40000]')}>
+                    {maxQty > 0 ? maxQty : 'Rupture'}
+                </span>
+            </p>
 
             <div className="space-y-2.5">
                 <p className="font-poppins text-lg font-semibold text-black sm:text-xl lg:text-[28px]">
@@ -102,21 +219,19 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
                     <div className="flex items-center justify-center gap-8 rounded-[20px] border border-[#5B5E64]/60 px-3 py-2 sm:justify-start sm:gap-12">
                         <button
                             type="button"
-                            onClick={() =>
-                                setQuantity((q) => Math.max(1, q - 1))
-                            }
-                            className="flex size-9 items-center justify-center text-black"
+                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                            disabled={maxQty <= 0}
+                            className="flex size-9 items-center justify-center text-black disabled:opacity-40"
                             aria-label="Diminuer"
                         >
                             <Minus className="size-6" />
                         </button>
-                        <span className="font-poppins text-2xl text-black">
-                            {quantity}
-                        </span>
+                        <span className="font-poppins text-2xl text-black">{quantity}</span>
                         <button
                             type="button"
-                            onClick={() => setQuantity((q) => q + 1)}
-                            className="flex size-9 items-center justify-center text-black"
+                            onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
+                            disabled={quantity >= maxQty}
+                            className="flex size-9 items-center justify-center text-black disabled:opacity-40"
                             aria-label="Augmenter"
                         >
                             <Plus className="size-6" />
@@ -131,8 +246,9 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
             <div className="flex flex-wrap items-center gap-2.5">
                 <AddToCartButton
                     productId={product.id}
+                    variantId={activeVariant?.id}
                     quantity={quantity}
-                    disabled={product.stock <= 0}
+                    disabled={!activeVariant || maxQty <= 0}
                     label="AJOUTER AU PANIER"
                     className="h-14 min-h-14 flex-1 rounded-full bg-black font-poppins text-base font-semibold uppercase text-white hover:bg-neutral-800"
                 />
