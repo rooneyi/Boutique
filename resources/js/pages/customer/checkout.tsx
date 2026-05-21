@@ -6,10 +6,10 @@ import { CheckoutBreadcrumbs } from '@/components/storefront/checkout/checkout-b
 import type { CheckoutFormData, CheckoutStep } from '@/components/storefront/checkout/checkout-form-data';
 import { CheckoutOrderSummary } from '@/components/storefront/checkout/checkout-order-summary';
 import { CheckoutPaymentStep } from '@/components/storefront/checkout/checkout-payment-step';
+import { CheckoutPaymentSummary } from '@/components/storefront/checkout/checkout-payment-summary';
 import { CheckoutShippingStep } from '@/components/storefront/checkout/checkout-shipping-step';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
-import { Button } from '@/components/ui/button';
 import { route } from '@/lib/route';
 import { SF_PAGE_MAIN, SF_PAGE_TITLE } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
@@ -116,64 +116,70 @@ export default function CustomerCheckout() {
         window.open(`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(message)}`, '_blank');
     }
 
-    const pageTitle = step === 'shipping' ? 'Livraison' : 'Paiement';
+    const pageTitle = step === 'shipping' ? 'Adresse de livraison' : 'Paiement';
+    const pageBg = step === 'payment' ? 'bg-white' : 'bg-[#f8f7f9]';
 
     return (
         <>
             <Head title={`${pageTitle} · PCJ`} />
 
-            <div className="min-h-screen bg-[#f8f7f9] font-poppins text-black antialiased">
+            <div className={cn('min-h-screen font-poppins text-black antialiased', pageBg)}>
                 <HomeHeader user={auth?.user} canRegister={canRegister} />
 
-                <main className={SF_PAGE_MAIN}>
-                    <div className="mx-auto max-w-[1440px]">
-                        <h1 className={cn(SF_PAGE_TITLE, 'pt-4 pb-2 text-center sm:pt-6 sm:text-left')}>
+                <main className={cn(SF_PAGE_MAIN, step === 'payment' && 'bg-white')}>
+                    <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-[100px]">
+                        <h1
+                            className={cn(
+                                SF_PAGE_TITLE,
+                                'pt-9 pb-0 text-center',
+                                step === 'payment' && 'pb-0',
+                            )}
+                        >
                             {pageTitle}
                         </h1>
-                        <CheckoutBreadcrumbs step={step} />
 
-                        <form
-                            onSubmit={submit}
-                            className="mt-6 flex flex-col gap-8 lg:mt-8 lg:flex-row lg:items-start lg:gap-12"
-                        >
-                            <div className="min-w-0 flex-1 lg:max-w-[769px]">
-                                {step === 'payment' ? (
-                                    <Button
-                                        type="button"
-                                        variant="link"
-                                        className="font-poppins mb-4 h-auto p-0 text-sm font-medium text-[#0059DD]"
-                                        onClick={() => setStep('shipping')}
-                                    >
-                                        ← Retour à la livraison
-                                    </Button>
-                                ) : null}
+                        <div className="mt-[30px] flex flex-col gap-[30px]">
+                            <CheckoutBreadcrumbs step={step} />
+
+                            <form onSubmit={submit} className="flex flex-col gap-[30px] lg:flex-row lg:items-start">
+                                <div className="min-w-0 flex-1">
+                                    {step === 'shipping' ? (
+                                        <CheckoutShippingStep
+                                            data={data}
+                                            errors={errors}
+                                            setData={setData}
+                                        />
+                                    ) : (
+                                        <CheckoutPaymentStep
+                                            data={data}
+                                            errors={errors}
+                                            setData={setData}
+                                            onWhatsApp={openWhatsApp}
+                                        />
+                                    )}
+                                </div>
 
                                 {step === 'shipping' ? (
-                                    <CheckoutShippingStep
-                                        data={data}
-                                        errors={errors}
-                                        setData={setData}
+                                    <CheckoutOrderSummary
+                                        lines={lines}
+                                        subtotal={subtotal}
+                                        shipping={shipping}
+                                        total={total}
+                                        step={step}
+                                        processing={processing}
+                                        onContinue={goToPayment}
+                                        onWhatsApp={openWhatsApp}
                                     />
                                 ) : (
-                                    <CheckoutPaymentStep
-                                        data={data}
-                                        errors={errors}
-                                        setData={setData}
+                                    <CheckoutPaymentSummary
+                                        subtotal={subtotal}
+                                        shipping={shipping}
+                                        processing={processing}
+                                        onBack={() => setStep('shipping')}
                                     />
                                 )}
-                            </div>
-
-                            <CheckoutOrderSummary
-                                lines={lines}
-                                subtotal={subtotal}
-                                shipping={shipping}
-                                total={total}
-                                step={step}
-                                processing={processing}
-                                onContinue={goToPayment}
-                                onWhatsApp={openWhatsApp}
-                            />
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </main>
 

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, Store, ShoppingBag, ChevronDown, ShoppingCart, Heart } from 'lucide-react';
 import { route } from '@/lib/route';
-import { HOME_ASSETS } from '@/lib/home-assets';
+import { StorefrontLogo } from '@/components/storefront/storefront-logo';
 import { SF_NAV_LINK } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
@@ -40,20 +40,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
     const favoritesDrawer = useOptionalFavoritesDrawer();
     const accountDrawer = useOptionalAccountDrawer();
 
-    const headerBrand = useMemo(
-        () => (
-            <Link href={route('home')} className="flex shrink-0 items-center" aria-label="Accueil PCJ">
-                <img
-                    src={HOME_ASSETS.logo}
-                    alt="PCJ"
-                    width={49}
-                    height={49}
-                    className="size-[49px] object-contain"
-                />
-            </Link>
-        ),
-        [],
-    );
+    const headerBrand = useMemo(() => <StorefrontLogo variant="on-light" />, []);
 
     return (
         <div className="flex min-h-screen flex-col bg-white font-poppins text-black antialiased">

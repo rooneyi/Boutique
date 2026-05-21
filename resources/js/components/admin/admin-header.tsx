@@ -21,7 +21,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { HOME_ASSETS } from '@/lib/home-assets';
+import { StorefrontLogo } from '@/components/storefront/storefront-logo';
 import {
     ADMIN_NAV_ITEM,
     ADMIN_NAV_ITEM_ACTIVE,
@@ -189,9 +189,7 @@ export function AdminHeader() {
                         'flex items-center justify-between gap-4 px-4 py-4 sm:px-8 lg:px-[100px]',
                     )}
                 >
-                    <Link href={route('admin.dashboard')} className="shrink-0">
-                        <img src={HOME_ASSETS.logo} alt="PCJ" className="size-12 object-contain" />
-                    </Link>
+                    <StorefrontLogo variant="on-light" href={route('admin.dashboard')} />
 
                     <nav className="hidden items-center gap-1 lg:flex">
                         {MAIN_NAV.map((item) => (

@@ -16,7 +16,7 @@ import { InertiaPropsSync } from '@/components/storefront/inertia-props-sync';
 import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
 import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
 import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
-import { HOME_ASSETS } from '@/lib/home-assets';
+import { StorefrontLogo } from '@/components/storefront/storefront-logo';
 import { ADMIN_MAIN_NAV, ADMIN_STOCK_NAV } from '@/lib/admin-nav';
 import { route } from '@/lib/route';
 import { SF_NAV_ITEM, SF_NAV_ITEM_ACTIVE } from '@/lib/storefront-ui-styles';
@@ -202,19 +202,12 @@ export function HomeHeader({
 
             <div className="relative border-b border-neutral-200 bg-white">
                 <div className="mx-auto grid max-w-[1440px] grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-3 sm:gap-4 sm:py-4 sm:px-8 lg:px-[100px]">
-                    <Link
-                        href={isAdmin ? route('admin.dashboard') : route('home')}
-                        className="col-start-1 row-start-1 flex shrink-0 items-center"
-                        aria-label="Accueil PCJ"
-                    >
-                        <img
-                            src={HOME_ASSETS.logo}
-                            alt="PCJ"
-                            width={49}
-                            height={49}
-                            className="size-[49px] object-contain"
+                    <div className="col-start-1 row-start-1">
+                        <StorefrontLogo
+                            variant="on-light"
+                            href={isAdmin ? route('admin.dashboard') : route('home')}
                         />
-                    </Link>
+                    </div>
 
                     <nav
                         className={cn(

@@ -38,11 +38,41 @@ class CartController extends Controller
 
         $subtotal = $this->cartService->total();
 
+        $cartProductIds = array_map(fn (array $line) => (int) $line['product_id'], $lines);
+
+        $suggestedProducts = Product::query()
+            ->where('status', '!=', 'DISCONTINUED')
+            ->when($cartProductIds !== [], fn ($q) => $q->whereNotIn('id', $cartProductIds))
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->orderByDesc('reviews_count')
+            ->orderByDesc('reviews_avg_rating')
+            ->limit(4)
+            ->get()
+            ->map(function (Product $product) use ($favoriteIdSet) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => (float) $product->price,
+                    'image_path' => $product->image
+                        ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->image)
+                        : null,
+                    'rating_avg' => $product->reviews_avg_rating !== null
+                        ? round((float) $product->reviews_avg_rating, 1)
+                        : null,
+                    'reviews_count' => (int) ($product->reviews_count ?? 0),
+                    'is_favorite' => isset($favoriteIdSet[$product->id]),
+                ];
+            })
+            ->values()
+            ->all();
+
         return Inertia::render('customer/cart', [
             'lines' => $lines,
             'subtotal' => $subtotal,
             'shipping' => 0,
             'total' => $subtotal,
+            'suggestedProducts' => $suggestedProducts,
             'canRegister' => Features::enabled(Features::registration()),
         ]);
     }

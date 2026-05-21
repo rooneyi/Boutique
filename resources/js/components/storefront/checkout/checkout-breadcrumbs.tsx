@@ -12,18 +12,20 @@ export function CheckoutBreadcrumbs({ step }: Props) {
             ? [
                   { label: 'Accueil', href: route('home') },
                   { label: 'Panier', href: route('customer.cart') },
-                  { label: 'Livraison' },
+                  { label: 'Passer la commande' },
+                  { label: 'Adresse de livraison' },
               ]
             : [
                   { label: 'Accueil', href: route('home') },
                   { label: 'Panier', href: route('customer.cart') },
-                  { label: 'Livraison', href: route('customer.checkout') },
+                  { label: 'Passer la commande', href: route('customer.checkout') },
+                  { label: 'Adresse de livraison', href: route('customer.checkout') },
                   { label: 'Paiement' },
               ];
 
     return (
         <StorefrontBreadcrumbs
-            className="rounded-[20px] p-2 sm:p-4"
+            className="font-poppins text-base font-medium text-[rgba(91,94,100,0.62)]"
             items={items}
         />
     );

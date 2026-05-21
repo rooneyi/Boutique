@@ -13,25 +13,26 @@ type Props = {
     onRemove: () => void;
 };
 
+function formatMoney(amount: number): string {
+    return `${amount.toFixed(2)}$`;
+}
+
 export function CartPageLine({ line, busy, onQuantityChange, onRemove }: Props) {
     const atMin = line.quantity <= 1;
     const atMax = line.quantity >= line.stock;
+    const displayName = line.name.split(' — ')[0];
 
     return (
-        <article className="flex flex-col gap-5 border-b border-[#e8e8e8] pb-8 last:border-b-0 sm:flex-row sm:gap-8 sm:pb-10">
-            <div className="relative mx-auto w-full max-w-[163px] shrink-0 sm:mx-0">
+        <article className="flex gap-5">
+            <div className="relative h-[284px] w-[218px] shrink-0 overflow-hidden rounded-[20px] bg-neutral-100">
                 <Link
                     href={route('customer.products.show', line.product_id)}
-                    className="block aspect-[163/213] w-full overflow-hidden rounded-[20px] bg-neutral-100 sm:h-[284px] sm:w-[218px] sm:aspect-auto"
+                    className="block size-full"
                 >
                     {line.image_path ? (
-                        <img
-                            src={line.image_path}
-                            alt=""
-                            className="h-full w-full object-cover"
-                        />
+                        <img src={line.image_path} alt="" className="size-full object-cover" />
                     ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-[#737373]">
+                        <div className="flex size-full items-center justify-center text-sm text-[#737373]">
                             —
                         </div>
                     )}
@@ -40,78 +41,72 @@ export function CartPageLine({ line, busy, onQuantityChange, onRemove }: Props) 
                     productId={line.product_id}
                     favorited={line.is_favorite ?? false}
                     openDrawerOnAdd={false}
-                    className="absolute top-3 right-3 size-9 rounded-full bg-white/90 shadow-sm hover:bg-white sm:size-10"
+                    className="absolute top-3 right-3 size-9 rounded-full border border-white bg-white p-2 shadow-sm hover:bg-white sm:size-10"
                 />
             </div>
 
-            <div className="flex min-w-0 flex-1 flex-col gap-2 sm:gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-2.5">
                 <Link
                     href={route('customer.products.show', line.product_id)}
-                    className="font-poppins text-lg font-bold leading-snug text-black hover:text-[#0059DD] sm:text-2xl"
+                    className="font-poppins text-2xl font-bold text-black hover:text-[#0059DD]"
                 >
-                    {line.name.split(' — ')[0]}
+                    {displayName}
                 </Link>
-                <p className="font-poppins text-lg font-medium text-black sm:text-xl">
-                    {line.price.toFixed(2)} $
-                </p>
+                <p className="font-poppins text-xl text-black">{formatMoney(line.price)}</p>
                 {line.size ? (
-                    <p className="font-poppins text-base font-medium text-[#737373] sm:text-lg">
-                        Taille : {line.size}
-                    </p>
+                    <p className="font-poppins text-xl text-black">Taille : {line.size}</p>
                 ) : null}
                 {line.color ? (
-                    <p className="font-poppins text-base font-medium text-[#737373] sm:text-lg">
-                        Couleur : {line.color}
-                    </p>
+                    <p className="font-poppins text-xl text-black">Couleur : {line.color}</p>
                 ) : null}
 
-                <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
-                    <div
-                        className={cn(
-                            'flex items-center gap-3 font-poppins text-base font-medium text-[#737373] sm:text-lg',
-                            busy && 'pointer-events-none opacity-60',
-                        )}
-                    >
-                        <span>Quantité : {line.quantity}</span>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="size-8 rounded-full border-[#737373] text-black sm:size-10"
-                                disabled={busy || atMin}
-                                onClick={() => onQuantityChange(line.quantity - 1)}
-                                aria-label="Diminuer la quantité"
-                            >
-                                <Minus className="size-4 sm:size-5" />
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="size-8 rounded-full border-[#737373] text-black sm:size-10"
-                                disabled={busy || atMax}
-                                onClick={() => onQuantityChange(line.quantity + 1)}
-                                aria-label="Augmenter la quantité"
-                            >
-                                <Plus className="size-4 sm:size-5" />
-                            </Button>
-                        </div>
+                <div
+                    className={cn(
+                        'flex items-center gap-8',
+                        busy && 'pointer-events-none opacity-60',
+                    )}
+                >
+                    <span className="font-poppins text-xl text-black">
+                        Quantité : {line.quantity}
+                    </span>
+                    <div className="flex items-center gap-2.5">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="size-6 text-black hover:bg-neutral-100"
+                            disabled={busy || atMin}
+                            onClick={() => onQuantityChange(line.quantity - 1)}
+                            aria-label="Diminuer la quantité"
+                        >
+                            <Minus className="size-6" strokeWidth={1.25} />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="size-6 text-black hover:bg-neutral-100"
+                            disabled={busy || atMax}
+                            onClick={() => onQuantityChange(line.quantity + 1)}
+                            aria-label="Augmenter la quantité"
+                        >
+                            <Plus className="size-6" strokeWidth={1.25} />
+                        </Button>
                     </div>
-                    <p className="font-poppins text-xl font-semibold text-black sm:text-2xl">
-                        {line.line_total.toFixed(2)} $
-                    </p>
                 </div>
 
-                <Button
+                <p className="font-poppins text-xl text-black">
+                    Total : {formatMoney(line.line_total)}
+                </p>
+
+                <button
                     type="button"
-                    variant="ghost"
-                    className="font-poppins h-auto w-fit p-0 text-xs font-semibold uppercase tracking-wide text-[#737373] hover:bg-transparent hover:text-black sm:text-sm"
+                    className="font-poppins w-fit text-left text-xl text-[rgba(91,94,100,0.62)] uppercase hover:text-black disabled:opacity-60"
                     disabled={busy}
                     onClick={onRemove}
                 >
                     Supprimer
-                </Button>
+                </button>
             </div>
         </article>
     );
