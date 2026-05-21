@@ -39,12 +39,14 @@ class CheckoutController extends Controller
             'total' => $subtotal,
             'canRegister' => Features::enabled(Features::registration()),
             'defaults' => [
+                'delivery_method' => 'home_delivery',
                 'shipping_full_name' => $user->name ?? '',
                 'shipping_whatsapp' => '',
                 'shipping_address' => '',
                 'shipping_city' => '',
                 'shipping_district' => '',
-                'payment_method' => 'cash_on_delivery',
+                'payment_method' => 'mobile_money',
+                'payment_provider' => 'airtel',
                 'customer_note' => '',
             ],
             'whatsappPhone' => '243991934590',
@@ -62,6 +64,19 @@ class CheckoutController extends Controller
 
         $customer = auth()->user()->customer;
         $validated = $request->validated();
+
+        if ($validated['delivery_method'] === 'store_pickup') {
+            $validated['shipping_address'] = $validated['shipping_address'] ?: 'Retrait en boutique';
+            $validated['shipping_city'] = $validated['shipping_city'] ?: '—';
+            $validated['shipping_district'] = $validated['shipping_district'] ?: '—';
+        }
+
+        if (! empty($validated['payment_provider'])) {
+            $providerNote = 'Moyen : '.$validated['payment_provider'];
+            $validated['customer_note'] = trim(
+                ($validated['customer_note'] ?? '')."\n".$providerNote
+            );
+        }
 
         $grouped = [];
         foreach ($lines as $line) {

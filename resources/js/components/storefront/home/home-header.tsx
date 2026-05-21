@@ -75,6 +75,10 @@ export function HomeHeader({
 
     function openAccount() {
         if (user?.role === 'CUSTOMER') {
+            if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) {
+                router.visit(route('customer.account'));
+                return;
+            }
             accountDrawer?.openAccount();
         } else {
             router.visit(route('login'));
@@ -87,7 +91,7 @@ export function HomeHeader({
             : user?.role === 'VENDOR'
               ? '/vendor/dashboard'
               : user?.role === 'CUSTOMER'
-                ? route('customer.products.index')
+                ? route('customer.account')
                 : route('login');
 
     useEffect(() => {
@@ -197,23 +201,26 @@ export function HomeHeader({
             </div>
 
             <div className="relative border-b border-neutral-200 bg-white">
-                <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:py-4 sm:px-8 lg:px-[100px]">
+                <div className="mx-auto grid max-w-[1440px] grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-3 sm:gap-4 sm:py-4 sm:px-8 lg:px-[100px]">
                     <Link
                         href={isAdmin ? route('admin.dashboard') : route('home')}
-                        className="shrink-0"
+                        className="col-start-1 row-start-1 flex shrink-0 items-center"
+                        aria-label="Accueil PCJ"
                     >
                         <img
                             src={HOME_ASSETS.logo}
                             alt="PCJ"
-                            className="h-12 w-12 object-contain"
+                            width={49}
+                            height={49}
+                            className="size-[49px] object-contain"
                         />
                     </Link>
 
                     <nav
                         className={cn(
-                            'hidden items-center gap-1 lg:flex',
+                            'col-start-2 row-start-1 hidden min-w-0 items-center justify-center gap-1 lg:flex',
                             isAdmin &&
-                                'min-w-0 flex-1 justify-center gap-0.5 overflow-x-auto xl:gap-1 [scrollbar-width:thin]',
+                                'gap-0.5 overflow-x-auto xl:gap-1 [scrollbar-width:thin]',
                         )}
                     >
                         {isAdmin
@@ -261,7 +268,7 @@ export function HomeHeader({
                               })}
                     </nav>
 
-                    <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="col-start-3 row-start-1 flex shrink-0 items-center justify-end gap-3 sm:gap-4">
                         {!isAdmin && (
                             <form
                                 onSubmit={submitSearch}

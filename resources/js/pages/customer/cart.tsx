@@ -99,7 +99,7 @@ export default function CustomerCart() {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
-                                <div className="min-w-0 flex-1 space-y-4">
+                                <div className="min-w-0 flex-1 space-y-4 lg:max-w-[769px]">
                                     <StorefrontBreadcrumbs
                                         items={[
                                             { label: 'Accueil', href: route('home') },

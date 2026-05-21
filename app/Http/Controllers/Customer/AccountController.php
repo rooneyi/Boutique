@@ -4,8 +4,27 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
+use Inertia\Response;
+use Laravel\Fortify\Features;
+
 class AccountController extends Controller
 {
+    public function index(): Response
+    {
+        $user = auth()->user();
+        $customer = $user?->customer;
+
+        if ($user === null || $user->role !== 'CUSTOMER' || $customer === null) {
+            abort(403, 'Accès réservé aux clients.');
+        }
+
+        return Inertia::render('customer/account/index', [
+            'account' => $this->accountPayload($user, $customer),
+            'canRegister' => Features::enabled(Features::registration()),
+        ]);
+    }
+
     public function preview(): JsonResponse
     {
         $user = auth()->user();
@@ -15,7 +34,15 @@ class AccountController extends Controller
             abort(403, 'Accès réservé aux clients.');
         }
 
-        return response()->json([
+        return response()->json($this->accountPayload($user, $customer));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function accountPayload($user, $customer): array
+    {
+        return [
             'name' => $user->name,
             'phone' => $this->formatPhonePlaceholder($user->email),
             'email' => $user->email,
@@ -23,7 +50,7 @@ class AccountController extends Controller
             'orders_count' => (int) $customer->orders()->count(),
             'tokens_count' => 0,
             'initials' => $this->initials($user->name),
-        ]);
+        ];
     }
 
     private function formatPhonePlaceholder(string $email): string

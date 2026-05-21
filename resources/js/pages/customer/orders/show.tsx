@@ -1,7 +1,9 @@
 import { Head, usePage } from '@inertiajs/react';
 import { CheckCircle2 } from 'lucide-react';
 import { FlashToaster } from '@/components/flash-toaster';
+import { OrderClientDetailsCard } from '@/components/storefront/orders/order-client-details-card';
 import { OrderConfirmationPanel } from '@/components/storefront/orders/order-confirmation-panel';
+import { OrderDetailsCard } from '@/components/storefront/orders/order-details-card';
 import { OrderRecapPanel } from '@/components/storefront/orders/order-recap-panel';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
@@ -67,7 +69,7 @@ export default function CustomerOrderShow() {
                 <HomeHeader user={auth?.user} canRegister={canRegister} />
 
                 <main className={SF_PAGE_MAIN}>
-                    <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-4 px-4 py-8 text-center sm:px-2 sm:py-10">
+                    <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-4 px-4 py-8 text-center sm:px-8 sm:py-10">
                         <CheckCircle2
                             className="size-14 text-[#068130] sm:size-[78px]"
                             strokeWidth={1.25}
@@ -88,19 +90,40 @@ export default function CustomerOrderShow() {
                         </p>
                     </section>
 
-                    <section className="mx-auto flex w-full max-w-[1100px] flex-col gap-6 px-4 sm:gap-8 lg:flex-row lg:items-start lg:justify-center lg:gap-12">
+                    <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 pb-16 sm:gap-8 sm:px-8">
+                        <OrderDetailsCard
+                            orderId={order.id}
+                            createdAt={order.created_at}
+                            status={order.status}
+                            paymentMethod={order.payment_method}
+                            vendorName={order.vendor.shop_name}
+                        />
+
                         <OrderRecapPanel
                             items={order.items}
                             subtotal={subtotal}
                             shipping={shipping}
                             total={order.total_amount}
+                            className="w-full rounded-[20px] bg-white px-6 py-5 shadow-[0_0_2px_rgba(0,0,0,0.12)] sm:px-8"
                         />
-                        <OrderConfirmationPanel
-                            order={order}
-                            whatsappPhone={whatsappPhone}
-                            supportPhone={supportPhone}
-                            supportEmail={supportEmail}
+
+                        <OrderClientDetailsCard
+                            name={order.shipping_full_name}
+                            whatsapp={order.shipping_whatsapp}
+                            address={order.shipping_address}
+                            city={order.shipping_city}
+                            district={order.shipping_district}
+                            note={order.customer_note}
                         />
+
+                        <div className="flex justify-center pt-2">
+                            <OrderConfirmationPanel
+                                order={order}
+                                whatsappPhone={whatsappPhone}
+                                supportPhone={supportPhone}
+                                supportEmail={supportEmail}
+                            />
+                        </div>
                     </section>
                 </main>
 

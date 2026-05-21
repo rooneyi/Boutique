@@ -16,7 +16,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, Store, ShoppingBag, ChevronDown, ShoppingCart, Heart } from 'lucide-react';
 import { route } from '@/lib/route';
-import { SF_BRAND, SF_BRAND_SHORT, SF_NAV_LINK } from '@/lib/storefront-ui-styles';
+import { HOME_ASSETS } from '@/lib/home-assets';
+import { SF_NAV_LINK } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
 type AuthUser = {
@@ -41,9 +42,14 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
 
     const headerBrand = useMemo(
         () => (
-            <Link href={route('home')} className="flex flex-col leading-tight">
-                <span className="font-poppins text-lg font-semibold tracking-tight text-black">{SF_BRAND}</span>
-                <span className="font-poppins text-xs text-[#747474]">{SF_BRAND_SHORT}</span>
+            <Link href={route('home')} className="flex shrink-0 items-center" aria-label="Accueil PCJ">
+                <img
+                    src={HOME_ASSETS.logo}
+                    alt="PCJ"
+                    width={49}
+                    height={49}
+                    className="size-[49px] object-contain"
+                />
             </Link>
         ),
         [],
@@ -162,7 +168,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                 <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
                     <div className="grid gap-4 text-center text-sm text-[#747474] md:grid-cols-3 md:text-left">
                         <div>
-                            <p className="mb-1 font-medium text-black">{SF_BRAND_SHORT}</p>
+                            <p className="mb-1 font-medium text-black">PCJ</p>
                             <p>Mode en ligne</p>
                         </div>
                         <div>
@@ -171,7 +177,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                         </div>
                         <div>
                             <p className="mb-1 font-medium text-black">Légal</p>
-                            <p>© {new Date().getFullYear()} {SF_BRAND}</p>
+                            <p>© {new Date().getFullYear()} Posé comme jamais</p>
                         </div>
                     </div>
                 </div>

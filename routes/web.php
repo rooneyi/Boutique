@@ -276,6 +276,7 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
         Route::get('checkout', [CheckoutController::class, 'create'])->name('checkout');
         Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
+        Route::get('account', [AccountController::class, 'index'])->name('account');
         Route::get('account/preview', [AccountController::class, 'preview'])->name('account.preview');
 
         Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
