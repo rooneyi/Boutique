@@ -8,6 +8,10 @@ import { Spinner } from '@/components/ui/spinner';
 import {
     AUTH_BTN_GOOGLE,
     AUTH_BTN_PRIMARY,
+    AUTH_DIVIDER_LABEL,
+    AUTH_DIVIDER_LINE,
+    AUTH_DIVIDER_ROW,
+    AUTH_GOOGLE_LINK,
     AUTH_INPUT,
     AUTH_LINK_RED,
 } from '@/lib/auth-ui-styles';
@@ -41,7 +45,9 @@ export default function Login({
                 </header>
 
                 {status && (
-                    <p className="text-center text-sm font-medium text-green-600">{status}</p>
+                    <p className="text-center text-sm font-medium text-green-600">
+                        {status}
+                    </p>
                 )}
 
                 <Form
@@ -100,15 +106,17 @@ export default function Login({
                                     disabled={processing}
                                     data-test="login-button"
                                 >
-                                    {processing && <Spinner className="text-white" />}
+                                    {processing && (
+                                        <Spinner className="text-white" />
+                                    )}
                                     SE CONNECTER
                                 </Button>
                             </div>
 
-                            <div className="flex items-center gap-1.5">
-                                <span className="h-px w-5 bg-[#8a8a8a]" aria-hidden />
-                                <span className="font-poppins text-xs text-[#8a8a8a]">Ou</span>
-                                <span className="h-px w-5 bg-[#8a8a8a]" aria-hidden />
+                            <div className={AUTH_DIVIDER_ROW} aria-hidden={false}>
+                                <span className={AUTH_DIVIDER_LINE} />
+                                <span className={AUTH_DIVIDER_LABEL}>ou</span>
+                                <span className={AUTH_DIVIDER_LINE} />
                             </div>
 
                             <Button
@@ -118,8 +126,11 @@ export default function Login({
                                 tabIndex={4}
                                 asChild
                             >
-                                <a href={route('auth.google.redirect')}>
-                                    <span className="flex-1 text-center lowercase">
+                                <a
+                                    href={route('auth.google.redirect')}
+                                    className={AUTH_GOOGLE_LINK}
+                                >
+                                    <span className="flex-1 text-center">
                                         se connecter avec google
                                     </span>
                                     <GoogleIcon className="size-[26px] shrink-0" />
@@ -128,13 +139,13 @@ export default function Login({
 
                             {canRegister && (
                                 <p className="text-center font-poppins text-xs text-[#484848]">
-                                    Vous n&apos;avez pas de compte ?{' '}
+                                    vous n&apos;avez pas de compte ?{' '}
                                     <Link
                                         href={route('auth.customer.register')}
                                         className={AUTH_LINK_RED}
                                         tabIndex={6}
                                     >
-                                        Inscrivez-vous
+                                        inscrivez-vous
                                     </Link>
                                 </p>
                             )}

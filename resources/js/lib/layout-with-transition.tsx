@@ -7,10 +7,14 @@ export function storefrontLayout() {
 }
 
 /** Enveloppe le contenu de page dans la transition, à l’intérieur du layout métier. */
-export function withPageTransition(Layout: ComponentType<{ children: ReactNode }>) {
-    return function LayoutWithTransition({ children }: { children: ReactNode }) {
+export function withPageTransition<P extends { children?: ReactNode }>(
+    Layout: ComponentType<P>,
+) {
+    return function LayoutWithTransition(props: P) {
+        const { children, ...layoutProps } = props;
+
         return (
-            <Layout>
+            <Layout {...(layoutProps as P)}>
                 <PageTransitionLayout>{children}</PageTransitionLayout>
             </Layout>
         );

@@ -22,6 +22,16 @@ import '@/lib/route'; // Initialize global route function
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+/** Pages auth avec maquette split noir / blanc (Figma 19-431). */
+const AUTH_SPLIT_PAGES = new Set([
+    'auth/login',
+    'auth/register-customer',
+    'auth/register-customer-birth',
+    'auth/forgot-password',
+    'auth/forgot-password-verify',
+    'auth/forgot-password-phone',
+]);
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
@@ -38,7 +48,14 @@ createInertiaApp({
             case name === 'customer/contact':
                 return storefrontLayout();
             case name.startsWith('auth/'):
-                return withPageTransition(AuthLayout);
+                return [
+                    withPageTransition(AuthLayout),
+                    {
+                        variant: AUTH_SPLIT_PAGES.has(name)
+                            ? ('split' as const)
+                            : ('simple' as const),
+                    },
+                ];
             case name.startsWith('admin/'):
                 return withPageTransition(AdminLayout);
             case name.startsWith('customer/'):

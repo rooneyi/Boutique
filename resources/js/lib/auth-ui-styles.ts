@@ -12,7 +12,15 @@ export const AUTH_BTN_PRIMARY =
     'font-poppins h-auto w-full rounded-full border border-black bg-black px-[18px] py-[15px] text-[15px] font-semibold tracking-normal text-white uppercase hover:bg-neutral-800';
 
 export const AUTH_BTN_GOOGLE =
-    'font-poppins h-auto w-full rounded-full border border-black bg-white px-[15px] py-3 text-sm font-medium normal-case text-[#4e4e4e] hover:bg-neutral-50';
+    'font-poppins h-auto w-full rounded-full border border-black bg-white px-[15px] py-3 text-sm font-normal normal-case text-[#4e4e4e] hover:bg-neutral-50';
+
+export const AUTH_DIVIDER_ROW = 'flex w-full items-center gap-3';
+export const AUTH_DIVIDER_LINE = 'h-px flex-1 bg-[#8a8a8a]';
+export const AUTH_DIVIDER_LABEL =
+    'shrink-0 font-poppins text-xs lowercase text-[#8a8a8a]';
+
+export const AUTH_GOOGLE_LINK =
+    'flex w-full items-center justify-center gap-2 lowercase';
 
 /** Champs avec soulignement — Figma register (313-2426). */
 export const AUTH_INPUT_UNDERLINE =
