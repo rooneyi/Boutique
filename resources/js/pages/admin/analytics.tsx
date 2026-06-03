@@ -7,6 +7,7 @@ import {
     AdminCardHeader,
 } from '@/components/admin/admin-card';
 import { AdminPageHero } from '@/components/admin/admin-page-hero';
+import { AdminSalesChart } from '@/components/admin/admin-sales-chart';
 import { AdminStatCard } from '@/components/admin/admin-stat-card';
 import { route } from '@/lib/route';
 import {
@@ -38,6 +39,7 @@ type Analytics = {
     top_customers: TopCustomer[];
     best_sales_day: BestDay;
     high_demand_out_of_stock: DemandRow[];
+    chart_series: { label: string; revenue: number; orders: number }[];
 };
 
 type Props = {
@@ -106,6 +108,11 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                         icon={BarChart3}
                     />
                 </div>
+
+                <AdminSalesChart
+                    data={analytics.chart_series ?? []}
+                    periodLabel={periodLabels[period]}
+                />
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <AdminCard>

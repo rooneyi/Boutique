@@ -100,7 +100,104 @@ class AdminService
         return array_merge($base, [
             'best_sales_day' => $bestSalesDay,
             'high_demand_out_of_stock' => $highDemandOutOfStock,
+            'chart_series' => $this->getSalesChartSeries($period),
         ]);
+    }
+
+    /**
+     * Série temporelle pour graphiques admin (CA + commandes).
+     *
+     * @return list<array{label: string, revenue: float, orders: int}>
+     */
+    public function getSalesChartSeries(string $period): array
+    {
+        $period = in_array($period, ['day', 'week', 'month', 'year'], true) ? $period : 'month';
+        $start = $this->analysisWindowStart($period);
+
+        $orders = Order::query()
+            ->where('created_at', '>=', $start)
+            ->get(['total', 'created_at']);
+
+        $buckets = match ($period) {
+            'day' => $this->chartBucketsByHour(),
+            'week' => $this->chartBucketsByDay(Carbon::now()->subDays(6)->startOfDay(), 7, 'D'),
+            'year' => $this->chartBucketsByMonth(Carbon::now()->subMonths(11)->startOfMonth(), 12),
+            default => $this->chartBucketsByDay($start->copy()->startOfDay(), (int) $start->diffInDays(Carbon::now()) + 1, 'd MMM'),
+        };
+
+        foreach ($orders as $order) {
+            $key = match ($period) {
+                'day' => $order->created_at->format('Y-m-d H:00'),
+                'year' => $order->created_at->format('Y-m'),
+                default => $order->created_at->format('Y-m-d'),
+            };
+
+            if (! isset($buckets[$key])) {
+                continue;
+            }
+
+            $buckets[$key]['revenue'] += (float) $order->total;
+            $buckets[$key]['orders'] += 1;
+        }
+
+        return array_values($buckets);
+    }
+
+    /**
+     * @return array<string, array{label: string, revenue: float, orders: int}>
+     */
+    private function chartBucketsByHour(): array
+    {
+        $buckets = [];
+        for ($i = 23; $i >= 0; $i--) {
+            $t = Carbon::now()->subHours($i)->startOfHour();
+            $key = $t->format('Y-m-d H:00');
+            $buckets[$key] = [
+                'label' => $t->format('H\h'),
+                'revenue' => 0.0,
+                'orders' => 0,
+            ];
+        }
+
+        return $buckets;
+    }
+
+    /**
+     * @return array<string, array{label: string, revenue: float, orders: int}>
+     */
+    private function chartBucketsByDay(Carbon $from, int $count, string $labelFormat): array
+    {
+        $buckets = [];
+        for ($i = 0; $i < $count; $i++) {
+            $t = $from->copy()->addDays($i);
+            $key = $t->format('Y-m-d');
+            $buckets[$key] = [
+                'label' => $t->locale('fr')->isoFormat($labelFormat),
+                'revenue' => 0.0,
+                'orders' => 0,
+            ];
+        }
+
+        return $buckets;
+    }
+
+    /**
+     * @return array<string, array{label: string, revenue: float, orders: int}>
+     */
+    private function chartBucketsByMonth(Carbon $from, int $count): array
+    {
+        $buckets = [];
+        for ($i = 0; $i < $count; $i++) {
+            $t = $from->copy()->addMonths($i);
+            $key = $t->format('Y-m');
+            $buckets[$key] = [
+                'label' => $t->locale('fr')->isoFormat('MMM yyyy'),
+                'revenue' => 0.0,
+                'orders' => 0,
+            ];
+        }
+
+        return $buckets;
     }
 
     public function paginateAdminProducts(string $filter = 'all')
