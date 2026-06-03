@@ -20,9 +20,9 @@ export function HomeNouveautes({ products }: Props) {
     return (
         <section className="bg-[#f0f0f0] py-16 lg:px-[100px] lg:py-[100px]">
             <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-0">
-                <div className="mb-10 text-center">
+                <div className="mb-10 space-y-1 p-5 text-center">
                     <h2 className={SF_SECTION_TITLE}>Nouveautés</h2>
-                    <p className={`${SF_SECTION_SUBTITLE} mt-1`}>
+                    <p className={SF_SECTION_SUBTITLE}>
                         Lorem ipsum sit dolor amet pelentesque
                     </p>
                 </div>
@@ -34,7 +34,7 @@ export function HomeNouveautes({ products }: Props) {
                 ) : (
                     <StorefrontHorizontalScroll
                         showControls
-                        trackClassName="gap-7 pb-4"
+                        trackClassName="product-card-track gap-7 pb-4"
                         scrollStep={320}
                     >
                         {products.map((product) => (

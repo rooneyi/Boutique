@@ -9,16 +9,15 @@ const FEATURES = [
 
 export function HomeAbout() {
     return (
-        <section id="pourquoi-nous" className="bg-white px-4 py-16 sm:px-8 lg:px-[100px] lg:py-[100px]">
-            <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-8 lg:flex-row lg:items-start lg:justify-center lg:gap-6">
-                <div className="flex w-full max-w-[578px] flex-col justify-center gap-7 py-2 lg:py-5">
-                    <div>
-                        <h2 className="font-poppins text-[clamp(2.5rem,6vw,5.25rem)] font-extrabold leading-tight text-black">
-                            Pourquoi
-                            <br />
-                            Nous ?
+        <section id="pourquoi-nous" className="bg-white px-4 py-16 sm:px-8 lg:p-[100px]">
+            <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start justify-center gap-6 lg:flex-row lg:gap-6">
+                <div className="flex w-full max-w-[618px] flex-col justify-center gap-7 p-5 lg:h-[720px] lg:gap-7">
+                    <div className="flex max-w-[578px] flex-col items-start gap-1">
+                        <h2 className="font-poppins text-[clamp(2.75rem,10vw,5.25rem)] font-extrabold leading-normal text-black">
+                            <span className="block">Pourquoi</span>
+                            <span className="block">Nous ?</span>
                         </h2>
-                        <p className="mt-1 max-w-xl font-poppins text-xl text-[#393939]">
+                        <p className="w-full max-w-[578px] font-poppins text-lg font-normal leading-[30px] text-[#393939] lg:text-[20px]">
                             Chez PCJ, la mode est une expression personnelle. Nos collections
                             uniques de vêtements et d&apos;accessoires sont conçus pour affirmer
                             votre style. Nous privilégions la durabilité et l&apos;éthique, en
@@ -27,16 +26,16 @@ export function HomeAbout() {
                         </p>
                     </div>
 
-                    <div className="grid w-full max-w-[578px] grid-cols-3 gap-2 overflow-hidden sm:gap-0 sm:pr-5">
+                    <div className="grid w-full max-w-[578px] grid-cols-3 pr-0 lg:pr-5">
                         {FEATURES.map(({ icon: Icon, label }, index) => (
                             <div
                                 key={label}
-                                className={`flex flex-col items-center gap-2 px-1 py-4 text-center sm:gap-2.5 sm:px-2.5 sm:py-6 sm:pt-11 sm:pb-2.5 ${
+                                className={`flex flex-col items-center gap-2.5 px-2.5 pt-11 pb-2.5 text-center ${
                                     index === 1 ? 'border-x border-black' : ''
                                 }`}
                             >
-                                <Icon className="size-9 text-black sm:size-[54px]" strokeWidth={1.25} />
-                                <p className="font-poppins text-xs font-medium text-black sm:text-xl">
+                                <Icon className="size-[54px] text-black" strokeWidth={1.25} />
+                                <p className="font-poppins text-base font-medium leading-normal text-black lg:text-xl">
                                     {label}
                                 </p>
                             </div>
@@ -44,7 +43,7 @@ export function HomeAbout() {
                     </div>
                 </div>
 
-                <div className="h-[min(367px,55vh)] w-full max-w-[600px] overflow-hidden rounded-[20px] lg:h-[min(720px,70vh)] lg:rounded-br-[20px] lg:rounded-tr-[20px] lg:shrink-0">
+                <div className="h-[min(367px,55vh)] w-full max-w-[600px] shrink-0 overflow-hidden rounded-[20px] lg:h-[720px] lg:rounded-br-[20px] lg:rounded-tr-[20px]">
                     <img
                         src={HOME_ASSETS.aboutModels}
                         alt="Modèles PCJ"

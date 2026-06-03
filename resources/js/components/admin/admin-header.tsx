@@ -9,7 +9,6 @@ import {
     Package,
     Settings,
     ShoppingBag,
-    Store,
     Users,
     X,
 } from 'lucide-react';
@@ -56,12 +55,6 @@ const MAIN_NAV: NavItem[] = [
         href: route('admin.products.index'),
         icon: Package,
         match: (path) => path.startsWith('/admin/products'),
-    },
-    {
-        label: 'Vendeurs',
-        href: route('admin.vendors.index'),
-        icon: Store,
-        match: (path) => path.startsWith('/admin/users/vendors'),
     },
     {
         label: 'Clients',

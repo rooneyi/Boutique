@@ -5,7 +5,6 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue,
 } from '@/components/ui/select';
 import { StorefrontBreadcrumbs } from '@/components/storefront/storefront-breadcrumbs';
 import { route } from '@/lib/route';
@@ -15,7 +14,9 @@ type Filters = {
     sort: string;
     min_price: number;
     max_price: number;
+    price_filter_active?: boolean;
     q?: string;
+    color?: string;
 };
 
 const SORT_LABELS: Record<string, string> = {
@@ -29,19 +30,33 @@ type Props = {
     filters: Filters;
 };
 
+function sortQueryParams(filters: Filters, sort: string) {
+    return {
+        category: filters.category || 'all',
+        sort,
+        ...(filters.price_filter_active
+            ? {
+                  min_price: filters.min_price,
+                  max_price: filters.max_price,
+              }
+            : {}),
+        ...(filters.q ? { q: filters.q } : {}),
+        ...(filters.color ? { color: filters.color } : {}),
+    };
+}
+
 export function CollectionToolbar({ filters }: Props) {
+    const activeSort = filters.sort || 'popular';
+
     const onSortChange = (sort: string) => {
-        router.get(
-            route('customer.products.index'),
-            {
-                category: filters.category,
-                sort,
-                min_price: filters.min_price,
-                max_price: filters.max_price,
-                ...(filters.q ? { q: filters.q } : {}),
-            },
-            { preserveState: true, preserveScroll: true },
-        );
+        if (sort === activeSort) {
+            return;
+        }
+
+        router.get(route('customer.products.index'), sortQueryParams(filters, sort), {
+            preserveState: false,
+            preserveScroll: false,
+        });
     };
 
     const breadcrumbItems = [
@@ -52,19 +67,19 @@ export function CollectionToolbar({ filters }: Props) {
     ];
 
     return (
-        <div className="flex items-center justify-between gap-3 px-4 py-4 sm:px-8 lg:px-12">
+        <div className="flex items-center justify-between gap-3 px-4 py-[15px] sm:px-8 lg:px-12 xl:px-[48px]">
             <StorefrontBreadcrumbs
-                className="font-poppins text-[11px] font-medium text-[rgba(91,94,100,0.62)] sm:text-base"
+                className="gap-2.5 font-poppins text-[10.5px] font-medium text-[rgba(91,94,100,0.62)] sm:text-base lg:text-base [&_svg]:size-6"
                 items={breadcrumbItems}
             />
 
-            <Select value={filters.sort} onValueChange={onSortChange}>
-                <SelectTrigger className="font-poppins h-[34px] w-auto gap-1 rounded-[13px] border border-black px-2.5 text-[9px] font-semibold shadow-none sm:h-12 sm:min-w-[200px] sm:rounded-[20px] sm:px-4 sm:text-[13px]">
-                    <SlidersHorizontal className="size-3 shrink-0 sm:size-4" aria-hidden />
-                    <span>
+            <Select value={activeSort} onValueChange={onSortChange}>
+                <SelectTrigger className="font-poppins h-[33px] w-auto gap-1 rounded-[13px] border border-black px-2.5 text-[8.5px] font-semibold shadow-none sm:h-[50px] sm:min-w-[220px] sm:rounded-[20px] sm:gap-1.5 sm:px-3.5 sm:text-[13px]">
+                    <SlidersHorizontal className="size-2.5 shrink-0 sm:size-4" aria-hidden />
+                    <span className="whitespace-nowrap">
                         TRIER PAR :{' '}
                         <span className="text-[#999]">
-                            {SORT_LABELS[filters.sort] ?? 'POPULAIRE'}
+                            {SORT_LABELS[activeSort] ?? 'POPULAIRE'}
                         </span>
                     </span>
                 </SelectTrigger>

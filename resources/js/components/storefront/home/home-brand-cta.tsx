@@ -15,13 +15,13 @@ export function HomeBrandCta() {
                     />
                 </div>
 
-                <div className="flex flex-col gap-5 sm:gap-6">
-                    <h2 className="font-poppins text-[clamp(2.5rem,5vw,6rem)] font-bold leading-[1.1] text-black">
+                <div className="flex flex-col gap-6 sm:gap-7">
+                    <h2 className="font-poppins text-[clamp(2.5rem,5vw,6rem)] font-bold leading-normal text-black">
                         I&apos;AM THE
                         <br />
                         BRAND
                     </h2>
-                    <p className="max-w-lg font-poppins text-lg text-[#292d32] md:text-xl">
+                    <p className="max-w-lg font-poppins text-lg font-normal leading-[30px] text-[#292d32] md:text-xl">
                         Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas
                         porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies,
                         purus lectus malesuada libero.

@@ -3,15 +3,12 @@ import admin from '@/routes/admin';
 import auth from '@/routes/auth';
 import customer from '@/routes/customer';
 import profile from '@/routes/profile';
-import vendor from '@/routes/vendor';
-
 const routes: Record<string, unknown> = {
     ...rootRoutes,
     admin,
     auth,
     customer,
     profile,
-    vendor,
 };
 
 type RoutePath = string;

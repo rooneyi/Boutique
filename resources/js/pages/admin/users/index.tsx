@@ -28,14 +28,6 @@ import {
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
-type VendorRow = {
-    id: number;
-    name: string;
-    email: string;
-    shop_name?: string;
-    created_at: string;
-};
-
 type CustomerRow = {
     id: number;
     name: string;
@@ -49,9 +41,9 @@ type CustomerRow = {
 
 type Props = {
     users: {
-        data: VendorRow[] | CustomerRow[];
+        data: CustomerRow[];
     };
-    role: 'vendor' | 'customer';
+    role: 'customer';
 };
 
 function segmentLabel(segment: CustomerRow['segment']): string {
@@ -67,12 +59,9 @@ function segmentLabel(segment: CustomerRow['segment']): string {
     }
 }
 
-export default function AdminUsers({ users, role }: Props) {
-    const title = role === 'vendor' ? 'Vendeurs' : 'Clients';
-    const description =
-        role === 'vendor'
-            ? 'Gestion des vendeurs inscrits sur la plateforme PCJ.'
-            : 'Liste globale des clients — fidèles, actifs et inactifs.';
+export default function AdminUsers({ users }: Props) {
+    const title = 'Clients';
+    const description = 'Liste globale des clients — fidèles, actifs et inactifs.';
 
     const formatDate = (date: string) => new Date(date).toLocaleDateString('fr-FR');
 
@@ -99,75 +88,29 @@ export default function AdminUsers({ users, role }: Props) {
                                             <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
                                                 Email
                                             </TableHead>
-                                            {role === 'vendor' && (
-                                                <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
-                                                    Boutique
-                                                </TableHead>
-                                            )}
-                                            {role === 'customer' && (
-                                                <>
-                                                    <TableHead
-                                                        className={cn(ADMIN_TABLE_HEAD, 'text-right')}
-                                                    >
-                                                        Commandes
-                                                    </TableHead>
-                                                    <TableHead
-                                                        className={cn(
-                                                            ADMIN_TABLE_HEAD,
-                                                            ADMIN_TABLE_COL_MD,
-                                                            'text-right',
-                                                        )}
-                                                    >
-                                                        Total
-                                                    </TableHead>
-                                                    <TableHead
-                                                        className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
-                                                    >
-                                                        Dernière cmd.
-                                                    </TableHead>
-                                                    <TableHead className={ADMIN_TABLE_HEAD}>Profil</TableHead>
-                                                </>
-                                            )}
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
+                                                Commandes
+                                            </TableHead>
+                                            <TableHead
+                                                className={cn(
+                                                    ADMIN_TABLE_HEAD,
+                                                    ADMIN_TABLE_COL_MD,
+                                                    'text-right',
+                                                )}
+                                            >
+                                                Total
+                                            </TableHead>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
+                                                Dernière cmd.
+                                            </TableHead>
+                                            <TableHead className={ADMIN_TABLE_HEAD}>Profil</TableHead>
                                             <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
                                                 Inscription
                                             </TableHead>
-                                            {role === 'vendor' && (
-                                                <TableHead className={ADMIN_TABLE_HEAD}>Statut</TableHead>
-                                            )}
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {role === 'vendor'
-                                            ? (users.data as VendorRow[]).map((user) => (
-                                                  <TableRow key={user.id} className={ADMIN_TABLE_ROW}>
-                                                      <TableCell
-                                                          className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}
-                                                      >
-                                                          {user.name}
-                                                          <span className={ADMIN_MOBILE_META}>
-                                                              {user.email}
-                                                          </span>
-                                                          {user.shop_name ? (
-                                                              <span className={ADMIN_MOBILE_META}>
-                                                                  {user.shop_name}
-                                                              </span>
-                                                          ) : null}
-                                                      </TableCell>
-                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
-                                                          {user.email}
-                                                      </TableCell>
-                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
-                                                          {user.shop_name || '—'}
-                                                      </TableCell>
-                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
-                                                          {formatDate(user.created_at)}
-                                                      </TableCell>
-                                                      <TableCell>
-                                                          <AdminBadge variant="muted">Actif</AdminBadge>
-                                                      </TableCell>
-                                                  </TableRow>
-                                              ))
-                                            : (users.data as CustomerRow[]).map((user) => (
+                                        {users.data.map((user) => (
                                                   <TableRow key={user.id} className={ADMIN_TABLE_ROW}>
                                                       <TableCell
                                                           className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}
@@ -217,7 +160,7 @@ export default function AdminUsers({ users, role }: Props) {
                                                           {formatDate(user.created_at)}
                                                       </TableCell>
                                                   </TableRow>
-                                              ))}
+                                        ))}
                                     </TableBody>
                             </AdminDataTable>
                         ) : (

@@ -45,14 +45,14 @@ export function CollectionPagination({ links, meta }: Props) {
 
     return (
         <nav
-            className="mt-10 flex items-center justify-center gap-3"
+            className="flex items-center justify-between px-[19px]"
             aria-label="Pagination"
         >
             {prev?.url ? (
                 <Button
                     variant="outline"
                     size="icon"
-                    className="size-10 rounded-full border-neutral-300"
+                    className="size-[39.5px] shrink-0 rounded-full border-neutral-300"
                     asChild
                 >
                     <Link href={prev.url} preserveScroll>
@@ -63,47 +63,49 @@ export function CollectionPagination({ links, meta }: Props) {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="size-10 rounded-full border-neutral-300"
+                    className="size-[39.5px] shrink-0 rounded-full border-neutral-300"
                     disabled
                 >
                     <ChevronLeft className="size-5" />
                 </Button>
             )}
 
-            {pageLinks.map((link, i) => {
-                const pageNum = link.label.replace(/<[^>]+>/g, '').trim();
-                if (!link.url) {
+            <div className="flex flex-1 items-center justify-center gap-2.5">
+                {pageLinks.map((link, i) => {
+                    const pageNum = link.label.replace(/<[^>]+>/g, '').trim();
+                    if (!link.url) {
+                        return (
+                            <span
+                                key={i}
+                                className="flex items-center justify-center px-2.5 py-1.5 font-poppins text-sm font-medium text-neutral-400"
+                            >
+                                {pageNum}
+                            </span>
+                        );
+                    }
                     return (
-                        <span
+                        <Link
                             key={i}
-                            className="flex size-10 items-center justify-center font-poppins text-base font-medium text-neutral-400"
+                            href={link.url}
+                            preserveScroll
+                            className={cn(
+                                'flex items-center justify-center rounded-[3px] px-2.5 py-1.5 font-poppins text-sm font-medium transition-colors',
+                                link.active
+                                    ? 'bg-[#e6e6e6] text-black'
+                                    : 'text-black hover:bg-neutral-100',
+                            )}
                         >
                             {pageNum}
-                        </span>
+                        </Link>
                     );
-                }
-                return (
-                    <Link
-                        key={i}
-                        href={link.url}
-                        preserveScroll
-                        className={cn(
-                            'flex size-10 items-center justify-center rounded-md font-poppins text-base font-medium transition-colors',
-                            link.active
-                                ? 'bg-neutral-200 text-black'
-                                : 'text-black hover:bg-neutral-100',
-                        )}
-                    >
-                        {pageNum}
-                    </Link>
-                );
-            })}
+                })}
+            </div>
 
             {next?.url ? (
                 <Button
                     variant="outline"
                     size="icon"
-                    className="size-10 rounded-full border-neutral-300"
+                    className="size-[39.5px] shrink-0 rounded-full border-neutral-300"
                     asChild
                 >
                     <Link href={next.url} preserveScroll>
@@ -114,7 +116,7 @@ export function CollectionPagination({ links, meta }: Props) {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="size-10 rounded-full border-neutral-300"
+                    className="size-[39.5px] shrink-0 rounded-full border-neutral-300"
                     disabled
                 >
                     <ChevronRight className="size-5" />

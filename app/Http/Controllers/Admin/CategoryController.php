@@ -2,52 +2,83 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Data\CategoryData;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Services\CategoryService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class CategoryController extends Controller
 {
     public function __construct(
-        private CategoryService $categoryService
+        private CategoryService $categoryService,
     ) {}
 
-    public function index()
+    public function index(): Response
     {
-        $categories = $this->categoryService->getAllCategories();
-        return response()->json($categories);
+        $categories = Category::query()
+            ->withCount('products')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Category $c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'products_count' => (int) $c->products_count,
+            ])
+            ->values()
+            ->all();
+
+        return Inertia::render('admin/categories/index', [
+            'categories' => $categories,
+        ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        $data = CategoryData::from($request->validate([
-            'name' => 'required|string|max:100',
-        ]));
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100', 'unique:categories,name'],
+        ]);
 
-        $category = $this->categoryService->createCategory($data->name);
-        return response()->json($category, 201);
+        $this->categoryService->createCategory($validated['name']);
+
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Catégorie créée.');
     }
 
-    public function show(Category $category)
+    public function update(Request $request, Category $category): RedirectResponse
     {
-        return response()->json($category);
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('categories', 'name')->ignore($category->id),
+            ],
+        ]);
+
+        $this->categoryService->updateCategory($category, $validated['name']);
+
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Catégorie mise à jour.');
     }
 
-    public function update(Request $request, Category $category)
+    public function destroy(Category $category): RedirectResponse
     {
-        $data = CategoryData::from($request->validate([
-            'name' => 'required|string|max:100',
-        ]));
+        if ($category->products()->exists()) {
+            return back()->withErrors([
+                'category' => "Impossible de supprimer « {$category->name} » : des produits y sont rattachés.",
+            ]);
+        }
 
-        $category = $this->categoryService->updateCategory($category, $data->name);
-        return response()->json($category);
-    }
-
-    public function destroy(Category $category)
-    {
         $this->categoryService->deleteCategory($category);
-        return response()->json(['message' => 'Category deleted']);
+
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Catégorie supprimée.');
     }
 }

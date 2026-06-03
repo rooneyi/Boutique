@@ -11,8 +11,12 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AdminLayout from '@/layouts/admin-layout';
 import AuthLayout from '@/layouts/auth-layout';
-import VendorLayout from '@/layouts/vendor-layout';
 import CustomerLayout from '@/layouts/customer-layout';
+import {
+    storefrontLayout,
+    withPageTransition,
+    withPageTransitionStack,
+} from '@/lib/layout-with-transition';
 import SettingsLayout from '@/layouts/settings/layout';
 import '@/lib/route'; // Initialize global route function
 
@@ -32,19 +36,17 @@ createInertiaApp({
             case name === 'customer/orders/index':
             case name === 'customer/orders/show':
             case name === 'customer/contact':
-                return null;
+                return storefrontLayout();
             case name.startsWith('auth/'):
-                return AuthLayout;
+                return withPageTransition(AuthLayout);
             case name.startsWith('admin/'):
-                return AdminLayout;
-            case name.startsWith('vendor/'):
-                return VendorLayout;
+                return withPageTransition(AdminLayout);
             case name.startsWith('customer/'):
-                return CustomerLayout;
+                return withPageTransition(CustomerLayout);
             case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return withPageTransitionStack(AppLayout, SettingsLayout);
             default:
-                return AppLayout;
+                return withPageTransition(AppLayout);
         }
     },
     strictMode: true,
@@ -66,7 +68,9 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#0059DD',
+        delay: 80,
+        includeCSS: true,
     },
 });
 

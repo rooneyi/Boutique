@@ -63,7 +63,7 @@ export function HomeCurated() {
                             <p className="mt-2 font-poppins text-2xl font-semibold text-black">
                                 {item.title}
                             </p>
-                            <p className="font-poppins text-base font-medium text-[#737373]">
+                            <p className="font-poppins text-base font-medium leading-[26px] text-[#737373]">
                                 {item.description}
                             </p>
                         </Link>

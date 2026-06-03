@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import { SlidersHorizontal } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -13,32 +13,38 @@ type CategoryFilter = {
     count: number;
 };
 
+type ColorFilter = {
+    name: string;
+    hex: string;
+    count: number;
+};
+
 type Filters = {
     category: string;
     sort: string;
     min_price: number;
     max_price: number;
+    price_filter_active?: boolean;
+    catalog_min_price?: number;
+    catalog_max_price?: number;
     q?: string;
     color?: string;
 };
 
 type Props = {
     categories: CategoryFilter[];
+    colorOptions: ColorFilter[];
     totalProducts: number;
     filters: Filters;
 };
 
-const COLOR_OPTIONS = [
-    { name: 'Noir', color: '#000000' },
-    { name: 'Bleu', color: '#0059DD' },
-    { name: 'Blanc', color: '#FFFFFF' },
-    { name: 'Gris', color: '#BFBFBF' },
-] as const;
-
 function FiltersPanel({
     categories,
+    colorOptions,
     totalProducts,
     filters,
+    priceMin,
+    priceMax,
     category,
     setCategory,
     minPrice,
@@ -50,8 +56,11 @@ function FiltersPanel({
     onApply,
 }: {
     categories: CategoryFilter[];
+    colorOptions: ColorFilter[];
     totalProducts: number;
     filters: Filters;
+    priceMin: number;
+    priceMax: number;
     category: string;
     setCategory: (v: string) => void;
     color: string;
@@ -63,9 +72,9 @@ function FiltersPanel({
     onApply: () => void;
 }) {
     return (
-        <div className="space-y-9">
-            <div className="space-y-4">
-                <h2 className="font-poppins text-lg font-medium text-black sm:text-xl">Catalogue</h2>
+        <div className="space-y-[37px]">
+            <div className="space-y-[15px]">
+                <h2 className="font-poppins text-xl font-medium text-black">Catalogue</h2>
 
                 <FilterRow
                     label="Tous"
@@ -87,46 +96,44 @@ function FiltersPanel({
                 <hr className="border-neutral-200" />
             </div>
 
-            <div className="space-y-4">
-                <h2 className="font-poppins text-lg font-medium text-black sm:text-xl">Couleurs</h2>
-                {COLOR_OPTIONS.map((opt) => (
-                    <div key={opt.name} className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <span
-                                className={cn(
-                                    'size-5 rounded-full border-2',
-                                    opt.color === '#FFFFFF' ? 'border-neutral-300' : 'border-transparent',
-                                )}
-                                style={{ backgroundColor: opt.color }}
-                                aria-hidden
-                            />
-                            <span className="font-poppins text-sm font-medium text-black sm:text-base">
-                                {opt.name}
-                            </span>
-                        </div>
-                        <span className="text-sm font-medium text-[#5B5E64]/60">(24)</span>
-                    </div>
-                ))}
-                <hr className="border-neutral-200" />
-            </div>
+            {colorOptions.length > 0 ? (
+                <div className="space-y-[15px]">
+                    <h2 className="font-poppins text-xl font-medium text-black">Couleurs</h2>
+                    {colorOptions.map((opt) => (
+                        <ColorFilterRow
+                            key={opt.name}
+                            label={opt.name}
+                            hex={opt.hex}
+                            count={opt.count}
+                            checked={color === opt.name}
+                            onCheckedChange={() => setColor(color === opt.name ? '' : opt.name)}
+                        />
+                    ))}
+                    <hr className="border-neutral-200" />
+                </div>
+            ) : null}
 
-            <div className="space-y-4">
-                <h2 className="font-poppins text-lg font-medium text-black sm:text-xl">Prix</h2>
+            <div className="space-y-2">
+                <h2 className="font-poppins text-xl font-medium text-black">Prix</h2>
                 <div className="space-y-3 px-1">
                     <input
                         type="range"
-                        min={0}
-                        max={200}
-                        value={minPrice}
-                        onChange={(e) => setMinPrice(Number(e.target.value))}
+                        min={priceMin}
+                        max={priceMax}
+                        value={Math.min(minPrice, maxPrice)}
+                        onChange={(e) =>
+                            setMinPrice(Math.min(Number(e.target.value), maxPrice))
+                        }
                         className="h-1 w-full cursor-pointer appearance-none rounded-full bg-neutral-200 accent-black"
                     />
                     <input
                         type="range"
-                        min={0}
-                        max={200}
-                        value={maxPrice}
-                        onChange={(e) => setMaxPrice(Number(e.target.value))}
+                        min={priceMin}
+                        max={priceMax}
+                        value={Math.max(maxPrice, minPrice)}
+                        onChange={(e) =>
+                            setMaxPrice(Math.max(Number(e.target.value), minPrice))
+                        }
                         className="h-1 w-full cursor-pointer appearance-none rounded-full bg-neutral-200 accent-black"
                     />
                     <div className="flex justify-between font-poppins text-sm font-medium text-black sm:text-base">
@@ -139,20 +146,29 @@ function FiltersPanel({
             <Button
                 type="button"
                 onClick={onApply}
-                className="h-12 w-full rounded-lg bg-black font-poppins text-sm font-semibold tracking-wide text-white uppercase hover:bg-neutral-800"
+                className="h-[43px] w-full rounded-[27px] bg-black font-poppins text-[13px] font-semibold tracking-wide text-white uppercase hover:bg-neutral-800"
             >
-                Appliquer les filtres
+                FILTRE
             </Button>
         </div>
     );
 }
 
-export function CollectionFilters({ categories, totalProducts, filters }: Props) {
+export function CollectionFilters({ categories, colorOptions, totalProducts, filters }: Props) {
+    const priceMin = filters.catalog_min_price ?? filters.min_price;
+    const priceMax = filters.catalog_max_price ?? filters.max_price;
     const [category, setCategory] = useState(filters.category);
     const [color, setColor] = useState(filters.color ?? '');
     const [minPrice, setMinPrice] = useState(filters.min_price);
     const [maxPrice, setMaxPrice] = useState(filters.max_price);
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    useEffect(() => {
+        setCategory(filters.category);
+        setColor(filters.color ?? '');
+        setMinPrice(filters.min_price);
+        setMaxPrice(filters.max_price);
+    }, [filters]);
 
     const applyFilters = () => {
         router.get(
@@ -165,15 +181,21 @@ export function CollectionFilters({ categories, totalProducts, filters }: Props)
                 ...(filters.q ? { q: filters.q } : {}),
                 ...(color ? { color } : {}),
             },
-            { preserveState: true, preserveScroll: true },
+            {
+                preserveState: false,
+                preserveScroll: false,
+            },
         );
         setMobileOpen(false);
     };
 
     const panelProps = {
         categories,
+        colorOptions,
         totalProducts,
         filters,
+        priceMin,
+        priceMax,
         category,
         setCategory,
         color,
@@ -187,7 +209,7 @@ export function CollectionFilters({ categories, totalProducts, filters }: Props)
 
     return (
         <>
-            <Collapsible open={mobileOpen} onOpenChange={setMobileOpen} className="lg:hidden">
+            <Collapsible open={mobileOpen} onOpenChange={setMobileOpen} className="w-full shrink-0 lg:hidden">
                 <CollapsibleTrigger asChild>
                     <Button
                         type="button"
@@ -203,10 +225,56 @@ export function CollectionFilters({ categories, totalProducts, filters }: Props)
                 </CollapsibleContent>
             </Collapsible>
 
-            <aside className="hidden w-full max-w-[280px] shrink-0 rounded-[27px] bg-white px-5 py-6 shadow-sm lg:block lg:w-[280px]">
+            <aside className="hidden w-full max-w-[289px] shrink-0 rounded-[27px] bg-white px-[22px] py-[21px] shadow-sm lg:sticky lg:top-24 lg:block lg:self-start">
                 <FiltersPanel {...panelProps} />
             </aside>
         </>
+    );
+}
+
+function ColorFilterRow({
+    label,
+    hex,
+    count,
+    checked,
+    onCheckedChange,
+}: {
+    label: string;
+    hex: string;
+    count: number;
+    checked: boolean;
+    onCheckedChange: () => void;
+}) {
+    return (
+        <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-3">
+                <Checkbox
+                    id={`color-${label}`}
+                    checked={checked}
+                    onCheckedChange={() => onCheckedChange()}
+                    className="h-[19px] w-5 shrink-0 rounded-[2px] border-[#5B5E64]/60 data-[state=checked]:border-black data-[state=checked]:bg-black"
+                />
+                <span
+                    className={cn(
+                        'size-[22px] shrink-0 rounded-full border-2',
+                        hex.toUpperCase() === '#FFFFFF' ? 'border-neutral-300' : 'border-transparent',
+                    )}
+                    style={{ backgroundColor: hex }}
+                    aria-hidden
+                />
+                <Label
+                    htmlFor={`color-${label}`}
+                    className="cursor-pointer truncate font-poppins text-base font-medium text-black"
+                >
+                    {label}
+                </Label>
+            </div>
+            {count > 0 ? (
+                <span className="shrink-0 font-poppins text-sm font-medium text-[#5B5E64]/60">
+                    ({count})
+                </span>
+            ) : null}
+        </div>
     );
 }
 
@@ -231,11 +299,11 @@ function FilterRow({
                     id={`cat-${label}`}
                     checked={checked}
                     onCheckedChange={(value) => value === true && onCheckedChange()}
-                    className="size-5 shrink-0 rounded-sm border-[#5B5E64]/60 data-[state=checked]:border-black data-[state=checked]:bg-black"
+                    className="h-[19px] w-5 shrink-0 rounded-[2px] border-[#5B5E64]/60 data-[state=checked]:border-black data-[state=checked]:bg-black"
                 />
                 <Label
                     htmlFor={`cat-${label}`}
-                    className="cursor-pointer truncate font-poppins text-sm font-medium text-black sm:text-base"
+                    className="cursor-pointer truncate font-poppins text-base font-medium text-black"
                 >
                     {label}
                 </Label>

@@ -25,7 +25,7 @@ export function HomeBenefits() {
     return (
         <section className="bg-[#f0f0f0] px-4 py-16 sm:px-8 lg:px-[100px] lg:py-[100px]">
             <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-10">
-                <h2 className="text-center font-poppins text-[clamp(2rem,6vw,5.25rem)] font-extrabold leading-tight text-black">
+                <h2 className="text-center font-poppins text-[clamp(2rem,6vw,5.25rem)] font-extrabold leading-normal text-black">
                     Simplifiez Vos
                     <br />
                     Achats Avec PCJ
@@ -41,7 +41,7 @@ export function HomeBenefits() {
                             <h3 className="font-poppins text-2xl font-semibold text-black md:text-[32px]">
                                 {title}
                             </h3>
-                            <p className="font-poppins text-lg font-medium text-[#484848] md:text-xl">
+                            <p className="font-poppins text-lg font-medium leading-[30px] text-[#484848] md:text-xl">
                                 {text}
                             </p>
                         </div>

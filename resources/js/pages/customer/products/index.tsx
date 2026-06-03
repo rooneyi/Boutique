@@ -30,11 +30,18 @@ type CategoryFilter = {
     count: number;
 };
 
+type ColorFilter = {
+    name: string;
+    hex: string;
+    count: number;
+};
+
 type Filters = {
     category: string;
     sort: string;
     min_price: number;
     max_price: number;
+    price_filter_active?: boolean;
     q?: string;
     color?: string;
 };
@@ -47,6 +54,7 @@ type AuthUser = {
 type PageProps = {
     products: PaginatedProducts;
     categories: CategoryFilter[];
+    colorOptions: ColorFilter[];
     totalProducts: number;
     filters: Filters;
     canRegister: boolean;
@@ -54,7 +62,7 @@ type PageProps = {
 };
 
 export default function BrowseProducts() {
-    const { auth, canRegister, products, categories, totalProducts, filters } =
+    const { auth, canRegister, products, categories, colorOptions, totalProducts, filters } =
         usePage<PageProps>().props;
     const items = products.data ?? [];
 
@@ -71,27 +79,32 @@ export default function BrowseProducts() {
 
                 <main>
                     <CollectionHero />
-                    <CollectionToolbar filters={filters} />
 
-                    <section className="pb-10 pt-2 sm:pb-12 lg:pb-16">
-                        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 lg:flex-row lg:gap-3 lg:px-7">
-                            <div className="hidden shrink-0 lg:block">
+                    {/* Figma 126:3227 — py 40, fil d’Ariane puis sidebar + grille */}
+                    <section className="py-10">
+                        <div className="mx-auto max-w-[1440px]">
+                            <CollectionToolbar filters={filters} />
+
+                            <div className="mt-0 flex flex-col gap-6 px-4 sm:px-8 lg:flex-row lg:items-start lg:gap-2.5 lg:px-7">
                                 <CollectionFilters
                                     categories={categories}
+                                    colorOptions={colorOptions ?? []}
                                     totalProducts={totalProducts}
                                     filters={filters}
                                 />
-                            </div>
 
-                            <div className="min-w-0 flex-1 px-2 sm:px-4 lg:px-0">
+                                <div className="flex min-w-0 flex-1 flex-col gap-8 lg:max-w-[1085px]">
                                 {items.length > 0 ? (
                                     <>
-                                        <div className="grid grid-cols-2 justify-center gap-2.5 px-2 sm:gap-4 sm:px-4 xl:grid-cols-3 xl:gap-6">
+                                        <div
+                                            key={`${filters.sort}-${filters.category}-${filters.color ?? ''}-${filters.price_filter_active ? `${filters.min_price}-${filters.max_price}` : ''}`}
+                                            className="collection-product-grid grid grid-cols-2 justify-items-center gap-2.5 px-2.5 lg:grid-cols-3 lg:justify-items-start lg:px-[18px]"
+                                        >
                                             {items.map((product) => (
                                                 <HomeProductShowcaseCard
                                                     key={product.id}
                                                     product={product}
-                                                    size="compact"
+                                                    size="collection"
                                                 />
                                             ))}
                                         </div>
@@ -105,6 +118,7 @@ export default function BrowseProducts() {
                                         Aucun produit ne correspond à vos filtres.
                                     </p>
                                 )}
+                                </div>
                             </div>
                         </div>
                     </section>

@@ -9,7 +9,10 @@ import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { HomeHero } from '@/components/storefront/home/home-hero';
 import { HomeNouveautes } from '@/components/storefront/home/home-nouveautes';
-import { HomeTestimonial } from '@/components/storefront/home/home-testimonial';
+import {
+    HomeTestimonial,
+    type HomeTestimonialItem,
+} from '@/components/storefront/home/home-testimonial';
 
 type FeaturedProduct = {
     id: number;
@@ -34,27 +37,28 @@ type PageProps = {
     canRegister: boolean;
     featuredProducts: FeaturedProduct[];
     highlightCategories: { id: number; name: string; count: number }[];
+    testimonials: HomeTestimonialItem[];
     auth?: {
         user?: AuthUser | null;
     };
 };
 
 export default function Welcome() {
-    const { auth, canRegister, featuredProducts } = usePage<PageProps>().props;
+    const { auth, canRegister, featuredProducts, testimonials } = usePage<PageProps>().props;
     const user = auth?.user;
 
     return (
         <>
             <Head title="PCJ · Pose Comme Jamais" />
 
-            <div className="min-h-screen bg-[#f8f7f9] font-poppins text-black antialiased">
+            <div className="min-h-screen bg-white font-poppins text-black antialiased">
                 <HomeHeader user={user} canRegister={canRegister} activeNav="home" />
                 <main>
                     <HomeHero />
                     <HomeCategories />
                     <HomeAbout />
                     <HomeNouveautes products={featuredProducts} />
-                    <HomeTestimonial />
+                    <HomeTestimonial testimonials={testimonials} />
                     <HomeBenefits />
                     <HomeCurated />
                     <HomeBrandCta />

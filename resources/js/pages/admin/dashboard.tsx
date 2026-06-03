@@ -162,7 +162,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                     <p className="font-poppins text-2xl font-semibold text-black">
                                         {stats.total_vendors}
                                     </p>
-                                    <p className={cn(ADMIN_MUTED, 'text-sm')}>Vendeurs</p>
+                                    <p className={cn(ADMIN_MUTED, 'text-sm')}>Boutique</p>
                                 </div>
                                 <div className="rounded-sm border border-neutral-100 bg-white p-4 text-center">
                                     <p className="font-poppins text-2xl font-semibold text-black">

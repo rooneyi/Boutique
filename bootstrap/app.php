@@ -3,7 +3,6 @@
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureCustomer;
-use App\Http\Middleware\EnsureVendor;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -22,7 +21,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->alias([
-            'vendor' => EnsureVendor::class,
             'customer' => EnsureCustomer::class,
             'admin' => EnsureAdmin::class,
         ]);

@@ -1,7 +1,8 @@
 <?php
 
 use App\Data\CustomerRegisterData;
-use App\Data\VendorRegisterData;
+use App\Http\Controllers\Admin\SalesController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\PasswordResetOtpController;
 use App\Http\Controllers\Customer\AccountController;
 use App\Http\Controllers\Customer\CartController;
@@ -11,15 +12,13 @@ use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\Customer\ProductReviewController;
-use App\Http\Controllers\Vendor\CustomerController as VendorCustomerController;
-use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
-use App\Http\Controllers\Vendor\ProductController as VendorProductController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductReview;
 use App\Services\AdminService;
 use App\Services\CustomerService;
-use App\Services\DashboardService;
-use App\Services\VendorService;
 use App\Support\CatalogProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,10 +31,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         if ($user?->role === 'ADMIN') {
             return Inertia::location(route('admin.dashboard'));
-        }
-
-        if ($user?->role === 'VENDOR') {
-            return Inertia::location(route('vendor.dashboard'));
         }
 
         return Inertia::location(route('home'));
@@ -52,10 +47,6 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
         'canResetPassword' => Features::enabled(Features::resetPasswords()),
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('login');
-
-    Route::get('vendor/register', fn () => Inertia::render('auth/register-vendor', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]))->name('vendor.register');
 
     Route::get('customer/register', fn () => Inertia::render('auth/register-customer', [
         'canRegister' => Features::enabled(Features::registration()),
@@ -75,10 +66,6 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('register');
 
-    Route::get('register-vendor', fn () => Inertia::render('auth/register-vendor', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]))->name('register-vendor');
-
     Route::get('register-customer', fn () => Inertia::render('auth/register-customer', [
         'canRegister' => Features::enabled(Features::registration()),
     ]))->name('register-customer');
@@ -90,6 +77,9 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     Route::get('forgot-password/phone', fn () => Inertia::render('auth/forgot-password-phone', [
         'status' => session('status'),
     ]))->name('forgot-password.phone');
+
+    Route::get('google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
+    Route::get('google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 
     Route::post('forgot-password', [PasswordResetOtpController::class, 'sendEmail'])
         ->name('forgot-password.store');
@@ -110,22 +100,6 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
         'email' => request('email'),
         'token' => $token,
     ]))->name('reset-password');
-
-    Route::post('vendor/register', function (Request $request) {
-        $data = VendorRegisterData::from($request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'shop_name' => ['required', 'string', 'max:150'],
-            'password' => ['required', 'confirmed', 'min:8'],
-        ]));
-
-        $user = app(VendorService::class)->register($data);
-
-        auth()->login($user);
-        $request->session()->regenerate();
-
-        return redirect()->route('vendor.dashboard');
-    })->name('vendor.register.store');
 
     Route::post('customer/register', function (Request $request) {
         $validated = $request->validate([
@@ -187,72 +161,71 @@ Route::middleware('auth')->prefix('auth')->name('auth.')->group(function () {
     Route::get('two-factor-challenge', fn () => Inertia::render('auth/two-factor-challenge'))->name('two-factor-challenge');
 });
 
-Route::middleware(['auth', 'verified', 'vendor'])->prefix('vendor')->name('vendor.')->group(function () {
-    Route::get('dashboard', function (DashboardService $dashboardService) {
-        return Inertia::render('vendor/dashboard', [
-            'stats' => $dashboardService->getVendorDashboard(auth()->user()->vendor),
+Route::get('/', function () {
+    $favoriteIdSet = [];
+    $user = auth()->user();
+    $customer = $user?->role === 'CUSTOMER' ? $user->customer : null;
+    if ($customer) {
+        $favoriteIdSet = $customer->favoriteProducts()->pluck('products.id')->flip()->all();
+    }
+
+    $featured = Product::query()
+        ->where('status', '!=', 'DISCONTINUED')
+        ->with(['category', 'vendor', 'variants' => fn ($q) => $q->orderBy('id')])
+        ->withAvg('reviews', 'rating')
+        ->withCount('reviews')
+        ->latest()
+        ->limit(4)
+        ->get()
+        ->map(function (Product $p) use ($favoriteIdSet) {
+            $card = CatalogProduct::compactCardPayload($p, isset($favoriteIdSet[$p->id]));
+
+            return array_merge($card, [
+                'vendor_shop' => $p->vendor->shop_name,
+                'category' => $p->category?->name ?? '',
+            ]);
+        });
+
+    $highlightCategories = Category::query()
+        ->withCount([
+            'products as active_count' => fn ($q) => $q->where('status', '!=', 'DISCONTINUED'),
+        ])
+        ->orderBy('name')
+        ->limit(6)
+        ->get()
+        ->map(fn (Category $c) => [
+            'id' => $c->id,
+            'name' => $c->name,
+            'count' => (int) $c->active_count,
         ]);
-    })->name('dashboard');
 
-    Route::get('products', [VendorProductController::class, 'index'])->name('products.index');
-    Route::get('products/create', [VendorProductController::class, 'create'])->name('products.create');
-    Route::post('products', [VendorProductController::class, 'store'])->name('products.store');
-    Route::get('products/{product}/edit', [VendorProductController::class, 'edit'])->name('products.edit');
-    Route::put('products/{product}', [VendorProductController::class, 'update'])->name('products.update');
-    Route::delete('products/{product}', [VendorProductController::class, 'destroy'])->name('products.destroy');
+    $testimonials = ProductReview::query()
+        ->whereNotNull('comment')
+        ->where('comment', '!=', '')
+        ->with(['customer.user', 'product'])
+        ->latest()
+        ->get()
+        ->map(static function (ProductReview $review) {
+            return [
+                'id' => $review->id,
+                'rating' => $review->rating,
+                'comment' => $review->comment,
+                'author' => $review->customer->user?->name ?? 'Client',
+                'product_name' => $review->product->name,
+            ];
+        })
+        ->values()
+        ->all();
 
-    Route::get('orders', [VendorOrderController::class, 'index'])->name('orders.index');
-    Route::get('customers', [VendorCustomerController::class, 'index'])->name('customers.index');
-    Route::get('customers/{customer}', [VendorCustomerController::class, 'show'])->name('customers.show');
-
-    Route::get('settings', fn () => redirect()->route('settings.profile'))->name('settings');
-});
+    return Inertia::render('welcome', [
+        'canRegister' => Features::enabled(Features::registration()),
+        'featuredProducts' => $featured,
+        'highlightCategories' => $highlightCategories,
+        'testimonials' => $testimonials,
+    ]);
+})->name('home');
 
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
-    Route::get('/', function () {
-        $favoriteIdSet = [];
-        $customer = auth()->user()->customer;
-        if ($customer) {
-            $favoriteIdSet = $customer->favoriteProducts()->pluck('products.id')->flip()->all();
-        }
-
-        $featured = Product::query()
-            ->where('status', '!=', 'DISCONTINUED')
-            ->with(['category', 'vendor', 'variants' => fn ($q) => $q->orderBy('id')])
-            ->withAvg('reviews', 'rating')
-            ->withCount('reviews')
-            ->latest()
-            ->limit(4)
-            ->get()
-            ->map(function (Product $p) use ($favoriteIdSet) {
-                $card = CatalogProduct::compactCardPayload($p, isset($favoriteIdSet[$p->id]));
-
-                return array_merge($card, [
-                    'vendor_shop' => $p->vendor->shop_name,
-                    'category' => $p->category?->name ?? '',
-                ]);
-            });
-
-        $highlightCategories = Category::query()
-            ->withCount([
-                'products as active_count' => fn ($q) => $q->where('status', '!=', 'DISCONTINUED'),
-            ])
-            ->orderBy('name')
-            ->limit(6)
-            ->get()
-            ->map(fn (Category $c) => [
-                'id' => $c->id,
-                'name' => $c->name,
-                'count' => (int) $c->active_count,
-            ]);
-
-        return Inertia::render('welcome', [
-            'canRegister' => Features::enabled(Features::registration()),
-            'featuredProducts' => $featured,
-            'highlightCategories' => $highlightCategories,
-        ]);
-    })->name('home');
-
     Route::get('contact', [ContactController::class, 'index'])->name('contact');
     Route::post('contact', [ContactController::class, 'store'])->name('contact.store');
 
@@ -339,12 +312,16 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         ]);
     })->name('products.discontinued');
 
-    Route::get('users/vendors', function (AdminService $adminService) {
-        return Inertia::render('admin/users/index', [
-            'users' => $adminService->paginateAdminVendors(),
-            'role' => 'vendor',
-        ]);
-    })->name('vendors.index');
+    Route::get('categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+    Route::post('categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+    Route::put('categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    Route::delete('categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+
+    Route::get('products/create', [AdminProductController::class, 'create'])->name('products.create');
+    Route::post('products', [AdminProductController::class, 'store'])->name('products.store');
+    Route::get('products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
+    Route::put('products/{product}', [AdminProductController::class, 'update'])->name('products.update');
+    Route::delete('products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('users/customers', function (AdminService $adminService) {
         return Inertia::render('admin/users/index', [
@@ -352,6 +329,12 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
             'role' => 'customer',
         ]);
     })->name('customers.index');
+
+    Route::prefix('sales')->name('sales.')->group(function () {
+        Route::get('orders', [SalesController::class, 'orders'])->name('orders.index');
+        Route::get('customers', [SalesController::class, 'customers'])->name('customers.index');
+        Route::get('customers/{customer}', [SalesController::class, 'customer'])->name('customers.show');
+    });
 });
 
 require __DIR__.'/settings.php';

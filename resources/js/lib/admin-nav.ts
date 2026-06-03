@@ -1,6 +1,6 @@
 import { route } from '@/lib/route';
 
-export type AdminNavKey = 'dashboard' | 'analytics' | 'products' | 'vendors' | 'customers';
+export type AdminNavKey = 'dashboard' | 'analytics' | 'products' | 'categories' | 'sales' | 'customers';
 
 export const ADMIN_MAIN_NAV: {
     key: AdminNavKey;
@@ -29,10 +29,16 @@ export const ADMIN_MAIN_NAV: {
         match: (path) => path.startsWith('/admin/products'),
     },
     {
-        key: 'vendors',
-        label: 'Vendeurs',
-        href: route('admin.vendors.index'),
-        match: (path) => path.startsWith('/admin/users/vendors'),
+        key: 'categories',
+        label: 'Catégories',
+        href: route('admin.categories.index'),
+        match: (path) => path.startsWith('/admin/categories'),
+    },
+    {
+        key: 'sales',
+        label: 'Ventes',
+        href: route('admin.sales.orders.index'),
+        match: (path) => path.startsWith('/admin/sales'),
     },
     {
         key: 'customers',

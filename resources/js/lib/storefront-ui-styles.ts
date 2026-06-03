@@ -35,22 +35,22 @@ export const SF_LIST_ROW =
 export const SF_MUTED_ON_DARK = 'font-poppins text-lg font-normal text-neutral-300';
 
 export const SF_CARD =
-    'rounded-sm border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md';
+    'rounded-sm border border-neutral-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md';
 
 export const SF_BTN_PRIMARY =
     'font-poppins inline-flex items-center justify-center gap-2 rounded-sm bg-[#0059DD] px-5 py-2.5 text-lg font-semibold text-white shadow-sm transition-colors hover:bg-[#0047b0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0059DD]';
 
 export const SF_NAV_LINK =
-    'font-poppins text-base font-normal text-black transition-colors hover:text-[#0059DD]';
+    'font-poppins text-base font-normal text-black transition-colors duration-300 ease-out hover:text-[#0059DD]';
 
 export const SF_INPUT =
     'font-poppins w-full rounded-sm border border-neutral-300 px-4 py-2 text-base text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#0059DD]/30';
 
 export const SF_SECTION_TITLE =
-    'font-poppins text-2xl font-semibold leading-tight text-black sm:text-3xl lg:text-[36px]';
+    'font-poppins text-2xl font-semibold leading-[1.2] text-black sm:text-3xl lg:text-[36px] lg:leading-[44px]';
 
 export const SF_SECTION_SUBTITLE =
-    'font-poppins text-base font-medium text-[#747474] sm:text-lg lg:text-xl';
+    'font-poppins text-base font-medium leading-[1.5] text-[#747474] sm:text-lg sm:leading-[28px] lg:text-xl lg:leading-[30px]';
 
 export const SF_PILL_BTN_DARK_RESPONSIVE =
     'font-poppins inline-flex w-full items-center justify-center gap-2 rounded-[32px] border border-black bg-black px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 sm:w-auto sm:px-[18px] sm:py-[15px] sm:text-[15px]';
@@ -78,8 +78,17 @@ export const SF_SCROLL_X = 'sf-scroll-x';
 export const SF_CAROUSEL_NAV_BTN =
     'size-[30px] rounded-full border border-neutral-300 bg-white text-black shadow-sm hover:bg-neutral-50';
 
+/** Item menu header — Figma Header (122:2256) */
 export const SF_NAV_ITEM =
-    'font-poppins relative flex h-12 flex-col items-center justify-center px-5 text-base text-black transition-colors hover:text-[#0059DD]';
+    'font-poppins flex h-[47px] min-w-[100px] shrink-0 flex-col items-center justify-center gap-0.5 px-5 py-2 text-base font-normal whitespace-nowrap text-black transition-colors hover:text-[#0059DD]';
 
 export const SF_NAV_ITEM_ACTIVE =
-    'font-poppins relative flex h-12 flex-col items-center justify-center px-5 text-base font-semibold text-black';
+    'font-poppins flex h-[47px] min-w-[100px] shrink-0 flex-col items-center justify-center gap-0.5 px-5 py-1.5 text-base font-semibold whitespace-nowrap text-black';
+
+export const SF_NAV_ACTIVE_DOT = 'size-[5px] shrink-0 rounded-full bg-[#0059DD]';
+
+/** Icônes header (cloche, panier) — gris Figma */
+export const SF_HEADER_ICON_MUTED = 'text-[#333333]';
+
+/** Cœur header — toujours rouge sur la maquette */
+export const SF_HEADER_HEART = 'text-[#dc0000]';

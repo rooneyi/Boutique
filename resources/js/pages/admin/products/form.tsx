@@ -1,4 +1,5 @@
-import { Head, Form } from '@inertiajs/react';
+import { Head, Form, Link } from '@inertiajs/react';
+import { ProductColorPicker } from '@/components/admin/product-color-picker';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
@@ -10,7 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { route } from '@/lib/route';
-import { VENDOR_BTN_PRIMARY, VENDOR_CARD, VENDOR_H1, VENDOR_H3, VENDOR_MUTED } from '@/lib/vendor-ui-styles';
+import {
+    ADMIN_BTN_PRIMARY,
+    ADMIN_CARD,
+    ADMIN_H3,
+    ADMIN_MUTED,
+    ADMIN_PAGE_TITLE,
+} from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Category = { id: number; name: string };
@@ -50,7 +57,7 @@ type Props = {
 };
 
 function emptyVariantRow(size = 'M'): VariantRow {
-    return { color: '', color_hex: '#000000', size, sku: '', stock: '0' };
+    return { color: 'Noir', color_hex: '#000000', size, sku: '', stock: '0' };
 }
 
 function rowsFromProduct(variants: VariantPayload[] | undefined, defaultSize: string): VariantRow[] {
@@ -110,18 +117,18 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
 
             <div className="mx-auto max-w-3xl space-y-8">
                 <div>
-                    <h1 className={VENDOR_H1}>{isEditing ? 'Éditer le produit' : 'Nouveau produit'}</h1>
-                    <p className={cn(VENDOR_MUTED, 'mt-3')}>
+                    <h1 className={ADMIN_PAGE_TITLE}>{isEditing ? 'Éditer le produit' : 'Nouveau produit'}</h1>
+                    <p className={cn(ADMIN_MUTED, 'mt-3')}>
                         {isEditing
                             ? 'Mettez à jour les informations et les articles (couleur / taille).'
                             : 'Renseignez la catégorie, le prix et au moins un article en stock.'}
                     </p>
                 </div>
 
-                <Card className={VENDOR_CARD}>
+                <Card className={ADMIN_CARD}>
                     <CardHeader>
-                        <h3 className={VENDOR_H3}>Informations</h3>
-                        <CardDescription className={cn(VENDOR_MUTED, 'text-base')}>
+                        <h3 className={ADMIN_H3}>Informations</h3>
+                        <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
                             Catégorie obligatoire · au moins un article
                         </CardDescription>
                     </CardHeader>
@@ -130,8 +137,8 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
                             method={isEditing ? 'put' : 'post'}
                             action={
                                 isEditing
-                                    ? route('vendor.products.update', product.id)
-                                    : route('vendor.products.store')
+                                    ? route('admin.products.update', product.id)
+                                    : route('admin.products.store')
                             }
                             encType="multipart/form-data"
                             className="space-y-6"
@@ -195,18 +202,31 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
 
                                     <div className="grid gap-2">
                                         <Label className={labelCn}>Catégorie</Label>
-                                        <Select value={categoryId} onValueChange={setCategoryId} required>
-                                            <SelectTrigger className="font-poppins">
-                                                <SelectValue placeholder="Sélectionner une catégorie" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categories.map((cat) => (
-                                                    <SelectItem key={cat.id} value={String(cat.id)}>
-                                                        {cat.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        {categories.length === 0 ? (
+                                            <p className="font-poppins text-sm text-[#747474]">
+                                                Aucune catégorie.{' '}
+                                                <Link
+                                                    href={route('admin.categories.index')}
+                                                    className="text-[#0059DD] underline-offset-2 hover:underline"
+                                                >
+                                                    Créer des catégories
+                                                </Link>{' '}
+                                                avant d’ajouter un produit.
+                                            </p>
+                                        ) : (
+                                            <Select value={categoryId} onValueChange={setCategoryId} required>
+                                                <SelectTrigger className="font-poppins">
+                                                    <SelectValue placeholder="Sélectionner une catégorie" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {categories.map((cat) => (
+                                                        <SelectItem key={cat.id} value={String(cat.id)}>
+                                                            {cat.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        )}
                                         <InputError message={errors.category_id} />
                                     </div>
 
@@ -214,7 +234,7 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
                                         <div className="flex flex-wrap items-center justify-between gap-2">
                                             <div>
                                                 <Label className={labelCn}>Articles en stock</Label>
-                                                <p className={cn(VENDOR_MUTED, 'mt-1 text-sm')}>
+                                                <p className={cn(ADMIN_MUTED, 'mt-1 text-sm')}>
                                                     Une ligne = couleur + taille (réf. SKU optionnelle)
                                                 </p>
                                             </div>
@@ -265,36 +285,12 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
                                                         value={row.stock}
                                                     />
 
-                                                    <div className="grid gap-1 sm:col-span-2">
-                                                        <Label className="text-sm font-medium text-[#747474]">
-                                                            Couleur
-                                                        </Label>
-                                                        <Input
-                                                            value={row.color}
-                                                            onChange={(e) =>
-                                                                updateRow(index, { color: e.target.value })
-                                                            }
-                                                            placeholder="Noir"
-                                                            required
-                                                            disabled={processing}
-                                                            className="font-poppins"
-                                                        />
-                                                    </div>
-
-                                                    <div className="grid gap-1">
-                                                        <Label className="text-sm font-medium text-[#747474]">
-                                                            Pastille
-                                                        </Label>
-                                                        <input
-                                                            type="color"
-                                                            value={row.color_hex}
-                                                            onChange={(e) =>
-                                                                updateRow(index, { color_hex: e.target.value })
-                                                            }
-                                                            className="h-10 w-full cursor-pointer rounded border border-neutral-200"
-                                                            disabled={processing}
-                                                        />
-                                                    </div>
+                                                    <ProductColorPicker
+                                                        color={row.color}
+                                                        colorHex={row.color_hex}
+                                                        disabled={processing}
+                                                        onChange={(patch) => updateRow(index, patch)}
+                                                    />
 
                                                     <div className="grid gap-1">
                                                         <Label className="text-sm font-medium text-[#747474]">
@@ -415,9 +411,11 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
                                     <div className="flex flex-wrap gap-3">
                                         <Button
                                             type="submit"
-                                            disabled={processing || !categoryId}
+                                            disabled={
+                                                processing || !categoryId || categories.length === 0
+                                            }
                                             className={cn(
-                                                VENDOR_BTN_PRIMARY,
+                                                ADMIN_BTN_PRIMARY,
                                                 'disabled:pointer-events-none disabled:opacity-50',
                                             )}
                                         >

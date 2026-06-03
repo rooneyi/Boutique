@@ -15,10 +15,6 @@ class LoginResponse implements LoginResponseContract
             return redirect()->intended('/admin/dashboard');
         }
 
-        if ($user?->role === 'VENDOR') {
-            return redirect()->intended('/vendor/dashboard');
-        }
-
         return redirect()->intended(route('home'));
     }
 }

@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
     {
         $now = Date::now();
 
-        User::updateOrCreate(
+        $admin = User::updateOrCreate(
             ['email' => 'admin@boutique.test'],
             [
                 'name' => 'Administrateur',
@@ -30,6 +30,11 @@ class DatabaseSeeder extends Seeder
                 'role' => 'ADMIN',
                 'email_verified_at' => $now,
             ]
+        );
+
+        $store = Vendor::firstOrCreate(
+            ['user_id' => $admin->id],
+            ['shop_name' => 'PCJ'],
         );
 
         $categories = collect([
@@ -40,42 +45,12 @@ class DatabaseSeeder extends Seeder
             'Accessoires',
         ])->mapWithKeys(fn (string $name) => [$name => Category::firstOrCreate(['name' => $name])]);
 
-        $vendorUserA = User::updateOrCreate(
-            ['email' => 'emma@boutique.test'],
-            [
-                'name' => 'Emma Martin',
-                'password' => bcrypt('password'),
-                'role' => 'VENDOR',
-                'email_verified_at' => $now,
-            ]
-        );
-        $vendorA = Vendor::firstOrCreate(
-            ['user_id' => $vendorUserA->id],
-            ['shop_name' => 'Atelier Emma']
-        );
-
-        $vendorUserB = User::updateOrCreate(
-            ['email' => 'lucas@boutique.test'],
-            [
-                'name' => 'Lucas Bernard',
-                'password' => bcrypt('password'),
-                'role' => 'VENDOR',
-                'email_verified_at' => $now,
-            ]
-        );
-        $vendorB = Vendor::firstOrCreate(
-            ['user_id' => $vendorUserB->id],
-            ['shop_name' => 'Mode Lucas']
-        );
-
-        $orderIds = Order::query()
-            ->whereIn('vendor_id', [$vendorA->id, $vendorB->id])
-            ->pluck('id');
+        $orderIds = Order::query()->where('vendor_id', $store->id)->pluck('id');
         if ($orderIds->isNotEmpty()) {
             OrderItem::query()->whereIn('order_id', $orderIds)->delete();
         }
-        Order::query()->whereIn('vendor_id', [$vendorA->id, $vendorB->id])->delete();
-        Product::query()->whereIn('vendor_id', [$vendorA->id, $vendorB->id])->delete();
+        Order::query()->where('vendor_id', $store->id)->delete();
+        Product::query()->where('vendor_id', $store->id)->delete();
 
         $customerUsers = [
             ['email' => 'sophie@client.test', 'name' => 'Sophie Dupont'],
@@ -102,16 +77,19 @@ class DatabaseSeeder extends Seeder
         $pantalon = $categories['Pantalons']->id;
         $chaussure = $categories['Chaussures']->id;
 
-        $productsA = [
+        $catalog = [
             ['name' => 'Robe midi lin', 'description' => 'Robe fluide, coupe droite.', 'price' => 89.9, 'stock' => 24, 'category_id' => $robe, 'status' => 'IN_STOCK'],
             ['name' => 'Chemise coton bio', 'description' => 'Chemise blanche col classique.', 'price' => 49.5, 'stock' => 5, 'category_id' => $haut, 'status' => 'LOW_STOCK'],
             ['name' => 'Jean slim indigo', 'description' => 'Denim stretch confortable.', 'price' => 79.0, 'stock' => 0, 'category_id' => $pantalon, 'status' => 'OUT_OF_STOCK'],
+            ['name' => 'Sneakers urbaines', 'description' => 'Semelle amortissante.', 'price' => 119.0, 'stock' => 15, 'category_id' => $chaussure, 'status' => 'IN_STOCK'],
+            ['name' => 'T-shirt oversize', 'description' => 'Coton peigné.', 'price' => 29.9, 'stock' => 80, 'category_id' => $haut, 'status' => 'IN_STOCK'],
+            ['name' => 'Ceinture cuir', 'description' => 'Boucle argentée.', 'price' => 45.0, 'stock' => 3, 'category_id' => $categories['Accessoires']->id, 'status' => 'LOW_STOCK'],
         ];
 
         $variantService = app(ProductVariantService::class);
 
-        foreach ($productsA as $row) {
-            $product = Product::create(array_merge($row, ['vendor_id' => $vendorA->id, 'stock' => 0]));
+        foreach ($catalog as $row) {
+            $product = Product::create(array_merge($row, ['vendor_id' => $store->id, 'stock' => 0]));
             $variantService->syncVariants($product, match ($product->name) {
                 'Robe midi lin' => [
                     ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'ROBE-NOIR-M', 'stock' => 8],
@@ -122,21 +100,6 @@ class DatabaseSeeder extends Seeder
                     ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'S', 'sku' => 'CHEM-BLANC-S', 'stock' => 2],
                     ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'CHEM-BLANC-M', 'stock' => 3],
                 ],
-                default => [
-                    ['color' => 'Gris', 'color_hex' => '#BFBFBF', 'size' => 'M', 'sku' => 'SKU-'.$product->id.'-M', 'stock' => max(0, (int) $row['stock'])],
-                ],
-            });
-        }
-
-        $productsB = [
-            ['name' => 'Sneakers urbaines', 'description' => 'Semelle amortissante.', 'price' => 119.0, 'stock' => 15, 'category_id' => $chaussure, 'status' => 'IN_STOCK'],
-            ['name' => 'T-shirt oversize', 'description' => 'Coton peigné.', 'price' => 29.9, 'stock' => 80, 'category_id' => $haut, 'status' => 'IN_STOCK'],
-            ['name' => 'Ceinture cuir', 'description' => 'Boucle argentée.', 'price' => 45.0, 'stock' => 3, 'category_id' => $categories['Accessoires']->id, 'status' => 'LOW_STOCK'],
-        ];
-
-        foreach ($productsB as $row) {
-            $product = Product::create(array_merge($row, ['vendor_id' => $vendorB->id, 'stock' => 0]));
-            $variantService->syncVariants($product, match ($product->name) {
                 'Sneakers urbaines' => [
                     ['color' => 'Noir', 'color_hex' => '#000000', 'size' => '40', 'sku' => 'SNK-NOIR-40', 'stock' => 5],
                     ['color' => 'Noir', 'color_hex' => '#000000', 'size' => '42', 'sku' => 'SNK-NOIR-42', 'stock' => 10],
@@ -147,15 +110,15 @@ class DatabaseSeeder extends Seeder
                     ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'L', 'sku' => 'TEE-NOIR-L', 'stock' => 40],
                 ],
                 default => [
-                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'SKU-'.$product->id.'-M', 'stock' => max(0, (int) $row['stock'])],
+                    ['color' => 'Gris', 'color_hex' => '#BFBFBF', 'size' => 'M', 'sku' => 'SKU-'.$product->id.'-M', 'stock' => max(0, (int) $row['stock'])],
                 ],
             });
         }
 
-        $pEmmaRobe = Product::where('vendor_id', $vendorA->id)->where('name', 'Robe midi lin')->first();
-        $pEmmaChemise = Product::where('vendor_id', $vendorA->id)->where('name', 'Chemise coton bio')->first();
-        $pLucasSneakers = Product::where('vendor_id', $vendorB->id)->where('name', 'Sneakers urbaines')->first();
-        $pLucasTee = Product::where('vendor_id', $vendorB->id)->where('name', 'T-shirt oversize')->first();
+        $pRobe = Product::where('vendor_id', $store->id)->where('name', 'Robe midi lin')->first();
+        $pChemise = Product::where('vendor_id', $store->id)->where('name', 'Chemise coton bio')->first();
+        $pSneakers = Product::where('vendor_id', $store->id)->where('name', 'Sneakers urbaines')->first();
+        $pTee = Product::where('vendor_id', $store->id)->where('name', 'T-shirt oversize')->first();
 
         $orderService = app(OrderService::class);
 
@@ -165,63 +128,63 @@ class DatabaseSeeder extends Seeder
 
         $orderService->createOrder($sophie, OrderData::from([
             'customer_id' => $sophie->id,
-            'vendor_id' => $vendorA->id,
+            'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $pEmmaRobe->id, 'quantity' => 1, 'price' => (float) $pEmmaRobe->price],
-                ['product_id' => $pEmmaChemise->id, 'quantity' => 2, 'price' => (float) $pEmmaChemise->price],
+                ['product_id' => $pRobe->id, 'quantity' => 1, 'price' => (float) $pRobe->price],
+                ['product_id' => $pChemise->id, 'quantity' => 2, 'price' => (float) $pChemise->price],
             ],
-            'total' => (float) $pEmmaRobe->price + 2 * (float) $pEmmaChemise->price,
+            'total' => (float) $pRobe->price + 2 * (float) $pChemise->price,
             'status' => 'PAID',
         ]));
 
         $orderService->createOrder($marc, OrderData::from([
             'customer_id' => $marc->id,
-            'vendor_id' => $vendorA->id,
+            'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $pEmmaRobe->id, 'quantity' => 1, 'price' => (float) $pEmmaRobe->price],
+                ['product_id' => $pRobe->id, 'quantity' => 1, 'price' => (float) $pRobe->price],
             ],
-            'total' => (float) $pEmmaRobe->price,
+            'total' => (float) $pRobe->price,
             'status' => 'PAID',
         ]));
 
         $orderService->createOrder($lea, OrderData::from([
             'customer_id' => $lea->id,
-            'vendor_id' => $vendorB->id,
+            'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $pLucasSneakers->id, 'quantity' => 1, 'price' => (float) $pLucasSneakers->price],
-                ['product_id' => $pLucasTee->id, 'quantity' => 3, 'price' => (float) $pLucasTee->price],
+                ['product_id' => $pSneakers->id, 'quantity' => 1, 'price' => (float) $pSneakers->price],
+                ['product_id' => $pTee->id, 'quantity' => 3, 'price' => (float) $pTee->price],
             ],
-            'total' => (float) $pLucasSneakers->price + 3 * (float) $pLucasTee->price,
+            'total' => (float) $pSneakers->price + 3 * (float) $pTee->price,
             'status' => 'PENDING',
         ]));
 
         $orderService->createOrder($sophie, OrderData::from([
             'customer_id' => $sophie->id,
-            'vendor_id' => $vendorB->id,
+            'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $pLucasTee->id, 'quantity' => 2, 'price' => (float) $pLucasTee->price],
+                ['product_id' => $pTee->id, 'quantity' => 2, 'price' => (float) $pTee->price],
             ],
-            'total' => 2 * (float) $pLucasTee->price,
+            'total' => 2 * (float) $pTee->price,
             'status' => 'PAID',
         ]));
 
         ProductReview::query()->updateOrCreate(
-            ['customer_id' => $sophie->id, 'product_id' => $pEmmaRobe->id],
+            ['customer_id' => $sophie->id, 'product_id' => $pRobe->id],
             ['rating' => 5, 'comment' => 'Qualité au rendez-vous, coupe parfaite.'],
         );
         ProductReview::query()->updateOrCreate(
-            ['customer_id' => $marc->id, 'product_id' => $pEmmaRobe->id],
+            ['customer_id' => $marc->id, 'product_id' => $pRobe->id],
             ['rating' => 4, 'comment' => 'Très jolie robe, livraison rapide.'],
         );
         ProductReview::query()->updateOrCreate(
-            ['customer_id' => $lea->id, 'product_id' => $pLucasSneakers->id],
+            ['customer_id' => $lea->id, 'product_id' => $pSneakers->id],
             ['rating' => 5, 'comment' => 'Confortables au quotidien.'],
         );
 
         $sophie->favoriteProducts()->syncWithoutDetaching([
-            $pEmmaRobe->id,
-            $pLucasSneakers->id,
+            $pRobe->id,
+            $pSneakers->id,
         ]);
-        $marc->favoriteProducts()->syncWithoutDetaching([$pLucasTee->id]);
+        $marc->favoriteProducts()->syncWithoutDetaching([$pTee->id]);
     }
 }

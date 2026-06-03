@@ -1,5 +1,4 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { toast } from 'sonner';
 import GoogleIcon from '@/components/icons/google-icon';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -117,17 +116,14 @@ export default function Login({
                                 variant="outline"
                                 className={AUTH_BTN_GOOGLE}
                                 tabIndex={4}
-                                onClick={() =>
-                                    toast.message('Bientôt disponible', {
-                                        description:
-                                            'La connexion Google sera activée prochainement.',
-                                    })
-                                }
+                                asChild
                             >
-                                <span className="flex-1 text-center lowercase">
-                                    se connecter avec google
-                                </span>
-                                <GoogleIcon className="size-[26px] shrink-0" />
+                                <a href={route('auth.google.redirect')}>
+                                    <span className="flex-1 text-center lowercase">
+                                        se connecter avec google
+                                    </span>
+                                    <GoogleIcon className="size-[26px] shrink-0" />
+                                </a>
                             </Button>
 
                             {canRegister && (

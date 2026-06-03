@@ -1,4 +1,5 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Pencil, Plus } from 'lucide-react';
 import {
     AdminDataTable,
     TableBody,
@@ -22,6 +23,7 @@ import { AdminFilterTabs } from '@/components/admin/admin-filter-tabs';
 import { AdminPageHero } from '@/components/admin/admin-page-hero';
 import { route } from '@/lib/route';
 import {
+    ADMIN_BTN_PRIMARY,
     ADMIN_H3,
     ADMIN_MOBILE_META,
     ADMIN_MUTED,
@@ -118,10 +120,16 @@ export default function AdminProducts() {
             <Head title={title} />
 
             <div className={ADMIN_PAGE_SECTION}>
-                <AdminPageHero
-                    title={title}
-                    description="Supervision de l'inventaire sur toute la plateforme."
-                />
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <AdminPageHero
+                        title={title}
+                        description="Gestion du catalogue PCJ — création, édition et stocks."
+                    />
+                    <Link href={route('admin.products.create')} className={cn(ADMIN_BTN_PRIMARY, 'shrink-0')}>
+                        <Plus className="size-5" />
+                        Nouveau produit
+                    </Link>
+                </div>
 
                 <div className="md:hidden">
                     <AdminFilterTabs tabs={tabs} />
@@ -140,9 +148,6 @@ export default function AdminProducts() {
                                     <TableHeader>
                                         <TableRow className={ADMIN_TABLE_HEADER_ROW}>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Produit</TableHead>
-                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
-                                                Vendeur
-                                            </TableHead>
                                             <TableHead
                                                 className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD, 'text-right')}
                                             >
@@ -157,6 +162,9 @@ export default function AdminProducts() {
                                                 Catégorie
                                             </TableHead>
                                             <TableHead className={ADMIN_TABLE_HEAD}>Statut</TableHead>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
+                                                Actions
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -167,17 +175,12 @@ export default function AdminProducts() {
                                                         {product.name}
                                                     </span>
                                                     <span className={ADMIN_MOBILE_META}>
-                                                        {product.vendor?.shop_name ?? '—'}
-                                                        {' · '}
                                                         {categoryLabel(product.category)}
                                                     </span>
                                                     <span className={ADMIN_MOBILE_META}>
                                                         €{Number(product.price).toFixed(2)} · Stock{' '}
                                                         {product.quantity}
                                                     </span>
-                                                </TableCell>
-                                                <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
-                                                    {product.vendor?.shop_name}
                                                 </TableCell>
                                                 <TableCell
                                                     className={cn(
@@ -204,6 +207,15 @@ export default function AdminProducts() {
                                                     <AdminBadge variant={stockBadgeVariant(product)}>
                                                         {stockBadgeLabel(product)}
                                                     </AdminBadge>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Link
+                                                        href={route('admin.products.edit', product.id)}
+                                                        className="inline-flex items-center gap-1 font-poppins text-sm font-medium text-[#0059DD] hover:underline"
+                                                    >
+                                                        <Pencil className="size-4" />
+                                                        Éditer
+                                                    </Link>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

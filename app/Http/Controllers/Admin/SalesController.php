@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Vendor;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
@@ -8,24 +8,42 @@ use App\Models\Order;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class CustomerController extends Controller
+class SalesController extends Controller
 {
-    public function index(): Response
+    public function orders(): Response
     {
-        $vendor = auth()->user()->vendor;
+        $orders = Order::query()
+            ->with(['customer.user', 'items.product'])
+            ->latest()
+            ->paginate(15);
 
-        $customerIds = Order::query()
-            ->where('vendor_id', $vendor->id)
-            ->distinct()
-            ->pluck('customer_id');
+        $orders->through(function (Order $order) {
+            return [
+                'id' => $order->id,
+                'customer_name' => $order->customer?->user?->name ?? '—',
+                'total' => (float) $order->total,
+                'status' => $order->status,
+                'created_at' => $order->created_at?->toIso8601String() ?? '',
+                'items' => $order->items->map(fn ($item) => [
+                    'product_name' => $item->product?->name ?? '—',
+                    'quantity' => $item->quantity,
+                    'line_total' => (float) ($item->price * $item->quantity),
+                ])->all(),
+            ];
+        });
 
+        return Inertia::render('admin/sales/orders', [
+            'orders' => $orders,
+        ]);
+    }
+
+    public function customers(): Response
+    {
         $customers = Customer::query()
-            ->whereIn('id', $customerIds)
             ->with('user')
             ->get()
-            ->map(function (Customer $customer) use ($vendor) {
+            ->map(function (Customer $customer) {
                 $ordersForCustomer = fn () => Order::query()
-                    ->where('vendor_id', $vendor->id)
                     ->where('customer_id', $customer->id);
 
                 return [
@@ -41,24 +59,14 @@ class CustomerController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('vendor/customers/index', [
+        return Inertia::render('admin/sales/customers', [
             'customers' => $customers,
         ]);
     }
 
-    public function show(Customer $customer): Response
+    public function customer(Customer $customer): Response
     {
-        $vendor = auth()->user()->vendor;
-
-        $hasOrders = Order::query()
-            ->where('vendor_id', $vendor->id)
-            ->where('customer_id', $customer->id)
-            ->exists();
-
-        abort_unless($hasOrders, 404);
-
         $orders = Order::query()
-            ->where('vendor_id', $vendor->id)
             ->where('customer_id', $customer->id)
             ->with(['items.product'])
             ->latest()
@@ -82,7 +90,7 @@ class CustomerController extends Controller
         $totalSpent = array_sum(array_column($orders, 'total'));
         $lastOrderAt = $orders[0]['created_at'] ?? null;
 
-        return Inertia::render('vendor/customers/show', [
+        return Inertia::render('admin/sales/customer-show', [
             'customer' => [
                 'id' => $customer->id,
                 'name' => $customer->user?->name ?? '—',

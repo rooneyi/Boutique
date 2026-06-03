@@ -20,22 +20,28 @@ type Product = {
 
 type Props = {
     product: Product;
-    size?: 'default' | 'compact' | 'favorites';
+    size?: 'default' | 'compact' | 'collection' | 'favorites';
 };
 
 export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
+    const isCollection = size === 'collection';
     const isCompact = size === 'compact';
     const isFavorites = size === 'favorites';
 
     return (
         <article
-            className={
-                isFavorites
-                    ? 'relative flex h-[428px] w-full max-w-[322px] flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]'
-                    : isCompact
-                      ? 'relative flex h-[252px] w-full flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)] lg:h-[428px] lg:max-w-[322px]'
-                      : 'relative flex h-[min(503px,70vh)] w-full max-w-[343px] shrink-0 flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]'
-            }
+            className={cn(
+                'motion-card-lift relative flex flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]',
+                isFavorites && 'h-[428px] w-full max-w-[322px]',
+                isCollection &&
+                    'h-[251.5px] w-[171.5px] shrink-0 lg:h-[503px] lg:w-[343px]',
+                isCompact &&
+                    'h-[252px] w-full lg:h-[428px] lg:max-w-[322px]',
+                !isFavorites &&
+                    !isCollection &&
+                    !isCompact &&
+                    'h-[min(503px,70vh)] w-full max-w-[343px] shrink-0',
+            )}
         >
             <Link
                 href={route('customer.products.show', product.id)}
@@ -57,7 +63,7 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
             <div
                 className={cn(
                     'pointer-events-auto absolute top-2 right-2 z-20 flex items-center justify-center rounded-[27px] border border-white bg-white shadow-sm',
-                    isCompact && !isFavorites
+                    (isCompact || isCollection) && !isFavorites
                         ? 'size-[25px] p-1 lg:size-[50px] lg:p-0'
                         : 'size-[50px]',
                 )}
@@ -76,7 +82,7 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                     'relative z-10 flex flex-col bg-gradient-to-b from-transparent via-black/60 to-black',
                     isFavorites
                         ? 'gap-[5px] px-5 pb-[30px] pt-5'
-                        : isCompact
+                        : isCompact || isCollection
                           ? 'gap-0.5 px-2.5 pb-4 pt-10 lg:gap-1 lg:px-5 lg:pb-8 lg:pt-16'
                           : 'gap-1 px-5 pb-8 pt-16',
                 )}
@@ -85,7 +91,9 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                     <h3
                         className={cn(
                             'font-poppins font-bold text-white',
-                            isFavorites || !isCompact ? 'text-2xl' : 'text-sm lg:text-2xl',
+                            isFavorites || (!isCompact && !isCollection)
+                                ? 'text-2xl'
+                                : 'text-sm lg:text-2xl',
                         )}
                     >
                         {product.name}
@@ -96,14 +104,18 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                     count={product.reviews_count}
                     className={cn(
                         'text-white',
-                        isCompact && !isFavorites && 'origin-left scale-75 lg:scale-100',
+                        (isCompact || isCollection) &&
+                            !isFavorites &&
+                            'origin-left scale-75 lg:scale-100',
                     )}
                 />
                 <div className="mt-1 flex items-center justify-between gap-2 lg:mt-2 lg:gap-3">
                     <p
                         className={cn(
                             'font-poppins font-medium tracking-tight text-[#f5f5f5]',
-                            isFavorites || !isCompact ? 'text-2xl' : 'text-xs lg:text-2xl',
+                            isFavorites || (!isCompact && !isCollection)
+                                ? 'text-2xl'
+                                : 'text-xs lg:text-2xl',
                         )}
                     >
                         {product.price.toFixed(2)} $
@@ -113,7 +125,7 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                         defaultVariantId={product.default_variant_id}
                         className={cn(
                             SF_PRODUCT_BUY_BTN,
-                            isCompact &&
+                            (isCompact || isCollection) &&
                                 !isFavorites &&
                                 'h-auto px-2 py-1 text-[7.5px] lg:px-4 lg:py-2.5 lg:text-sm',
                         )}

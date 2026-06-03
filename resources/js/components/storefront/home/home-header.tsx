@@ -1,14 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import {
-    Bell,
-    Globe,
-    Heart,
-    Instagram,
-    Menu,
-    Search,
-    User,
-    X,
-} from 'lucide-react';
+import { Bell, Heart, Menu, Search, User, X } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { InertiaPropsSync } from '@/components/storefront/inertia-props-sync';
@@ -16,10 +7,17 @@ import { useOptionalAccountDrawer } from '@/components/storefront/account/accoun
 import { HeaderCartButton } from '@/components/storefront/header/header-cart-button';
 import { HeaderFavoritesButton } from '@/components/storefront/header/header-favorites-button';
 import { HeaderIconPill } from '@/components/storefront/header/header-icon-pill';
+import { HomeHeaderTopBar } from '@/components/storefront/home/home-header-top-bar';
 import { StorefrontLogo } from '@/components/storefront/storefront-logo';
 import { ADMIN_MAIN_NAV, ADMIN_STOCK_NAV } from '@/lib/admin-nav';
 import { route } from '@/lib/route';
-import { SF_NAV_ITEM, SF_NAV_ITEM_ACTIVE } from '@/lib/storefront-ui-styles';
+import {
+    SF_HEADER_HEART,
+    SF_HEADER_ICON_MUTED,
+    SF_NAV_ACTIVE_DOT,
+    SF_NAV_ITEM,
+    SF_NAV_ITEM_ACTIVE,
+} from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
 type AuthUser = {
@@ -53,7 +51,7 @@ const NAV_ITEMS = [
         label: 'Collection',
         href: route('customer.products.index'),
     },
-    { key: 'about' as const, label: 'A Propos', href: `${route('home')}#pourquoi-nous` },
+    { key: 'about' as const, label: 'A\u00a0Propos', href: `${route('home')}#pourquoi-nous` },
     { key: 'contact' as const, label: 'Contact', href: route('contact') },
 ];
 
@@ -86,11 +84,9 @@ export function HomeHeader({
     const accountHref =
         user?.role === 'ADMIN'
             ? '/admin/dashboard'
-            : user?.role === 'VENDOR'
-              ? '/vendor/dashboard'
-              : user?.role === 'CUSTOMER'
-                ? route('customer.account')
-                : route('login');
+            : user?.role === 'CUSTOMER'
+              ? route('customer.account')
+              : route('login');
 
     useEffect(() => {
         if (!isAdmin) {
@@ -128,7 +124,7 @@ export function HomeHeader({
 
     const searchField = (
         <>
-            <Search className="size-5 shrink-0 text-[#999]" aria-hidden />
+            <Search className="size-6 shrink-0 text-[#999]" aria-hidden />
             <input
                 type="search"
                 name="q"
@@ -145,73 +141,25 @@ export function HomeHeader({
         <>
             <InertiaPropsSync />
             <header className="sticky top-0 z-50">
-            <div className="bg-black text-white">
-                <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-8 lg:px-[102px]">
-                    <div className="flex items-center gap-3">
-                        <a
-                            href="https://instagram.com"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-white/90 transition-colors hover:text-white"
-                            aria-label="Instagram"
-                        >
-                            <Instagram className="size-7" strokeWidth={1.5} />
-                        </a>
-                        {isAdmin ? (
-                            <span className="hidden font-poppins text-sm font-medium text-white/90 sm:inline">
-                                Administration PCJ
-                            </span>
-                        ) : null}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-6 text-sm">
-                        {isAdmin ? (
-                            <Link
-                                href={route('home')}
-                                className="font-poppins font-normal text-white/90 transition-opacity hover:text-white"
-                            >
-                                Voir la boutique
-                            </Link>
-                        ) : null}
-                        {!isAdmin && canRegister && !user ? (
-                            <Link
-                                href={route('auth.customer.register')}
-                                className="flex items-center gap-2 transition-opacity hover:opacity-80"
-                            >
-                                <User className="size-5" strokeWidth={1.5} />
-                                <span className="font-poppins font-normal">
-                                    Rejoignez-nous
-                                </span>
-                            </Link>
-                        ) : null}
-                        <div
-                            className={cn(
-                                'flex items-center gap-2 text-white/90',
-                                isAdmin && 'hidden sm:flex',
-                            )}
-                        >
-                            <Globe className="size-5" strokeWidth={1.5} />
-                            <span className="font-poppins font-normal">
-                                Lubumbashi
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <HomeHeaderTopBar
+                isAdmin={isAdmin}
+                canRegister={canRegister}
+                isGuest={!user}
+                accountHref={accountHref}
+            />
 
             <div className="relative border-b border-neutral-200 bg-white">
-                <div className="mx-auto grid max-w-[1440px] grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-3 sm:gap-4 sm:py-4 sm:px-8 lg:px-[100px]">
-                    <div className="col-start-1 row-start-1">
-                        <StorefrontLogo
-                            variant="on-light"
-                            href={isAdmin ? route('admin.dashboard') : route('home')}
-                        />
-                    </div>
+                <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-4 sm:px-8 lg:px-[100px]">
+                    <StorefrontLogo
+                        variant="on-light"
+                        href={isAdmin ? route('admin.dashboard') : route('home')}
+                        className="shrink-0"
+                    />
 
                     <nav
                         className={cn(
-                            'col-start-2 row-start-1 hidden min-w-0 items-center justify-center gap-1 lg:flex',
-                            isAdmin &&
-                                'gap-0.5 overflow-x-auto xl:gap-1 [scrollbar-width:thin]',
+                            'hidden min-w-0 flex-1 items-center justify-center gap-6 lg:flex',
+                            isAdmin && 'gap-0.5 overflow-x-auto justify-start xl:gap-1 [scrollbar-width:thin]',
                         )}
                     >
                         {isAdmin
@@ -228,69 +176,45 @@ export function HomeHeader({
                                       >
                                           <span className="xl:hidden">{item.shortLabel ?? item.label}</span>
                                           <span className="hidden xl:inline">{item.label}</span>
-                                          {isActive ? (
-                                              <span className="mt-0.5 size-1.5 rounded-full bg-[#0059DD]" />
-                                          ) : null}
+                                          {isActive ? <span className={SF_NAV_ACTIVE_DOT} /> : null}
                                       </Link>
                                   );
                               })
                             : NAV_ITEMS.map((item) => {
                                   const isActive = item.key === activeNav;
-                                  const isContactActive =
-                                      isActive && item.key === 'contact';
                                   return (
                                       <Link
                                           key={item.label}
                                           href={item.href}
                                           className={
-                                              isContactActive
-                                                  ? 'font-poppins border-b-2 border-[#0059DD] px-2.5 py-2.5 text-base font-medium text-black'
-                                                  : isActive
-                                                    ? SF_NAV_ITEM_ACTIVE
-                                                    : SF_NAV_ITEM
+                                              isActive ? SF_NAV_ITEM_ACTIVE : SF_NAV_ITEM
                                           }
                                       >
                                           {item.label}
-                                          {isActive && !isContactActive ? (
-                                              <span className="mt-0.5 size-1.5 rounded-full bg-[#0059DD]" />
-                                          ) : null}
+                                          {isActive ? <span className={SF_NAV_ACTIVE_DOT} /> : null}
                                       </Link>
                                   );
                               })}
                     </nav>
 
-                    <div className="col-start-3 row-start-1 flex shrink-0 items-center justify-end gap-3 sm:gap-4">
+                    <div className="flex shrink-0 items-center justify-end gap-[15px]">
                         {!isAdmin && (
                             <form
                                 onSubmit={submitSearch}
-                                className="hidden min-w-[200px] items-center gap-3 border-b border-[#bfbfbf] pb-2 md:flex lg:min-w-[280px]"
+                                className="hidden min-w-[220px] items-center gap-5 border-b border-[#bfbfbf] px-1 py-2 md:flex lg:min-w-[280px]"
                                 role="search"
                             >
                                 {searchField}
                             </form>
                         )}
-                        {user?.role === 'CUSTOMER' ? (
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="hidden rounded-full text-black lg:inline-flex"
-                                onClick={openAccount}
-                                aria-label="Mon compte"
-                            >
-                                <User className="size-6" strokeWidth={1.25} />
-                            </Button>
-                        ) : !isAdmin ? (
-                            <HeaderIconPill
-                                href={accountHref}
-                                aria-label="Notifications"
-                                className="hidden lg:inline-flex"
-                            >
-                                <Bell className="size-5 text-black" strokeWidth={1.25} />
-                            </HeaderIconPill>
-                        ) : null}
                         {!isAdmin && (
-                            <>
+                            <div className="hidden items-center gap-3 lg:flex">
+                                <HeaderIconPill
+                                    href={user ? accountHref : route('login')}
+                                    aria-label="Notifications"
+                                >
+                                    <Bell className="size-5 text-black" strokeWidth={1.25} />
+                                </HeaderIconPill>
                                 {user?.role === 'CUSTOMER' ? (
                                     <HeaderFavoritesButton />
                                 ) : (
@@ -298,11 +222,11 @@ export function HomeHeader({
                                         aria-label="Favoris"
                                         onClick={() => router.visit(route('login'))}
                                     >
-                                        <Heart className="size-5 text-[#dc0000]" strokeWidth={1.25} />
+                                        <Heart className={cn('size-5', SF_HEADER_HEART)} strokeWidth={1.25} />
                                     </HeaderIconPill>
                                 )}
-                                {user?.role === 'CUSTOMER' ? <HeaderCartButton /> : null}
-                            </>
+                                <HeaderCartButton />
+                            </div>
                         )}
                         {isAdmin && (
                             <Button variant="ghost" size="icon" className="rounded-full" asChild>
@@ -340,7 +264,7 @@ export function HomeHeader({
                                         key={item.href}
                                         href={item.href}
                                         className={cn(
-                                            'font-poppins border-b-2 pb-0.5 text-base transition-colors',
+                                            'font-poppins border-b-2 pb-0.5 text-base transition-[color,border-color] duration-300 ease-out',
                                             active
                                                 ? 'border-[#0059DD] font-medium text-[#0059DD]'
                                                 : 'border-transparent text-black hover:text-[#0059DD]',

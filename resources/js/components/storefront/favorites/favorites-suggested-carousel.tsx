@@ -35,7 +35,7 @@ export function FavoritesSuggestedCarousel({ products }: Props) {
                 <StorefrontHorizontalScroll
                     showControls
                     className="shadow-[0_4px_2px_rgba(0,0,0,0.25)]"
-                    trackClassName="gap-7 pb-4 pl-4 sm:pl-12 lg:pl-[50px]"
+                    trackClassName="product-card-track gap-7 pb-4 pl-4 sm:pl-12 lg:pl-[50px]"
                     controlsClassName="mt-8"
                     scrollStep={320}
                 >

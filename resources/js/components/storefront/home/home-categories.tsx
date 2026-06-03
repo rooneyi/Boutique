@@ -29,11 +29,11 @@ const CATEGORIES = [
 
 export function HomeCategories() {
     return (
-        <section className="bg-[#f0f0f0] py-16">
+        <section className="bg-[#f0f0f0] py-16 lg:py-16">
             <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-[30px] px-4 sm:px-8">
-                <div className="text-center">
+                <div className="space-y-1 p-5 text-center">
                     <h2 className={SF_SECTION_TITLE}>Catégories</h2>
-                    <p className={`${SF_SECTION_SUBTITLE} mt-1`}>
+                    <p className={SF_SECTION_SUBTITLE}>
                         Lorem ipsum sit dolor amet pelentesque
                     </p>
                 </div>

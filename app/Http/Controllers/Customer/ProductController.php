@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductReview;
+use App\Models\ProductVariant;
 use App\Services\ProductVariantService;
 use App\Support\CatalogProduct;
 use Illuminate\Http\Request;
@@ -54,21 +55,35 @@ class ProductController extends Controller
             $query->whereHas('variants', fn ($q) => $q->where('color', $colorFilter));
         }
 
-        $minPrice = $request->has('min_price') ? (float) $request->input('min_price') : null;
-        $maxPrice = $request->has('max_price') ? (float) $request->input('max_price') : null;
-        if ($minPrice !== null) {
-            $query->where('price', '>=', $minPrice);
+        $priceFilterActive = $request->filled('min_price') || $request->filled('max_price');
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', (float) $request->input('min_price'));
         }
-        if ($maxPrice !== null) {
-            $query->where('price', '<=', $maxPrice);
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', (float) $request->input('max_price'));
         }
 
         $sort = $request->string('sort', 'popular')->toString();
+        if (! in_array($sort, ['popular', 'newest', 'price_asc', 'price_desc'], true)) {
+            $sort = 'popular';
+        }
+
         match ($sort) {
             'newest' => $query->orderByDesc('created_at'),
             'price_asc' => $query->orderBy('price'),
             'price_desc' => $query->orderByDesc('price'),
-            default => $query->orderByDesc('reviews_count')->orderByDesc('reviews_avg_rating'),
+            'popular' => $query
+                ->withSum(
+                    ['orderItems as units_sold' => fn ($q) => $q->whereHas(
+                        'order',
+                        fn ($o) => $o->whereIn('status', ['PAID', 'PENDING']),
+                    )],
+                    'quantity',
+                )
+                ->orderByDesc('units_sold')
+                ->orderByDesc('reviews_count')
+                ->orderByDesc('reviews_avg_rating')
+                ->orderByDesc('created_at'),
         };
 
         $products = $query->paginate(6)->withQueryString();
@@ -99,15 +114,48 @@ class ProductController extends Controller
             ->where('status', '!=', 'DISCONTINUED')
             ->count();
 
+        $priceBounds = Product::query()
+            ->where('status', '!=', 'DISCONTINUED')
+            ->selectRaw('COALESCE(MIN(price), 0) as min_bound, COALESCE(MAX(price), 200) as max_bound')
+            ->first();
+
+        $catalogMinPrice = (int) floor((float) ($priceBounds->min_bound ?? 0));
+        $catalogMaxPrice = (int) ceil((float) ($priceBounds->max_bound ?? 200));
+
+        $colorOptions = ProductVariant::query()
+            ->join('products', 'product_variants.product_id', '=', 'products.id')
+            ->where('products.status', '!=', 'DISCONTINUED')
+            ->whereNotNull('product_variants.color')
+            ->where('product_variants.color', '!=', '')
+            ->selectRaw('product_variants.color as name, MAX(product_variants.color_hex) as hex, COUNT(DISTINCT products.id) as count')
+            ->groupBy('product_variants.color')
+            ->orderBy('product_variants.color')
+            ->get()
+            ->map(fn ($row) => [
+                'name' => (string) $row->name,
+                'hex' => (string) ($row->hex ?: '#000000'),
+                'count' => (int) $row->count,
+            ])
+            ->values()
+            ->all();
+
         return Inertia::render('customer/products/index', [
             'products' => $products,
             'categories' => $categories,
+            'colorOptions' => $colorOptions,
             'totalProducts' => $totalProducts,
             'filters' => [
                 'category' => $categoryFilter !== '' ? $categoryFilter : 'all',
                 'sort' => $sort,
-                'min_price' => (int) ($minPrice ?? 10),
-                'max_price' => (int) ($maxPrice ?? 50),
+                'min_price' => $request->filled('min_price')
+                    ? (int) $request->input('min_price')
+                    : $catalogMinPrice,
+                'max_price' => $request->filled('max_price')
+                    ? (int) $request->input('max_price')
+                    : $catalogMaxPrice,
+                'price_filter_active' => $priceFilterActive,
+                'catalog_min_price' => $catalogMinPrice,
+                'catalog_max_price' => $catalogMaxPrice,
                 'q' => $search,
                 'color' => $colorFilter,
             ],

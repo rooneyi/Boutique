@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export const SF_HEADER_ICON_PILL =
-    'inline-flex size-[37px] shrink-0 items-center justify-center rounded-[25px] border-[0.5px] border-[#bfbfbf] bg-white transition-colors hover:bg-neutral-50';
+    'inline-flex size-[37px] shrink-0 items-center justify-center rounded-[25px] border-[0.5px] border-[#bfbfbf] bg-white transition-colors duration-200 hover:bg-neutral-50';
 
 type Props = {
     children: ReactNode;

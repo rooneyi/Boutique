@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 
 type PageProps = {
     cartCount?: number;
-    url?: string;
 };
 
 type Props = {
@@ -14,18 +13,12 @@ type Props = {
 };
 
 export function HeaderCartButton({ className }: Props) {
-    const { cartCount = 0, url } = usePage<PageProps>().props;
-    const isCartPage = (url ?? '').split('?')[0] === route('customer.cart');
+    const { cartCount = 0 } = usePage<PageProps>().props;
 
     return (
         <Link
             href={route('customer.cart')}
-            className={cn(
-                SF_HEADER_ICON_PILL,
-                'relative px-2.5 py-2',
-                isCartPage && 'border-[#0059DD] ring-1 ring-[#0059DD]/20',
-                className,
-            )}
+            className={cn(SF_HEADER_ICON_PILL, 'relative px-2.5 py-2', className)}
             aria-label="Mon panier"
         >
             <img
