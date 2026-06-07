@@ -44,18 +44,18 @@ class AccountController extends Controller
     {
         return [
             'name' => $user->name,
-            'phone' => $this->formatPhonePlaceholder($user->email),
+            'phone' => $this->formatPhonePlaceholder($customer->phone, $user->email),
             'email' => $user->email,
-            'avatar_url' => null,
+            'avatar_url' => $user->avatar_url,
             'orders_count' => (int) $customer->orders()->count(),
             'tokens_count' => 0,
             'initials' => $this->initials($user->name),
         ];
     }
 
-    private function formatPhonePlaceholder(string $email): string
+    private function formatPhonePlaceholder(?string $phone, string $email): string
     {
-        return $email;
+        return $phone !== null && $phone !== '' ? $phone : $email;
     }
 
     private function initials(string $name): string

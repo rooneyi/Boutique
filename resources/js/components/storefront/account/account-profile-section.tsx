@@ -1,5 +1,5 @@
-import { HOME_ASSETS } from '@/lib/home-assets';
 import type { AccountPreview } from '@/components/storefront/account/account-types';
+import { cn } from '@/lib/utils';
 
 type Props = {
     account: AccountPreview;
@@ -23,11 +23,20 @@ export function AccountProfileSection({ account, compact = false }: Props) {
 
     return (
         <div className="flex flex-col items-center gap-1.5 px-2.5 py-4">
-            <div className={`${avatarSize} overflow-hidden rounded-full bg-neutral-200`}>
+            <div className={`${avatarSize} overflow-hidden rounded-full bg-[#f0f0f0]`}>
                 {account.avatar_url ? (
                     <img src={account.avatar_url} alt="" className="size-full object-cover" />
                 ) : (
-                    <img src={HOME_ASSETS.heroModel} alt="" className="size-full object-cover" />
+                    <div className="flex size-full items-center justify-center bg-[#f0f0f0]">
+                        <span
+                            className={cn(
+                                'font-poppins font-semibold text-[#999]',
+                                compact ? 'text-3xl' : 'text-4xl',
+                            )}
+                        >
+                            {account.initials}
+                        </span>
+                    </div>
                 )}
             </div>
             <p className={nameClass}>{account.name}</p>
