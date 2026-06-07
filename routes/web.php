@@ -228,10 +228,10 @@ Route::get('/', function () {
 
 Route::get('about', [AboutController::class, 'index'])->name('about');
 
-Route::middleware(['auth', 'verified', 'customer'])->group(function () {
-    Route::get('contact', [ContactController::class, 'index'])->name('contact');
-    Route::post('contact', [ContactController::class, 'store'])->name('contact.store');
+Route::get('contact', [ContactController::class, 'index'])->name('contact');
+Route::post('contact', [ContactController::class, 'store'])->name('contact.store');
 
+Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::prefix('customer')->name('customer.')->group(function () {
         Route::get('products', [CustomerProductController::class, 'index'])->name('products.index');
         Route::get('products/{product}', [CustomerProductController::class, 'show'])->name('products.show');

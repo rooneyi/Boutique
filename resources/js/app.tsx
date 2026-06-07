@@ -30,6 +30,8 @@ const AUTH_SPLIT_PAGES = new Set([
     'auth/forgot-password',
     'auth/forgot-password-verify',
     'auth/forgot-password-phone',
+    'auth/reset-password',
+    'auth/confirm-password',
 ]);
 
 createInertiaApp({

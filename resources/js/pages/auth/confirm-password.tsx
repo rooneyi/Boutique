@@ -1,51 +1,69 @@
 import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
+import {
+    AUTH_BTN_PRIMARY,
+    AUTH_INPUT_UNDERLINE,
+} from '@/lib/auth-ui-styles';
 import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
     return (
         <>
-            <Head title="Confirm password" />
+            <Head title="Confirmer le mot de passe · PCJ" />
 
-            <Form {...store.form()} resetOnSuccess={['password']}>
-                {({ processing, errors }) => (
-                    <div className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <PasswordInput
-                                id="password"
-                                name="password"
-                                placeholder="Password"
-                                autoComplete="current-password"
-                                autoFocus
-                            />
+            <div className="flex w-full flex-col items-center gap-[54px]">
+                <header className="flex w-full flex-col items-center gap-2.5 py-3 text-center">
+                    <h1 className="font-poppins text-[36px] font-bold leading-tight text-[#171616]">
+                        Confirmez votre mot de passe
+                    </h1>
+                    <p className="font-poppins text-[15px] font-normal text-[#484848]">
+                        Cette zone est sécurisée. Veuillez confirmer votre
+                        mot de passe pour continuer.
+                    </p>
+                </header>
 
-                            <InputError message={errors.password} />
-                        </div>
+                <Form
+                    {...store.form()}
+                    resetOnSuccess={['password']}
+                    className="flex w-full flex-col items-center gap-[25px]"
+                >
+                    {({ processing, errors }) => (
+                        <div className="flex w-full flex-col items-end gap-10 pb-2">
+                            <div className="w-full space-y-1">
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    autoFocus
+                                    autoComplete="current-password"
+                                    placeholder="Mot de passe"
+                                    disabled={processing}
+                                    className={AUTH_INPUT_UNDERLINE}
+                                />
+                                <InputError message={errors.password} />
+                            </div>
 
-                        <div className="flex items-center">
                             <Button
-                                className="w-full"
+                                type="submit"
+                                className={AUTH_BTN_PRIMARY}
                                 disabled={processing}
                                 data-test="confirm-password-button"
                             >
-                                {processing && <Spinner />}
-                                Confirm password
+                                {processing && <Spinner className="text-white" />}
+                                CONFIRMER
                             </Button>
                         </div>
-                    </div>
-                )}
-            </Form>
+                    )}
+                </Form>
+            </div>
         </>
     );
 }
 
 ConfirmPassword.layout = {
-    title: 'Confirm your password',
-    description:
-        'This is a secure area of the application. Please confirm your password before continuing.',
+    variant: 'split',
 };

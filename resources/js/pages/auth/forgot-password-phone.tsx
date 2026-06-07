@@ -71,7 +71,7 @@ export default function ForgotPasswordPhone({ status }: Props) {
 
                                 <p className="w-full text-center">
                                     <Link
-                                        href={route('password.request')}
+                                        href={route('auth.forgot-password')}
                                         className={AUTH_LINK_MUTED}
                                     >
                                         Utilisez votre adresse email

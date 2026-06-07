@@ -56,7 +56,7 @@ export function AccountMenuNav({ onNavigate, compact = false }: Props) {
             <AccountDrawerMenuItem
                 icon={Headphones}
                 label="Aides & Contact"
-                href="mailto:kambmusene@gmail.com"
+                href={route('contact')}
                 onClick={onNavigate}
                 className={itemClass}
             />

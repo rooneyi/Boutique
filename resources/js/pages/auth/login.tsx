@@ -17,7 +17,6 @@ import {
 } from '@/lib/auth-ui-styles';
 import { route } from '@/lib/route';
 import { store } from '@/routes/login';
-import { request } from '@/routes/password';
 
 type Props = {
     status?: string;
@@ -91,7 +90,7 @@ export default function Login({
 
                                 {canResetPassword && (
                                     <TextLink
-                                        href={request()}
+                                        href={route('auth.forgot-password')}
                                         className={AUTH_LINK_RED}
                                         tabIndex={5}
                                     >
