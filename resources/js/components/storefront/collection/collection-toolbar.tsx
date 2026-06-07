@@ -69,7 +69,7 @@ export function CollectionToolbar({ filters }: Props) {
     return (
         <div className="flex items-center justify-between gap-3 px-4 py-[15px] sm:px-8 lg:px-12 xl:px-[48px]">
             <StorefrontBreadcrumbs
-                className="gap-2.5 font-poppins text-[10.5px] font-medium text-[rgba(91,94,100,0.62)] sm:text-base lg:text-base [&_svg]:size-6"
+                className="gap-2.5 text-base font-medium text-[rgba(91,94,100,0.62)] [&_a]:text-[rgba(91,94,100,0.62)] [&_svg]:size-6 [&_span:last-child]:text-black"
                 items={breadcrumbItems}
             />
 

@@ -1,19 +1,22 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { Bell, Heart, Menu, Search, User, X } from 'lucide-react';
+import { Menu, User, X } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { InertiaPropsSync } from '@/components/storefront/inertia-props-sync';
 import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
 import { HeaderCartButton } from '@/components/storefront/header/header-cart-button';
 import { HeaderFavoritesButton } from '@/components/storefront/header/header-favorites-button';
-import { HeaderIconPill } from '@/components/storefront/header/header-icon-pill';
+import {
+    HeaderIconPill,
+    SF_HEADER_ICON_PILL_BELL,
+    SF_HEADER_ICON_PILL_HEART,
+} from '@/components/storefront/header/header-icon-pill';
 import { HomeHeaderTopBar } from '@/components/storefront/home/home-header-top-bar';
 import { StorefrontLogo } from '@/components/storefront/storefront-logo';
 import { ADMIN_MAIN_NAV, ADMIN_STOCK_NAV } from '@/lib/admin-nav';
+import { HEADER_ASSETS } from '@/lib/header-assets';
 import { route } from '@/lib/route';
 import {
-    SF_HEADER_HEART,
-    SF_HEADER_ICON_MUTED,
     SF_NAV_ACTIVE_DOT,
     SF_NAV_ITEM,
     SF_NAV_ITEM_ACTIVE,
@@ -25,7 +28,7 @@ type AuthUser = {
     role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
 };
 
-type ActiveNav = 'home' | 'collection' | 'contact';
+type ActiveNav = 'home' | 'collection' | 'about' | 'contact';
 
 type Props = {
     user?: AuthUser | null;
@@ -51,7 +54,7 @@ const NAV_ITEMS = [
         label: 'Collection',
         href: route('customer.products.index'),
     },
-    { key: 'about' as const, label: 'A\u00a0Propos', href: `${route('home')}#pourquoi-nous` },
+    { key: 'about' as const, label: 'A\u00a0Propos', href: route('about') },
     { key: 'contact' as const, label: 'Contact', href: route('contact') },
 ];
 
@@ -124,7 +127,14 @@ export function HomeHeader({
 
     const searchField = (
         <>
-            <Search className="size-6 shrink-0 text-[#999]" aria-hidden />
+            <img
+                src={HEADER_ASSETS.iconSearch}
+                alt=""
+                width={24}
+                height={24}
+                className="size-6 shrink-0"
+                aria-hidden
+            />
             <input
                 type="search"
                 name="q"
@@ -148,7 +158,7 @@ export function HomeHeader({
                 accountHref={accountHref}
             />
 
-            <div className="relative border-b border-neutral-200 bg-white">
+            <div className="relative bg-white">
                 <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-4 sm:px-8 lg:px-[100px]">
                     <StorefrontLogo
                         variant="on-light"
@@ -159,7 +169,7 @@ export function HomeHeader({
                     <nav
                         className={cn(
                             'hidden min-w-0 flex-1 items-center justify-center gap-6 lg:flex',
-                            isAdmin && 'gap-0.5 overflow-x-auto justify-start xl:gap-1 [scrollbar-width:thin]',
+                            isAdmin && 'justify-start gap-0.5 overflow-x-auto xl:gap-1 [scrollbar-width:thin]',
                         )}
                     >
                         {isAdmin
@@ -210,19 +220,32 @@ export function HomeHeader({
                         {!isAdmin && (
                             <div className="hidden items-center gap-3 lg:flex">
                                 <HeaderIconPill
-                                    href={user ? accountHref : route('login')}
                                     aria-label="Notifications"
+                                    className={SF_HEADER_ICON_PILL_BELL}
                                 >
-                                    <Bell className="size-5 text-black" strokeWidth={1.25} />
+                                    <img
+                                        src={HEADER_ASSETS.iconBell}
+                                        alt=""
+                                        width={17}
+                                        height={20}
+                                        className="h-[19.5px] w-[16.514px] object-contain"
+                                    />
                                 </HeaderIconPill>
                                 {user?.role === 'CUSTOMER' ? (
                                     <HeaderFavoritesButton />
                                 ) : (
                                     <HeaderIconPill
                                         aria-label="Favoris"
+                                        className={SF_HEADER_ICON_PILL_HEART}
                                         onClick={() => router.visit(route('login'))}
                                     >
-                                        <Heart className={cn('size-5', SF_HEADER_HEART)} strokeWidth={1.25} />
+                                        <img
+                                            src={HEADER_ASSETS.iconHeart}
+                                            alt=""
+                                            width={22}
+                                            height={19}
+                                            className="h-[18.716px] w-[21.5px] object-contain"
+                                        />
                                     </HeaderIconPill>
                                 )}
                                 <HeaderCartButton />

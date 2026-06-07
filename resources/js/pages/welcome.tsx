@@ -1,6 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
 import { FlashToaster } from '@/components/flash-toaster';
-import { HomeAbout } from '@/components/storefront/home/home-about';
 import { HomeBenefits } from '@/components/storefront/home/home-benefits';
 import { HomeBrandCta } from '@/components/storefront/home/home-brand-cta';
 import { HomeCategories } from '@/components/storefront/home/home-categories';
@@ -56,7 +55,6 @@ export default function Welcome() {
                 <main>
                     <HomeHero />
                     <HomeCategories />
-                    <HomeAbout />
                     <HomeNouveautes products={featuredProducts} />
                     <HomeTestimonial testimonials={testimonials} />
                     <HomeBenefits />

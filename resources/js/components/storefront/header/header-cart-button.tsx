@@ -1,7 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
-import headerCartIcon from '../../../../media/header-cart-icon.svg';
+import {
+    SF_HEADER_ICON_PILL,
+    SF_HEADER_ICON_PILL_CART,
+} from '@/components/storefront/header/header-icon-pill';
+import { HEADER_ASSETS } from '@/lib/header-assets';
 import { route } from '@/lib/route';
-import { SF_HEADER_ICON_PILL } from '@/components/storefront/header/header-icon-pill';
 import { cn } from '@/lib/utils';
 
 type PageProps = {
@@ -18,15 +21,15 @@ export function HeaderCartButton({ className }: Props) {
     return (
         <Link
             href={route('customer.cart')}
-            className={cn(SF_HEADER_ICON_PILL, 'relative px-2.5 py-2', className)}
+            className={cn(SF_HEADER_ICON_PILL, SF_HEADER_ICON_PILL_CART, 'relative', className)}
             aria-label="Mon panier"
         >
             <img
-                src={headerCartIcon}
+                src={HEADER_ASSETS.iconCart}
                 alt=""
                 width={20}
                 height={22}
-                className="size-5 object-contain"
+                className="h-[21.667px] w-5 object-contain"
             />
             {cartCount > 0 ? (
                 <span className="absolute -top-1 -right-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[#0059DD] px-1 text-[10px] font-semibold leading-none text-white">

@@ -9,7 +9,7 @@ const FEATURES = [
 
 export function HomeAbout() {
     return (
-        <section id="pourquoi-nous" className="bg-white px-4 py-16 sm:px-8 lg:p-[100px]">
+        <section className="bg-white px-4 py-16 sm:px-8 lg:p-[100px]">
             <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start justify-center gap-6 lg:flex-row lg:gap-6">
                 <div className="flex w-full max-w-[618px] flex-col justify-center gap-7 p-5 lg:h-[720px] lg:gap-7">
                     <div className="flex max-w-[578px] flex-col items-start gap-1">

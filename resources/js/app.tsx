@@ -46,6 +46,7 @@ createInertiaApp({
             case name === 'customer/orders/index':
             case name === 'customer/orders/show':
             case name === 'customer/contact':
+            case name === 'customer/about':
                 return storefrontLayout();
             case name.startsWith('auth/'):
                 return [

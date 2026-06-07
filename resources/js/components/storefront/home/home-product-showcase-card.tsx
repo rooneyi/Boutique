@@ -34,7 +34,7 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                 'motion-card-lift relative flex flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]',
                 isFavorites && 'h-[428px] w-full max-w-[322px]',
                 isCollection &&
-                    'h-[251.5px] w-[171.5px] shrink-0 lg:h-[503px] lg:w-[343px]',
+                    'collection-card h-[251.5px] w-[171.5px] shrink-0 lg:h-[503px] lg:w-[343px]',
                 isCompact &&
                     'h-[252px] w-full lg:h-[428px] lg:max-w-[322px]',
                 !isFavorites &&
@@ -79,12 +79,14 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
 
             <div
                 className={cn(
-                    'relative z-10 flex flex-col bg-gradient-to-b from-transparent via-black/60 to-black',
+                    'relative z-10 flex flex-col bg-gradient-to-b from-[rgba(26,24,24,0)] via-[30%] via-[rgba(31,31,31,0.6)] to-[66.346%] to-black',
                     isFavorites
                         ? 'gap-[5px] px-5 pb-[30px] pt-5'
-                        : isCompact || isCollection
-                          ? 'gap-0.5 px-2.5 pb-4 pt-10 lg:gap-1 lg:px-5 lg:pb-8 lg:pt-16'
-                          : 'gap-1 px-5 pb-8 pt-16',
+                        : isCollection
+                          ? 'gap-[5px] px-2.5 pb-4 pt-10 lg:gap-[5px] lg:px-5 lg:pb-[30px] lg:pt-5'
+                          : isCompact
+                            ? 'gap-0.5 px-2.5 pb-4 pt-10 lg:gap-1 lg:px-5 lg:pb-8 lg:pt-16'
+                            : 'gap-1 px-5 pb-8 pt-16',
                 )}
             >
                 <Link href={route('customer.products.show', product.id)}>

@@ -4,6 +4,7 @@ use App\Data\CustomerRegisterData;
 use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\PasswordResetOtpController;
+use App\Http\Controllers\Customer\AboutController;
 use App\Http\Controllers\Customer\AccountController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
@@ -224,6 +225,8 @@ Route::get('/', function () {
         'testimonials' => $testimonials,
     ]);
 })->name('home');
+
+Route::get('about', [AboutController::class, 'index'])->name('about');
 
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('contact', [ContactController::class, 'index'])->name('contact');

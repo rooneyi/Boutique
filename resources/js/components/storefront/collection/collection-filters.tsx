@@ -1,3 +1,4 @@
+import { CollectionPriceRange } from '@/components/storefront/collection/collection-price-range';
 import { router } from '@inertiajs/react';
 import { SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -115,38 +116,21 @@ function FiltersPanel({
 
             <div className="space-y-2">
                 <h2 className="font-poppins text-xl font-medium text-black">Prix</h2>
-                <div className="space-y-3 px-1">
-                    <input
-                        type="range"
-                        min={priceMin}
-                        max={priceMax}
-                        value={Math.min(minPrice, maxPrice)}
-                        onChange={(e) =>
-                            setMinPrice(Math.min(Number(e.target.value), maxPrice))
-                        }
-                        className="h-1 w-full cursor-pointer appearance-none rounded-full bg-neutral-200 accent-black"
-                    />
-                    <input
-                        type="range"
-                        min={priceMin}
-                        max={priceMax}
-                        value={Math.max(maxPrice, minPrice)}
-                        onChange={(e) =>
-                            setMaxPrice(Math.max(Number(e.target.value), minPrice))
-                        }
-                        className="h-1 w-full cursor-pointer appearance-none rounded-full bg-neutral-200 accent-black"
-                    />
-                    <div className="flex justify-between font-poppins text-sm font-medium text-black sm:text-base">
-                        <span>{minPrice}</span>
-                        <span>{maxPrice}</span>
-                    </div>
-                </div>
+                <CollectionPriceRange
+                    min={priceMin}
+                    max={priceMax}
+                    value={[minPrice, maxPrice]}
+                    onChange={([nextMin, nextMax]) => {
+                        setMinPrice(nextMin);
+                        setMaxPrice(nextMax);
+                    }}
+                />
             </div>
 
             <Button
                 type="button"
                 onClick={onApply}
-                className="h-[43px] w-full rounded-[27px] bg-black font-poppins text-[13px] font-semibold tracking-wide text-white uppercase hover:bg-neutral-800"
+                className="h-[43px] w-full rounded-[32px] bg-black font-poppins text-[13px] font-semibold tracking-wide text-white uppercase hover:bg-neutral-800"
             >
                 FILTRE
             </Button>
@@ -220,12 +204,12 @@ export function CollectionFilters({ categories, colorOptions, totalProducts, fil
                         Filtres
                     </Button>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-4 rounded-[27px] bg-white px-5 py-6 shadow-sm">
+                <CollapsibleContent className="mt-4 rounded-[27px] bg-white px-5 py-6">
                     <FiltersPanel {...panelProps} />
                 </CollapsibleContent>
             </Collapsible>
 
-            <aside className="hidden w-full max-w-[289px] shrink-0 rounded-[27px] bg-white px-[22px] py-[21px] shadow-sm lg:sticky lg:top-24 lg:block lg:self-start">
+            <aside className="hidden w-full max-w-[289px] shrink-0 rounded-[27px] bg-white px-[22px] py-[21px] lg:sticky lg:top-24 lg:block lg:self-start">
                 <FiltersPanel {...panelProps} />
             </aside>
         </>
@@ -246,35 +230,31 @@ function ColorFilterRow({
     onCheckedChange: () => void;
 }) {
     return (
-        <div className="flex items-center justify-between gap-2">
+        <button
+            type="button"
+            onClick={onCheckedChange}
+            className="flex w-full items-center justify-between gap-2 text-left"
+        >
             <div className="flex min-w-0 items-center gap-3">
-                <Checkbox
-                    id={`color-${label}`}
-                    checked={checked}
-                    onCheckedChange={() => onCheckedChange()}
-                    className="h-[19px] w-5 shrink-0 rounded-[2px] border-[#5B5E64]/60 data-[state=checked]:border-black data-[state=checked]:bg-black"
-                />
                 <span
                     className={cn(
-                        'size-[22px] shrink-0 rounded-full border-2',
-                        hex.toUpperCase() === '#FFFFFF' ? 'border-neutral-300' : 'border-transparent',
+                        'size-[22px] shrink-0 rounded-full border-2 transition-shadow',
+                        hex.toUpperCase() === '#FFFFFF'
+                            ? 'border-neutral-300'
+                            : 'border-transparent',
+                        checked && 'ring-2 ring-black ring-offset-1',
                     )}
                     style={{ backgroundColor: hex }}
                     aria-hidden
                 />
-                <Label
-                    htmlFor={`color-${label}`}
-                    className="cursor-pointer truncate font-poppins text-base font-medium text-black"
-                >
-                    {label}
-                </Label>
+                <span className="truncate text-base font-medium text-black">{label}</span>
             </div>
             {count > 0 ? (
-                <span className="shrink-0 font-poppins text-sm font-medium text-[#5B5E64]/60">
+                <span className="shrink-0 text-base font-medium text-[rgba(91,94,100,0.62)]">
                     ({count})
                 </span>
             ) : null}
-        </div>
+        </button>
     );
 }
 
@@ -303,13 +283,15 @@ function FilterRow({
                 />
                 <Label
                     htmlFor={`cat-${label}`}
-                    className="cursor-pointer truncate font-poppins text-base font-medium text-black"
+                    className="cursor-pointer truncate text-base font-medium text-black"
                 >
                     {label}
                 </Label>
             </div>
             {count > 0 ? (
-                <span className="shrink-0 font-poppins text-sm font-medium text-[#5B5E64]/60">({count})</span>
+                <span className="shrink-0 text-base font-medium text-[rgba(91,94,100,0.62)]">
+                    ({count})
+                </span>
             ) : null}
         </div>
     );

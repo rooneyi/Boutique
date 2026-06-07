@@ -2,8 +2,18 @@ import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
+/** Pilule icône navbar — Figma 122-2184 (#bfbfbf, rounded 25px) */
 export const SF_HEADER_ICON_PILL =
-    'inline-flex size-[37px] shrink-0 items-center justify-center rounded-[25px] border-[0.5px] border-[#bfbfbf] bg-white transition-colors duration-200 hover:bg-neutral-50';
+    'inline-flex shrink-0 items-center justify-center rounded-[25px] border-[0.5px] border-[#bfbfbf] bg-white transition-colors duration-200 hover:bg-neutral-50';
+
+export const SF_HEADER_ICON_PILL_BELL =
+    'px-[10.5px] py-[9px]';
+
+export const SF_HEADER_ICON_PILL_HEART =
+    'px-2 py-[9.5px]';
+
+export const SF_HEADER_ICON_PILL_CART =
+    'px-[10.5px] py-[9px]';
 
 type Props = {
     children: ReactNode;
@@ -11,11 +21,16 @@ type Props = {
     href?: string;
     onClick?: () => void;
     'aria-label': string;
-    active?: boolean;
 };
 
-export function HeaderIconPill({ children, className, href, onClick, 'aria-label': ariaLabel, active }: Props) {
-    const classes = cn(SF_HEADER_ICON_PILL, active && 'border-[#0059DD] bg-[#0059DD]/5', className);
+export function HeaderIconPill({
+    children,
+    className,
+    href,
+    onClick,
+    'aria-label': ariaLabel,
+}: Props) {
+    const classes = cn(SF_HEADER_ICON_PILL, className);
 
     if (href) {
         return (

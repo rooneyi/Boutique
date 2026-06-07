@@ -38,7 +38,7 @@ const FOOTER_SOCIAL = [
 const FOOTER_NAV = [
     { label: 'Accueil', href: route('home') },
     { label: 'Catalogue', href: route('customer.products.index') },
-    { label: 'A Propos', href: `${route('home')}#pourquoi-nous` },
+    { label: 'A Propos', href: route('about') },
     { label: 'Contact', href: route('contact') },
 ] as const;
 
