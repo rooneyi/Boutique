@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,9 @@ import { Spinner } from '@/components/ui/spinner';
 import {
     AUTH_BTN_PRIMARY,
     AUTH_INPUT_UNDERLINE,
+    AUTH_LINK_RED,
 } from '@/lib/auth-ui-styles';
+import { route } from '@/lib/route';
 import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
@@ -56,6 +58,12 @@ export default function ConfirmPassword() {
                                 {processing && <Spinner className="text-white" />}
                                 CONFIRMER
                             </Button>
+
+                            <p className="w-full text-center font-poppins text-xs text-[#484848]">
+                                <Link href={route('profile.edit')} className={AUTH_LINK_RED}>
+                                    Retour au profil
+                                </Link>
+                            </p>
                         </div>
                     )}
                 </Form>

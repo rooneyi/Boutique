@@ -41,6 +41,12 @@ class SecurityController extends Controller implements HasMiddleware
             $props['requiresConfirmation'] = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm');
         }
 
+        if ($request->user()->role === 'CUSTOMER') {
+            return Inertia::render('customer/profile/security', [
+                'canRegister' => Features::enabled(Features::registration()),
+            ]);
+        }
+
         return Inertia::render('settings/security', $props);
     }
 
@@ -53,7 +59,10 @@ class SecurityController extends Controller implements HasMiddleware
             'password' => $request->password,
         ]);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Password updated.')]);
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Mot de passe mis à jour.',
+        ]);
 
         return back();
     }
