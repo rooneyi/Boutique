@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { Package, Plus, ShoppingCart, TrendingUp, Users } from 'lucide-react';
 import { AdminBadge, orderStatusBadgeVariant } from '@/components/admin/admin-badge';
 import {
     AdminCard,
@@ -6,12 +7,12 @@ import {
     AdminCardDescription,
     AdminCardHeader,
 } from '@/components/admin/admin-card';
-import { AdminPageHero } from '@/components/admin/admin-page-hero';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminStatCard } from '@/components/admin/admin-stat-card';
 import { route } from '@/lib/route';
 import {
-    ADMIN_BTN_PILL_DARK,
-    ADMIN_BTN_PILL_OUTLINE,
+    ADMIN_BTN_SM_OUTLINE,
+    ADMIN_BTN_SM_PRIMARY,
     ADMIN_H3,
     ADMIN_LIST_ROW,
     ADMIN_LIST_ROW_STACKED,
@@ -20,7 +21,23 @@ import {
     ADMIN_PAGE_SECTION,
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
-import { Package, Plus, ShoppingCart, TrendingUp, Users } from 'lucide-react';
+
+function orderStatusLabel(status: string): string {
+    switch (status.toUpperCase()) {
+        case 'PAID':
+            return 'Payée';
+        case 'PENDING':
+            return 'En attente';
+        case 'CANCELLED':
+            return 'Annulée';
+        case 'SHIPPED':
+            return 'Expédiée';
+        case 'DELIVERED':
+            return 'Livrée';
+        default:
+            return status;
+    }
+}
 
 type AdminStats = {
     total_vendors: number;
@@ -66,17 +83,23 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
             <Head title="Tableau de bord" />
 
             <div className={ADMIN_PAGE_SECTION}>
-                <AdminPageHero
+                <AdminPageHeader
                     title="Tableau de bord"
                     description="Vue d'ensemble de la plateforme PCJ — ventes, catalogue et utilisateurs."
                     actions={
                         <>
-                            <Link href={route('admin.analytics.sales')} className={ADMIN_BTN_PILL_OUTLINE}>
+                            <Link
+                                href={route('admin.analytics.sales')}
+                                className={ADMIN_BTN_SM_OUTLINE}
+                            >
                                 Analyse des ventes
                             </Link>
-                            <Link href={route('admin.products.index')} className={ADMIN_BTN_PILL_DARK}>
-                                <Plus className="size-5" />
-                                Catalogue produits
+                            <Link
+                                href={route('admin.products.index')}
+                                className={ADMIN_BTN_SM_PRIMARY}
+                            >
+                                <Plus className="size-4" />
+                                Catalogue
                             </Link>
                         </>
                     }
@@ -99,7 +122,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                     <AdminStatCard
                         label="Produits actifs"
                         value={stats.total_products}
-                        hint={`${stats.total_vendors} vendeurs · ${stats.total_customers} clients`}
+                        hint={`${stats.total_customers} clients inscrits`}
                         icon={Package}
                     />
                     <AdminStatCard
@@ -114,7 +137,9 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                     <AdminCard>
                         <AdminCardHeader>
                             <h3 className={ADMIN_H3}>Produits populaires</h3>
-                            <AdminCardDescription>Top ventes sur la plateforme</AdminCardDescription>
+                            <AdminCardDescription>
+                                Top ventes sur la plateforme
+                            </AdminCardDescription>
                         </AdminCardHeader>
                         <AdminCardContent className="space-y-3">
                             {stats.top_products.length > 0 ? (
@@ -127,20 +152,25 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                         )}
                                     >
                                         <div className="min-w-0 flex-1">
-                                            <p className="font-poppins font-semibold text-black">
+                                            <p className="font-poppins font-semibold text-slate-900">
                                                 {product.name}
                                             </p>
                                             <p className={cn(ADMIN_MUTED, 'text-sm')}>
                                                 Stock : {product.stock}
                                             </p>
                                         </div>
-                                        <AdminBadge className="self-start sm:self-center" variant="blue">
+                                        <AdminBadge
+                                            className="self-start sm:self-center"
+                                            variant="blue"
+                                        >
                                             {product.total_sold} vendus
                                         </AdminBadge>
                                     </div>
                                 ))
                             ) : (
-                                <p className={ADMIN_MUTED}>Aucun produit pour le moment.</p>
+                                <p className={ADMIN_MUTED}>
+                                    Aucun produit pour le moment.
+                                </p>
                             )}
                         </AdminCardContent>
                     </AdminCard>
@@ -148,7 +178,9 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                     <AdminCard>
                         <AdminCardHeader>
                             <h3 className={ADMIN_H3}>Indicateurs</h3>
-                            <AdminCardDescription>Panier moyen et répartition</AdminCardDescription>
+                            <AdminCardDescription>
+                                Panier moyen et répartition
+                            </AdminCardDescription>
                         </AdminCardHeader>
                         <AdminCardContent className="space-y-4">
                             <div className={ADMIN_LIST_ROW}>
@@ -157,19 +189,13 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                     €{stats.avg_order_value.toFixed(2)}
                                 </p>
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="rounded-sm border border-neutral-100 bg-white p-4 text-center">
-                                    <p className="font-poppins text-2xl font-semibold text-black">
-                                        {stats.total_vendors}
-                                    </p>
-                                    <p className={cn(ADMIN_MUTED, 'text-sm')}>Boutique</p>
-                                </div>
-                                <div className="rounded-sm border border-neutral-100 bg-white p-4 text-center">
-                                    <p className="font-poppins text-2xl font-semibold text-black">
-                                        {stats.total_customers}
-                                    </p>
-                                    <p className={cn(ADMIN_MUTED, 'text-sm')}>Clients</p>
-                                </div>
+                            <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-center">
+                                <p className="font-poppins text-3xl font-bold text-slate-900">
+                                    {stats.total_customers}
+                                </p>
+                                <p className={cn(ADMIN_MUTED, 'mt-0.5 text-xs')}>
+                                    Clients inscrits
+                                </p>
                             </div>
                         </AdminCardContent>
                     </AdminCard>
@@ -178,51 +204,68 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                 <AdminCard>
                     <AdminCardHeader>
                         <h3 className={ADMIN_H3}>Commandes récentes</h3>
-                        <AdminCardDescription>Dernières transactions enregistrées</AdminCardDescription>
+                        <AdminCardDescription>
+                            Dernières transactions enregistrées
+                        </AdminCardDescription>
                     </AdminCardHeader>
                     <AdminCardContent>
                         {stats.recent_orders.length > 0 ? (
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 {stats.recent_orders.map((order) => (
-                                    <div
-                                        key={order.id}
-                                        className={ADMIN_LIST_ROW_STACKED}
-                                    >
+                                    <div key={order.id} className={ADMIN_LIST_ROW_STACKED}>
                                         <div className="flex items-center justify-between gap-2 md:col-span-2 md:block">
-                                            <span className={ADMIN_MOBILE_META}>Commande</span>
-                                            <span className="font-poppins font-semibold text-black">
+                                            <span className={ADMIN_MOBILE_META}>
+                                                Commande
+                                            </span>
+                                            <span className="font-poppins font-semibold text-slate-900">
                                                 #{order.id}
                                             </span>
                                         </div>
                                         <div className="min-w-0 md:col-span-3">
-                                            <span className={ADMIN_MOBILE_META}>Client</span>
+                                            <span className={ADMIN_MOBILE_META}>
+                                                Client
+                                            </span>
                                             <span className={cn(ADMIN_MUTED, 'md:text-sm')}>
                                                 {order.customer_name}
                                             </span>
                                         </div>
                                         <div className="md:col-span-3">
-                                            <span className={ADMIN_MOBILE_META}>Date</span>
+                                            <span className={ADMIN_MOBILE_META}>
+                                                Date
+                                            </span>
                                             <span className={cn(ADMIN_MUTED, 'md:text-sm')}>
-                                                {order.created_at}
+                                                {new Date(
+                                                    order.created_at,
+                                                ).toLocaleDateString('fr-FR')}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between gap-2 md:col-span-2 md:block">
-                                            <span className={ADMIN_MOBILE_META}>Montant</span>
-                                            <span className="font-poppins font-semibold text-black">
+                                            <span className={ADMIN_MOBILE_META}>
+                                                Montant
+                                            </span>
+                                            <span className="font-poppins font-semibold text-slate-900">
                                                 €{order.total.toFixed(2)}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between gap-2 md:col-span-2 md:block">
-                                            <span className={ADMIN_MOBILE_META}>Statut</span>
-                                            <AdminBadge variant={orderStatusBadgeVariant(order.status)}>
-                                                {order.status}
+                                            <span className={ADMIN_MOBILE_META}>
+                                                Statut
+                                            </span>
+                                            <AdminBadge
+                                                variant={orderStatusBadgeVariant(
+                                                    order.status,
+                                                )}
+                                            >
+                                                {orderStatusLabel(order.status)}
                                             </AdminBadge>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <p className={ADMIN_MUTED}>Aucune commande récente.</p>
+                            <p className={ADMIN_MUTED}>
+                                Aucune commande récente.
+                            </p>
                         )}
                     </AdminCardContent>
                 </AdminCard>

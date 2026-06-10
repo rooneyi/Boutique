@@ -191,7 +191,7 @@ class AdminService
             $t = $from->copy()->addMonths($i);
             $key = $t->format('Y-m');
             $buckets[$key] = [
-                'label' => $t->locale('fr')->isoFormat('MMM yyyy'),
+                'label' => $t->locale('fr')->isoFormat('MMM YY'),
                 'revenue' => 0.0,
                 'orders' => 0,
             ];

@@ -1,6 +1,12 @@
 import { Head, Form, Link } from '@inertiajs/react';
 import { ProductColorPicker } from '@/components/admin/product-color-picker';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import {
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
@@ -12,11 +18,11 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { route } from '@/lib/route';
 import {
+    ADMIN_BTN_SM_OUTLINE,
     ADMIN_BTN_PRIMARY,
-    ADMIN_CARD,
     ADMIN_H3,
     ADMIN_MUTED,
-    ADMIN_PAGE_TITLE,
+    ADMIN_PAGE_SECTION,
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
@@ -115,24 +121,29 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
         <>
             <Head title={isEditing ? 'Éditer Produit' : 'Créer Produit'} />
 
-            <div className="mx-auto max-w-3xl space-y-8">
-                <div>
-                    <h1 className={ADMIN_PAGE_TITLE}>{isEditing ? 'Éditer le produit' : 'Nouveau produit'}</h1>
-                    <p className={cn(ADMIN_MUTED, 'mt-3')}>
-                        {isEditing
+            <div className={cn(ADMIN_PAGE_SECTION, 'mx-auto max-w-3xl')}>
+                <AdminPageHeader
+                    title={isEditing ? 'Éditer le produit' : 'Nouveau produit'}
+                    description={
+                        isEditing
                             ? 'Mettez à jour les informations et les articles (couleur / taille).'
-                            : 'Renseignez la catégorie, le prix et au moins un article en stock.'}
-                    </p>
-                </div>
+                            : 'Renseignez la catégorie, le prix et au moins un article en stock.'
+                    }
+                    actions={
+                        <Link href={route('admin.products.index')} className={ADMIN_BTN_SM_OUTLINE}>
+                            ← Catalogue
+                        </Link>
+                    }
+                />
 
-                <Card className={ADMIN_CARD}>
-                    <CardHeader>
+                <AdminCard>
+                    <AdminCardHeader>
                         <h3 className={ADMIN_H3}>Informations</h3>
-                        <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
+                        <AdminCardDescription>
                             Catégorie obligatoire · au moins un article
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                        </AdminCardDescription>
+                    </AdminCardHeader>
+                    <AdminCardContent>
                         <Form
                             method={isEditing ? 'put' : 'post'}
                             action={
@@ -443,8 +454,8 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
                                 </>
                             )}
                         </Form>
-                    </CardContent>
-                </Card>
+                    </AdminCardContent>
+                </AdminCard>
             </div>
         </>
     );

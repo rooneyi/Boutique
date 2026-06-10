@@ -52,7 +52,7 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                     <nav className="order-3 flex w-full basis-full flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm sm:order-none sm:w-auto sm:flex-1 sm:basis-auto md:gap-6 md:text-base">
                         <Link href={route('customer.products.index')} className={cn(SF_NAV_LINK, 'inline-flex items-center gap-2')}>
                             <Store className="h-4 w-4 shrink-0 text-[#747474]" aria-hidden />
-                            Catalogue
+                            Collection
                         </Link>
                         {isCustomer && (
                             <>

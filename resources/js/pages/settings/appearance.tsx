@@ -1,32 +1,35 @@
 import { Head } from '@inertiajs/react';
 import AppearanceTabs from '@/components/appearance-tabs';
-import Heading from '@/components/heading';
+import {
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
+import { ADMIN_H3 } from '@/lib/admin-ui-styles';
 import { edit as editAppearance } from '@/routes/appearance';
 
 export default function Appearance() {
     return (
         <>
-            <Head title="Appearance settings" />
+            <Head title="Apparence" />
+            <h1 className="sr-only">Paramètres d&apos;apparence</h1>
 
-            <h1 className="sr-only">Appearance settings</h1>
-
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Appearance settings"
-                    description="Update your account's appearance settings"
-                />
-                <AppearanceTabs />
-            </div>
+            <AdminCard>
+                <AdminCardHeader>
+                    <h3 className={ADMIN_H3}>Apparence</h3>
+                    <AdminCardDescription>
+                        Personnalisez l&apos;affichage de l&apos;interface.
+                    </AdminCardDescription>
+                </AdminCardHeader>
+                <AdminCardContent>
+                    <AppearanceTabs />
+                </AdminCardContent>
+            </AdminCard>
         </>
     );
 }
 
 Appearance.layout = {
-    breadcrumbs: [
-        {
-            title: 'Appearance settings',
-            href: editAppearance(),
-        },
-    ],
+    breadcrumbs: [{ title: 'Apparence', href: editAppearance() }],
 };

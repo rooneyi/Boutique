@@ -1,15 +1,33 @@
 import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import {
-    Table,
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
+import {
+    AdminDataTable,
     TableBody,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table';
+    ADMIN_TABLE_CELL,
+    ADMIN_TABLE_HEAD,
+    ADMIN_TABLE_HEADER_ROW,
+    ADMIN_TABLE_ROW,
+} from '@/components/admin/admin-table';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { route } from '@/lib/route';
-import { ADMIN_CARD, ADMIN_H3, ADMIN_H4, ADMIN_MUTED } from '@/lib/admin-ui-styles';
+import {
+    ADMIN_BTN_SM_OUTLINE,
+    ADMIN_H3,
+    ADMIN_MOBILE_META,
+    ADMIN_MUTED,
+    ADMIN_PAGE_SECTION,
+    ADMIN_TABLE_COL_LG,
+    ADMIN_TABLE_COL_MD,
+} from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type CustomerRow = {
@@ -28,83 +46,117 @@ type Props = {
 export default function AdminSalesCustomers({ customers }: Props) {
     return (
         <>
-            <Head title="Ventes · Clients" />
+            <Head title="Clients" />
 
-            <div className="space-y-10">
-                <div>
-                    <h1 className="font-poppins text-3xl font-semibold text-black">Clients</h1>
-                    <p className={cn(ADMIN_MUTED, 'mt-3 max-w-xl')}>
-                        Vue globale des clients et de leur historique d’achat.
-                    </p>
-                </div>
+            <div className={ADMIN_PAGE_SECTION}>
+                <AdminPageHeader
+                    title="Clients"
+                    description="Vue globale des clients et de leur historique d'achat."
+                    actions={
+                        <Link href={route('admin.dashboard')} className={ADMIN_BTN_SM_OUTLINE}>
+                            Tableau de bord
+                        </Link>
+                    }
+                />
 
-                <Card className={ADMIN_CARD}>
-                    <CardHeader>
+                <AdminCard>
+                    <AdminCardHeader>
                         <h3 className={ADMIN_H3}>Liste des clients</h3>
-                        <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
-                            Basée sur l’historique des commandes
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                        <AdminCardDescription>
+                            {customers.length} client(s) · basé sur l&apos;historique des commandes
+                        </AdminCardDescription>
+                    </AdminCardHeader>
+                    <AdminCardContent>
                         {customers.length === 0 ? (
-                            <p className={ADMIN_MUTED}>Aucun client pour le moment.</p>
+                            <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>
+                                Aucun client pour le moment.
+                            </p>
                         ) : (
-                            <div className="overflow-x-auto rounded-sm border border-neutral-200">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="border-neutral-200 bg-neutral-50 hover:bg-neutral-50">
-                                            <TableHead className={cn(ADMIN_H4, 'text-[#747474]')}>Client</TableHead>
-                                            <TableHead className={cn(ADMIN_H4, 'text-[#747474]')}>Email</TableHead>
-                                            <TableHead className={cn(ADMIN_H4, 'text-right text-[#747474]')}>
-                                                Commandes
-                                            </TableHead>
-                                            <TableHead className={cn(ADMIN_H4, 'text-right text-[#747474]')}>
-                                                Total dépensé
-                                            </TableHead>
-                                            <TableHead className={cn(ADMIN_H4, 'text-[#747474]')}>
-                                                Dernière commande
-                                            </TableHead>
-                                            <TableHead className={cn(ADMIN_H4, 'text-right text-[#747474]')}>
-                                                Détails
-                                            </TableHead>
+                            <AdminDataTable>
+                                <TableHeader>
+                                    <TableRow className={ADMIN_TABLE_HEADER_ROW}>
+                                        <TableHead className={ADMIN_TABLE_HEAD}>Client</TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
+                                        >
+                                            Email
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, 'text-right')}
+                                        >
+                                            Commandes
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(
+                                                ADMIN_TABLE_HEAD,
+                                                ADMIN_TABLE_COL_MD,
+                                                'text-right',
+                                            )}
+                                        >
+                                            Total dépensé
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_LG)}
+                                        >
+                                            Dernière commande
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {customers.map((c) => (
+                                        <TableRow key={c.id} className={ADMIN_TABLE_ROW}>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    'font-medium text-neutral-900',
+                                                )}
+                                            >
+                                                {c.name}
+                                                <span className={ADMIN_MOBILE_META}>{c.email}</span>
+                                                <span className={ADMIN_MOBILE_META}>
+                                                    {c.orders_count} cmd. · €
+                                                    {Number(c.total_spent).toFixed(2)}
+                                                    {c.last_order_at
+                                                        ? ` · ${new Date(c.last_order_at).toLocaleDateString('fr-FR')}`
+                                                        : ''}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}
+                                            >
+                                                {c.email}
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(ADMIN_TABLE_CELL, 'text-right')}
+                                            >
+                                                {c.orders_count}
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    ADMIN_TABLE_COL_MD,
+                                                    'text-right font-semibold text-neutral-900',
+                                                )}
+                                            >
+                                                €{Number(c.total_spent).toFixed(2)}
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_LG)}
+                                            >
+                                                {c.last_order_at
+                                                    ? new Date(c.last_order_at).toLocaleDateString(
+                                                          'fr-FR',
+                                                      )
+                                                    : '—'}
+                                            </TableCell>
                                         </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {customers.map((c) => (
-                                            <TableRow key={c.id} className="border-neutral-100">
-                                                <TableCell className="font-poppins font-semibold text-black">{c.name}</TableCell>
-                                                <TableCell className={cn(ADMIN_MUTED, 'text-sm')}>{c.email}</TableCell>
-                                                <TableCell className="text-right font-poppins text-black">{c.orders_count}</TableCell>
-                                                <TableCell className="text-right font-poppins font-semibold text-black">
-                                                    €{Number(c.total_spent).toFixed(2)}
-                                                </TableCell>
-                                                <TableCell className={cn(ADMIN_MUTED, 'text-sm')}>
-                                                    {c.last_order_at ? new Date(c.last_order_at).toLocaleDateString('fr-FR') : '—'}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <Link
-                                                        href={route('admin.sales.customers.show', c.id)}
-                                                        className="inline-flex rounded-[32px] border border-black bg-black px-4 py-2 font-poppins text-sm font-semibold text-white hover:bg-neutral-800"
-                                                    >
-                                                        Historique
-                                                    </Link>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                                    ))}
+                                </TableBody>
+                            </AdminDataTable>
                         )}
-                    </CardContent>
-                </Card>
-
-                <p className="font-poppins text-base font-normal">
-                    <Link href={route('admin.dashboard')} className="font-semibold text-[#0059DD] hover:underline">
-                        ← Tableau de bord
-                    </Link>
-                </p>
+                    </AdminCardContent>
+                </AdminCard>
             </div>
         </>
     );
 }
-

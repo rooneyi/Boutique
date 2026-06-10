@@ -20,7 +20,6 @@ type UserReview = {
 
 const TABS = [
     { id: 'description', label: 'Description' },
-    { id: 'detail', label: 'Détail' },
     { id: 'care', label: 'Guide de soins' },
     { id: 'reviews', label: 'Avis' },
 ] as const;
@@ -94,12 +93,6 @@ export function ProductInfoSection({
                                     <li>Fabriqué avec soin</li>
                                 </ul>
                             </div>
-                        )}
-                        {tab === 'detail' && (
-                            <p>
-                                Coupe décontractée, col rond, manches courtes. Idéal pour un
-                                look streetwear au quotidien.
-                            </p>
                         )}
                         {tab === 'care' && (
                             <ul className="list-disc space-y-2 pl-5">

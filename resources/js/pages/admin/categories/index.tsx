@@ -19,7 +19,7 @@ import {
     AdminCardDescription,
     AdminCardHeader,
 } from '@/components/admin/admin-card';
-import { AdminPageHero } from '@/components/admin/admin-page-hero';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
@@ -54,7 +54,7 @@ export default function AdminCategories({ categories }: Props) {
             <Head title="Catégories · Admin" />
 
             <div className={ADMIN_PAGE_SECTION}>
-                <AdminPageHero
+                <AdminPageHeader
                     title="Catégories"
                     description="Créez les catégories du catalogue. Chaque produit doit être rattaché à une catégorie."
                 />

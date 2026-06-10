@@ -2,14 +2,19 @@ import { Form, Head } from '@inertiajs/react';
 import { ShieldCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
-import { Button } from '@/components/ui/button';
+import {
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
 import { Label } from '@/components/ui/label';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
+import { ADMIN_BTN_SM_OUTLINE, ADMIN_BTN_SM_PRIMARY, ADMIN_H3, ADMIN_MUTED } from '@/lib/admin-ui-styles';
 import { edit } from '@/routes/security';
 import { disable, enable } from '@/routes/two-factor';
 
@@ -38,6 +43,7 @@ export default function Security({
         fetchRecoveryCodes,
         errors,
     } = useTwoFactorAuth();
+
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
     const prevTwoFactorEnabled = useRef(twoFactorEnabled);
 
@@ -45,205 +51,214 @@ export default function Security({
         if (prevTwoFactorEnabled.current && !twoFactorEnabled) {
             clearTwoFactorAuthData();
         }
-
         prevTwoFactorEnabled.current = twoFactorEnabled;
     }, [twoFactorEnabled, clearTwoFactorAuthData]);
 
     return (
         <>
-            <Head title="Security settings" />
+            <Head title="Sécurité" />
+            <h1 className="sr-only">Paramètres de sécurité</h1>
 
-            <h1 className="sr-only">Security settings</h1>
+            <AdminCard>
+                <AdminCardHeader>
+                    <h3 className={ADMIN_H3}>Modifier le mot de passe</h3>
+                    <AdminCardDescription>
+                        Utilisez un mot de passe long et aléatoire pour sécuriser
+                        votre compte.
+                    </AdminCardDescription>
+                </AdminCardHeader>
+                <AdminCardContent>
+                    <Form
+                        {...SecurityController.update.form()}
+                        options={{ preserveScroll: true }}
+                        resetOnError={[
+                            'password',
+                            'password_confirmation',
+                            'current_password',
+                        ]}
+                        resetOnSuccess
+                        onError={(errs) => {
+                            if (errs.password) passwordInput.current?.focus();
+                            if (errs.current_password)
+                                currentPasswordInput.current?.focus();
+                        }}
+                        className="space-y-5"
+                    >
+                        {({ errors: formErrors, processing }) => (
+                            <>
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="current_password"
+                                        className="font-poppins text-sm font-medium text-slate-700"
+                                    >
+                                        Mot de passe actuel
+                                    </Label>
+                                    <PasswordInput
+                                        id="current_password"
+                                        ref={currentPasswordInput}
+                                        name="current_password"
+                                        className="font-poppins"
+                                        autoComplete="current-password"
+                                        placeholder="Mot de passe actuel"
+                                        disabled={processing}
+                                    />
+                                    <InputError
+                                        message={formErrors.current_password}
+                                    />
+                                </div>
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
-                />
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="password"
+                                        className="font-poppins text-sm font-medium text-slate-700"
+                                    >
+                                        Nouveau mot de passe
+                                    </Label>
+                                    <PasswordInput
+                                        id="password"
+                                        ref={passwordInput}
+                                        name="password"
+                                        className="font-poppins"
+                                        autoComplete="new-password"
+                                        placeholder="Nouveau mot de passe"
+                                        disabled={processing}
+                                    />
+                                    <InputError message={formErrors.password} />
+                                </div>
 
-                <Form
-                    {...SecurityController.update.form()}
-                    options={{
-                        preserveScroll: true,
-                    }}
-                    resetOnError={[
-                        'password',
-                        'password_confirmation',
-                        'current_password',
-                    ]}
-                    resetOnSuccess
-                    onError={(errors) => {
-                        if (errors.password) {
-                            passwordInput.current?.focus();
-                        }
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="password_confirmation"
+                                        className="font-poppins text-sm font-medium text-slate-700"
+                                    >
+                                        Confirmer le mot de passe
+                                    </Label>
+                                    <PasswordInput
+                                        id="password_confirmation"
+                                        name="password_confirmation"
+                                        className="font-poppins"
+                                        autoComplete="new-password"
+                                        placeholder="Confirmer le mot de passe"
+                                        disabled={processing}
+                                    />
+                                    <InputError
+                                        message={formErrors.password_confirmation}
+                                    />
+                                </div>
 
-                        if (errors.current_password) {
-                            currentPasswordInput.current?.focus();
-                        }
-                    }}
-                    className="space-y-6"
-                >
-                    {({ errors, processing }) => (
-                        <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="current_password">
-                                    Current password
-                                </Label>
-
-                                <PasswordInput
-                                    id="current_password"
-                                    ref={currentPasswordInput}
-                                    name="current_password"
-                                    className="mt-1 block w-full"
-                                    autoComplete="current-password"
-                                    placeholder="Current password"
-                                />
-
-                                <InputError message={errors.current_password} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">New password</Label>
-
-                                <PasswordInput
-                                    id="password"
-                                    ref={passwordInput}
-                                    name="password"
-                                    className="mt-1 block w-full"
-                                    autoComplete="new-password"
-                                    placeholder="New password"
-                                />
-
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    name="password_confirmation"
-                                    className="mt-1 block w-full"
-                                    autoComplete="new-password"
-                                    placeholder="Confirm password"
-                                />
-
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <Button
-                                    disabled={processing}
-                                    data-test="update-password-button"
-                                >
-                                    Save password
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </div>
+                                <div>
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className={ADMIN_BTN_SM_PRIMARY}
+                                    >
+                                        {processing
+                                            ? 'Enregistrement…'
+                                            : 'Enregistrer le mot de passe'}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                </AdminCardContent>
+            </AdminCard>
 
             {canManageTwoFactor && (
-                <div className="space-y-6">
-                    <Heading
-                        variant="small"
-                        title="Two-factor authentication"
-                        description="Manage your two-factor authentication settings"
-                    />
-                    {twoFactorEnabled ? (
-                        <div className="flex flex-col items-start justify-start space-y-4">
-                            <p className="text-sm text-muted-foreground">
-                                You will be prompted for a secure, random pin
-                                during login, which you can retrieve from the
-                                TOTP-supported application on your phone.
-                            </p>
-
-                            <div className="relative inline">
-                                <Form {...disable.form()}>
-                                    {({ processing }) => (
-                                        <Button
-                                            variant="destructive"
-                                            type="submit"
-                                            disabled={processing}
-                                        >
-                                            Disable 2FA
-                                        </Button>
-                                    )}
-                                </Form>
-                            </div>
-
-                            <TwoFactorRecoveryCodes
-                                recoveryCodesList={recoveryCodesList}
-                                fetchRecoveryCodes={fetchRecoveryCodes}
-                                errors={errors}
-                            />
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-start justify-start space-y-4">
-                            <p className="text-sm text-muted-foreground">
-                                When you enable two-factor authentication, you
-                                will be prompted for a secure pin during login.
-                                This pin can be retrieved from a TOTP-supported
-                                application on your phone.
-                            </p>
-
-                            <div>
-                                {hasSetupData ? (
-                                    <Button
-                                        onClick={() => setShowSetupModal(true)}
-                                    >
-                                        <ShieldCheck />
-                                        Continue setup
-                                    </Button>
-                                ) : (
-                                    <Form
-                                        {...enable.form()}
-                                        onSuccess={() =>
-                                            setShowSetupModal(true)
-                                        }
-                                    >
-                                        {({ processing }) => (
-                                            <Button
+                <AdminCard>
+                    <AdminCardHeader>
+                        <h3 className={ADMIN_H3}>
+                            Authentification à deux facteurs
+                        </h3>
+                        <AdminCardDescription>
+                            Ajoutez une couche de sécurité supplémentaire à
+                            votre compte.
+                        </AdminCardDescription>
+                    </AdminCardHeader>
+                    <AdminCardContent className="space-y-4">
+                        {twoFactorEnabled ? (
+                            <>
+                                <p className={ADMIN_MUTED}>
+                                    Lors de la connexion, un code sécurisé vous
+                                    sera demandé. Récupérez-le depuis
+                                    l&apos;application TOTP sur votre téléphone.
+                                </p>
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <Form {...disable.form()}>
+                                        {({ processing: proc }) => (
+                                            <button
                                                 type="submit"
-                                                disabled={processing}
+                                                disabled={proc}
+                                                className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3.5 py-2 font-poppins text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
                                             >
-                                                Enable 2FA
-                                            </Button>
+                                                Désactiver le 2FA
+                                            </button>
                                         )}
                                     </Form>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    <TwoFactorSetupModal
-                        isOpen={showSetupModal}
-                        onClose={() => setShowSetupModal(false)}
-                        requiresConfirmation={requiresConfirmation}
-                        twoFactorEnabled={twoFactorEnabled}
-                        qrCodeSvg={qrCodeSvg}
-                        manualSetupKey={manualSetupKey}
-                        clearSetupData={clearSetupData}
-                        fetchSetupData={fetchSetupData}
-                        errors={errors}
-                    />
-                </div>
+                                </div>
+                                <TwoFactorRecoveryCodes
+                                    recoveryCodesList={recoveryCodesList}
+                                    fetchRecoveryCodes={fetchRecoveryCodes}
+                                    errors={errors}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <p className={ADMIN_MUTED}>
+                                    Activez le 2FA pour sécuriser davantage
+                                    votre compte lors de la connexion.
+                                </p>
+                                <div>
+                                    {hasSetupData ? (
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setShowSetupModal(true)
+                                            }
+                                            className={ADMIN_BTN_SM_PRIMARY}
+                                        >
+                                            <ShieldCheck className="size-4" />
+                                            Continuer la configuration
+                                        </button>
+                                    ) : (
+                                        <Form
+                                            {...enable.form()}
+                                            onSuccess={() =>
+                                                setShowSetupModal(true)
+                                            }
+                                        >
+                                            {({ processing: proc }) => (
+                                                <button
+                                                    type="submit"
+                                                    disabled={proc}
+                                                    className={ADMIN_BTN_SM_PRIMARY}
+                                                >
+                                                    Activer le 2FA
+                                                </button>
+                                            )}
+                                        </Form>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </AdminCardContent>
+                </AdminCard>
             )}
+
+            <TwoFactorSetupModal
+                isOpen={showSetupModal}
+                onClose={() => setShowSetupModal(false)}
+                requiresConfirmation={requiresConfirmation}
+                twoFactorEnabled={twoFactorEnabled}
+                qrCodeSvg={qrCodeSvg}
+                manualSetupKey={manualSetupKey}
+                clearSetupData={clearSetupData}
+                fetchSetupData={fetchSetupData}
+                errors={errors}
+            />
         </>
     );
 }
 
 Security.layout = {
-    breadcrumbs: [
-        {
-            title: 'Security settings',
-            href: edit(),
-        },
-    ],
+    breadcrumbs: [{ title: 'Sécurité', href: edit() }],
 };

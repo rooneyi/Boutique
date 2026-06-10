@@ -18,7 +18,7 @@ import {
     AdminCardDescription,
     AdminCardHeader,
 } from '@/components/admin/admin-card';
-import { AdminPageHero } from '@/components/admin/admin-page-hero';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import {
     ADMIN_H3,
     ADMIN_MOBILE_META,
@@ -70,7 +70,7 @@ export default function AdminUsers({ users }: Props) {
             <Head title={title} />
 
             <div className={ADMIN_PAGE_SECTION}>
-                <AdminPageHero title={title} description={description} />
+                <AdminPageHeader title={title} description={description} />
 
                 <AdminCard>
                     <AdminCardHeader>

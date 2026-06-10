@@ -68,7 +68,7 @@ createInertiaApp({
             case name.startsWith('customer/'):
                 return withPageTransition(CustomerLayout);
             case name.startsWith('settings/'):
-                return withPageTransitionStack(AppLayout, SettingsLayout);
+                return withPageTransitionStack(AdminLayout, SettingsLayout);
             default:
                 return withPageTransition(AppLayout);
         }

@@ -1,13 +1,18 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
+import {
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/profile';
+import { ADMIN_BTN_SM_PRIMARY, ADMIN_H3 } from '@/lib/admin-ui-styles';
 import { send } from '@/routes/verification';
+import { edit } from '@/routes/profile';
 
 export default function Profile({
     mustVerifyEmail,
@@ -20,102 +25,106 @@ export default function Profile({
 
     return (
         <>
-            <Head title="Profile settings" />
+            <Head title="Profil" />
+            <h1 className="sr-only">Paramètres du profil</h1>
 
-            <h1 className="sr-only">Profile settings</h1>
+            <AdminCard>
+                <AdminCardHeader>
+                    <h3 className={ADMIN_H3}>Informations du profil</h3>
+                    <AdminCardDescription>
+                        Mettez à jour votre nom et votre adresse e-mail.
+                    </AdminCardDescription>
+                </AdminCardHeader>
+                <AdminCardContent>
+                    <Form
+                        {...ProfileController.update.form()}
+                        options={{ preserveScroll: true }}
+                        className="space-y-5"
+                    >
+                        {({ processing, errors }) => (
+                            <>
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="name"
+                                        className="font-poppins text-sm font-medium text-slate-700"
+                                    >
+                                        Nom complet
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        name="name"
+                                        defaultValue={auth.user.name}
+                                        required
+                                        autoComplete="name"
+                                        placeholder="Nom complet"
+                                        className="font-poppins"
+                                        disabled={processing}
+                                    />
+                                    <InputError message={errors.name} />
+                                </div>
 
-            <div className="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Profile information"
-                    description="Update your name and email address"
-                />
+                                <div className="grid gap-2">
+                                    <Label
+                                        htmlFor="email"
+                                        className="font-poppins text-sm font-medium text-slate-700"
+                                    >
+                                        Adresse e-mail
+                                    </Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        defaultValue={auth.user.email}
+                                        required
+                                        autoComplete="username"
+                                        placeholder="Adresse e-mail"
+                                        className="font-poppins"
+                                        disabled={processing}
+                                    />
+                                    <InputError message={errors.email} />
+                                </div>
 
-                <Form
-                    {...ProfileController.update.form()}
-                    options={{
-                        preserveScroll: true,
-                    }}
-                    className="space-y-6"
-                >
-                    {({ processing, errors }) => (
-                        <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                {mustVerifyEmail &&
+                                    auth.user.email_verified_at === null && (
+                                        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                                            <p className="font-poppins text-sm text-amber-700">
+                                                Votre adresse e-mail n&apos;est
+                                                pas vérifiée.{' '}
+                                                <Link
+                                                    href={send()}
+                                                    as="button"
+                                                    className="font-semibold text-[#0059DD] hover:underline"
+                                                >
+                                                    Renvoyer le lien de
+                                                    vérification.
+                                                </Link>
+                                            </p>
+                                            {status ===
+                                                'verification-link-sent' && (
+                                                <p className="mt-1 font-poppins text-sm font-medium text-green-600">
+                                                    Un nouveau lien a été envoyé
+                                                    à votre adresse e-mail.
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
 
-                                <Input
-                                    id="name"
-                                    className="mt-1 block w-full"
-                                    defaultValue={auth.user.name}
-                                    name="name"
-                                    required
-                                    autoComplete="name"
-                                    placeholder="Full name"
-                                />
-
-                                <InputError
-                                    className="mt-2"
-                                    message={errors.name}
-                                />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    className="mt-1 block w-full"
-                                    defaultValue={auth.user.email}
-                                    name="email"
-                                    required
-                                    autoComplete="username"
-                                    placeholder="Email address"
-                                />
-
-                                <InputError
-                                    className="mt-2"
-                                    message={errors.email}
-                                />
-                            </div>
-
-                            {mustVerifyEmail &&
-                                auth.user.email_verified_at === null && (
-                                    <div>
-                                        <p className="-mt-4 text-sm text-muted-foreground">
-                                            Your email address is unverified.{' '}
-                                            <Link
-                                                href={send()}
-                                                as="button"
-                                                className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                                            >
-                                                Click here to resend the
-                                                verification email.
-                                            </Link>
-                                        </p>
-
-                                        {status ===
-                                            'verification-link-sent' && (
-                                            <div className="mt-2 text-sm font-medium text-green-600">
-                                                A new verification link has been
-                                                sent to your email address.
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
-                            <div className="flex items-center gap-4">
-                                <Button
-                                    disabled={processing}
-                                    data-test="update-profile-button"
-                                >
-                                    Save
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
-            </div>
+                                <div>
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className={ADMIN_BTN_SM_PRIMARY}
+                                    >
+                                        {processing
+                                            ? 'Enregistrement…'
+                                            : 'Enregistrer'}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                </AdminCardContent>
+            </AdminCard>
 
             <DeleteUser />
         </>
@@ -123,10 +132,5 @@ export default function Profile({
 }
 
 Profile.layout = {
-    breadcrumbs: [
-        {
-            title: 'Profile settings',
-            href: edit(),
-        },
-    ],
+    breadcrumbs: [{ title: 'Profil', href: edit() }],
 };

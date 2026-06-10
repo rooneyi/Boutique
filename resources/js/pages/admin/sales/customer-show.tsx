@@ -1,16 +1,32 @@
 import { Head, Link } from '@inertiajs/react';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Clock, ShoppingCart, Wallet } from 'lucide-react';
+import { AdminBadge, orderStatusBadgeVariant } from '@/components/admin/admin-badge';
 import {
-    Table,
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
+import { AdminStatCard } from '@/components/admin/admin-stat-card';
+import {
+    AdminDataTable,
     TableBody,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table';
+    ADMIN_TABLE_CELL,
+    ADMIN_TABLE_HEAD,
+    ADMIN_TABLE_HEADER_ROW,
+    ADMIN_TABLE_ROW,
+} from '@/components/admin/admin-table';
 import { route } from '@/lib/route';
-import { ADMIN_CARD, ADMIN_H3, ADMIN_H4, ADMIN_MUTED } from '@/lib/admin-ui-styles';
+import {
+    ADMIN_BTN_SM_OUTLINE,
+    ADMIN_H3,
+    ADMIN_MUTED,
+    ADMIN_PAGE_SECTION,
+} from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type OrderItem = {
@@ -39,118 +55,157 @@ type Props = {
     orders: OrderRow[];
 };
 
-function statusBadgeClass(status: string): string {
-    switch (status) {
+function statusLabel(status: string): string {
+    switch (status.toUpperCase()) {
         case 'PAID':
-            return 'bg-[#0059DD] text-white';
+            return 'Payée';
         case 'PENDING':
-            return 'bg-neutral-200 text-black';
+            return 'En attente';
         case 'CANCELLED':
-            return 'bg-black text-white';
+            return 'Annulée';
+        case 'SHIPPED':
+            return 'Expédiée';
+        case 'DELIVERED':
+            return 'Livrée';
         default:
-            return 'bg-neutral-100 text-[#747474]';
+            return status;
     }
 }
 
 export default function AdminSalesCustomerShow({ customer, orders }: Props) {
     return (
         <>
-            <Head title={`Ventes · ${customer.name}`} />
+            <Head title={`Client · ${customer.name}`} />
 
-            <div className="space-y-10">
-                <div>
-                    <h1 className="font-poppins text-3xl font-semibold text-black">{customer.name}</h1>
-                    <p className={cn(ADMIN_MUTED, 'mt-3 text-lg')}>{customer.email}</p>
-                    <p className="mt-4 font-poppins text-base font-normal">
-                        <Link href={route('admin.sales.customers.index')} className="font-semibold text-[#0059DD] hover:underline">
-                            ← Tous les clients
-                        </Link>
-                    </p>
+            <div className={ADMIN_PAGE_SECTION}>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                    <div>
+                        <h1 className="font-poppins text-3xl font-bold tracking-tight text-black">
+                            {customer.name}
+                        </h1>
+                        <p className={cn(ADMIN_MUTED, 'mt-1 text-base')}>{customer.email}</p>
+                    </div>
+                    <Link
+                        href={route('admin.sales.customers.index')}
+                        className={cn(ADMIN_BTN_SM_OUTLINE, 'shrink-0')}
+                    >
+                        ← Tous les clients
+                    </Link>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3">
-                    <Card className={ADMIN_CARD}>
-                        <CardHeader className="pb-2">
-                            <h4 className={ADMIN_H4}>Commandes</h4>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="font-poppins text-3xl font-semibold text-black">{customer.orders_count}</p>
-                        </CardContent>
-                    </Card>
-                    <Card className={ADMIN_CARD}>
-                        <CardHeader className="pb-2">
-                            <h4 className={ADMIN_H4}>Total dépensé</h4>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="font-poppins text-3xl font-semibold text-black">
-                                €{Number(customer.total_spent).toFixed(2)}
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card className={ADMIN_CARD}>
-                        <CardHeader className="pb-2">
-                            <h4 className={ADMIN_H4}>Dernière commande</h4>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="font-poppins text-xl font-semibold text-black">
-                                {customer.last_order_at ? new Date(customer.last_order_at).toLocaleString('fr-FR') : '—'}
-                            </p>
-                        </CardContent>
-                    </Card>
+                    <AdminStatCard
+                        label="Commandes"
+                        value={customer.orders_count}
+                        hint="Nombre total de commandes"
+                        icon={ShoppingCart}
+                    />
+                    <AdminStatCard
+                        label="Total dépensé"
+                        value={`€${Number(customer.total_spent).toFixed(2)}`}
+                        hint="Montant cumulé"
+                        icon={Wallet}
+                        accent
+                    />
+                    <AdminStatCard
+                        label="Dernière commande"
+                        value={
+                            customer.last_order_at
+                                ? new Date(customer.last_order_at).toLocaleDateString('fr-FR')
+                                : '—'
+                        }
+                        hint="Date de la dernière transaction"
+                        icon={Clock}
+                    />
                 </div>
 
-                <Card className={ADMIN_CARD}>
-                    <CardHeader>
+                <AdminCard>
+                    <AdminCardHeader>
                         <h3 className={ADMIN_H3}>Historique des commandes</h3>
-                        <CardDescription className={cn(ADMIN_MUTED, 'text-base')}>
-                            Détail des articles et montants
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-8">
+                        <AdminCardDescription>
+                            {orders.length} commande(s) · détail des articles et montants
+                        </AdminCardDescription>
+                    </AdminCardHeader>
+                    <AdminCardContent className="space-y-6">
                         {orders.length === 0 ? (
-                            <p className={ADMIN_MUTED}>Aucune commande.</p>
+                            <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>
+                                Aucune commande.
+                            </p>
                         ) : (
                             orders.map((order) => (
-                                <div key={order.id} className="overflow-hidden rounded-sm border border-neutral-200">
-                                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 bg-neutral-50 px-4 py-3 font-poppins text-base">
-                                        <span className="font-semibold text-black">Commande #{order.id}</span>
+                                <div
+                                    key={order.id}
+                                    className="overflow-hidden rounded-sm border border-neutral-100"
+                                >
+                                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 bg-[#fafafa] px-4 py-3">
+                                        <span className="font-poppins font-semibold text-black">
+                                            Commande #{order.id}
+                                        </span>
                                         <span className={ADMIN_MUTED}>
                                             {new Date(order.created_at).toLocaleString('fr-FR')}
                                         </span>
-                                        <Badge className={cn('px-3 py-1 font-poppins text-xs font-semibold', statusBadgeClass(order.status))}>
-                                            {order.status}
-                                        </Badge>
-                                        <span className="font-semibold text-black">€{Number(order.total).toFixed(2)}</span>
+                                        <AdminBadge
+                                            variant={orderStatusBadgeVariant(order.status)}
+                                        >
+                                            {statusLabel(order.status)}
+                                        </AdminBadge>
+                                        <span className="font-poppins font-semibold text-neutral-900">
+                                            €{Number(order.total).toFixed(2)}
+                                        </span>
                                     </div>
-                                    <Table>
+                                    <AdminDataTable>
                                         <TableHeader>
-                                            <TableRow className="bg-white hover:bg-white">
-                                                <TableHead className={cn(ADMIN_H4, 'text-[#747474]')}>Produit</TableHead>
-                                                <TableHead className={cn(ADMIN_H4, 'text-right text-[#747474]')}>Qté</TableHead>
-                                                <TableHead className={cn(ADMIN_H4, 'text-right text-[#747474]')}>
+                                            <TableRow className={ADMIN_TABLE_HEADER_ROW}>
+                                                <TableHead className={ADMIN_TABLE_HEAD}>
+                                                    Produit
+                                                </TableHead>
+                                                <TableHead
+                                                    className={cn(ADMIN_TABLE_HEAD, 'text-right')}
+                                                >
+                                                    Qté
+                                                </TableHead>
+                                                <TableHead
+                                                    className={cn(ADMIN_TABLE_HEAD, 'text-right')}
+                                                >
                                                     Sous-total
                                                 </TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {order.items.map((it, idx) => (
-                                                <TableRow key={`${order.id}-${idx}`} className="border-neutral-100">
-                                                    <TableCell className="font-poppins text-black">{it.product_name}</TableCell>
-                                                    <TableCell className="text-right font-poppins text-black">{it.quantity}</TableCell>
-                                                    <TableCell className="text-right font-poppins font-semibold text-black">
+                                                <TableRow
+                                                    key={`${order.id}-${idx}`}
+                                                    className={ADMIN_TABLE_ROW}
+                                                >
+                                                    <TableCell className={ADMIN_TABLE_CELL}>
+                                                        {it.product_name}
+                                                    </TableCell>
+                                                    <TableCell
+                                                        className={cn(
+                                                            ADMIN_TABLE_CELL,
+                                                            'text-right',
+                                                        )}
+                                                    >
+                                                        {it.quantity}
+                                                    </TableCell>
+                                                    <TableCell
+                                                        className={cn(
+                                                            ADMIN_TABLE_CELL,
+                                                            'text-right font-semibold text-neutral-900',
+                                                        )}
+                                                    >
                                                         €{Number(it.line_total).toFixed(2)}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
-                                    </Table>
+                                    </AdminDataTable>
                                 </div>
                             ))
                         )}
-                    </CardContent>
-                </Card>
+                    </AdminCardContent>
+                </AdminCard>
             </div>
         </>
     );
 }
-

@@ -75,7 +75,7 @@ function FiltersPanel({
     return (
         <div className="space-y-[37px]">
             <div className="space-y-[15px]">
-                <h2 className="font-poppins text-xl font-medium text-black">Catalogue</h2>
+                <h2 className="font-poppins text-xl font-medium text-black">Collection</h2>
 
                 <FilterRow
                     label="Tous"

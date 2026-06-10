@@ -1,9 +1,14 @@
 import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
+import {
+    AdminCard,
+    AdminCardContent,
+    AdminCardDescription,
+    AdminCardHeader,
+} from '@/components/admin/admin-card';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -15,106 +20,115 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { ADMIN_H3 } from '@/lib/admin-ui-styles';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
 
     return (
-        <div className="space-y-6">
-            <Heading
-                variant="small"
-                title="Delete account"
-                description="Delete your account and all of its resources"
-            />
-            <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
-                <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
-                    <p className="font-medium">Warning</p>
-                    <p className="text-sm">
-                        Please proceed with caution, this cannot be undone.
-                    </p>
-                </div>
+        <AdminCard>
+            <AdminCardHeader>
+                <h3 className={ADMIN_H3}>Supprimer le compte</h3>
+                <AdminCardDescription>
+                    Supprimez votre compte et toutes les données associées.
+                </AdminCardDescription>
+            </AdminCardHeader>
+            <AdminCardContent>
+                <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4">
+                    <div className="space-y-0.5 text-red-600">
+                        <p className="font-poppins text-sm font-semibold">
+                            Attention
+                        </p>
+                        <p className="font-poppins text-sm">
+                            Cette action est irréversible. Toutes vos données
+                            seront définitivement supprimées.
+                        </p>
+                    </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button
-                            variant="destructive"
-                            data-test="delete-user-button"
-                        >
-                            Delete account
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogTitle>
-                            Are you sure you want to delete your account?
-                        </DialogTitle>
-                        <DialogDescription>
-                            Once your account is deleted, all of its resources
-                            and data will also be permanently deleted. Please
-                            enter your password to confirm you would like to
-                            permanently delete your account.
-                        </DialogDescription>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button
+                                variant="destructive"
+                                className="font-poppins"
+                                data-test="delete-user-button"
+                            >
+                                Supprimer le compte
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogTitle>
+                                Confirmer la suppression du compte
+                            </DialogTitle>
+                            <DialogDescription>
+                                Cette action est irréversible. Toutes vos
+                                données seront définitivement supprimées.
+                                Saisissez votre mot de passe pour confirmer.
+                            </DialogDescription>
 
-                        <Form
-                            {...ProfileController.destroy.form()}
-                            options={{
-                                preserveScroll: true,
-                            }}
-                            onError={() => passwordInput.current?.focus()}
-                            resetOnSuccess
-                            className="space-y-6"
-                        >
-                            {({ resetAndClearErrors, processing, errors }) => (
-                                <>
-                                    <div className="grid gap-2">
-                                        <Label
-                                            htmlFor="password"
-                                            className="sr-only"
-                                        >
-                                            Password
-                                        </Label>
+                            <Form
+                                {...ProfileController.destroy.form()}
+                                options={{ preserveScroll: true }}
+                                onError={() =>
+                                    passwordInput.current?.focus()
+                                }
+                                resetOnSuccess
+                                className="space-y-6"
+                            >
+                                {({ resetAndClearErrors, processing, errors }) => (
+                                    <>
+                                        <div className="grid gap-2">
+                                            <Label
+                                                htmlFor="password"
+                                                className="sr-only"
+                                            >
+                                                Mot de passe
+                                            </Label>
+                                            <PasswordInput
+                                                id="password"
+                                                name="password"
+                                                ref={passwordInput}
+                                                placeholder="Mot de passe"
+                                                autoComplete="current-password"
+                                                className="font-poppins"
+                                            />
+                                            <InputError
+                                                message={errors.password}
+                                            />
+                                        </div>
 
-                                        <PasswordInput
-                                            id="password"
-                                            name="password"
-                                            ref={passwordInput}
-                                            placeholder="Password"
-                                            autoComplete="current-password"
-                                        />
-
-                                        <InputError message={errors.password} />
-                                    </div>
-
-                                    <DialogFooter className="gap-2">
-                                        <DialogClose asChild>
+                                        <DialogFooter className="gap-2">
+                                            <DialogClose asChild>
+                                                <Button
+                                                    variant="secondary"
+                                                    className="font-poppins"
+                                                    onClick={() =>
+                                                        resetAndClearErrors()
+                                                    }
+                                                >
+                                                    Annuler
+                                                </Button>
+                                            </DialogClose>
                                             <Button
-                                                variant="secondary"
-                                                onClick={() =>
-                                                    resetAndClearErrors()
-                                                }
+                                                variant="destructive"
+                                                disabled={processing}
+                                                className="font-poppins"
+                                                asChild
                                             >
-                                                Cancel
+                                                <button
+                                                    type="submit"
+                                                    data-test="confirm-delete-user-button"
+                                                >
+                                                    Supprimer le compte
+                                                </button>
                                             </Button>
-                                        </DialogClose>
-
-                                        <Button
-                                            variant="destructive"
-                                            disabled={processing}
-                                            asChild
-                                        >
-                                            <button
-                                                type="submit"
-                                                data-test="confirm-delete-user-button"
-                                            >
-                                                Delete account
-                                            </button>
-                                        </Button>
-                                    </DialogFooter>
-                                </>
-                            )}
-                        </Form>
-                    </DialogContent>
-                </Dialog>
-            </div>
-        </div>
+                                        </DialogFooter>
+                                    </>
+                                )}
+                            </Form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            </AdminCardContent>
+        </AdminCard>
     );
 }

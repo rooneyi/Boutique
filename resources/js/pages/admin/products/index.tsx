@@ -20,10 +20,10 @@ import {
     AdminCardHeader,
 } from '@/components/admin/admin-card';
 import { AdminFilterTabs } from '@/components/admin/admin-filter-tabs';
-import { AdminPageHero } from '@/components/admin/admin-page-hero';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { route } from '@/lib/route';
 import {
-    ADMIN_BTN_PRIMARY,
+    ADMIN_BTN_SM_PRIMARY,
     ADMIN_H3,
     ADMIN_MOBILE_META,
     ADMIN_MUTED,
@@ -40,9 +40,6 @@ type Product = {
     quantity: number;
     status?: string;
     category: string | { id: number; name: string } | null;
-    vendor: {
-        shop_name: string;
-    };
 };
 
 function categoryLabel(category: Product['category']): string {
@@ -120,16 +117,19 @@ export default function AdminProducts() {
             <Head title={title} />
 
             <div className={ADMIN_PAGE_SECTION}>
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                    <AdminPageHero
-                        title={title}
-                        description="Gestion du catalogue PCJ — création, édition et stocks."
-                    />
-                    <Link href={route('admin.products.create')} className={cn(ADMIN_BTN_PRIMARY, 'shrink-0')}>
-                        <Plus className="size-5" />
-                        Nouveau produit
-                    </Link>
-                </div>
+                <AdminPageHeader
+                    title={title}
+                    description="Gestion du catalogue PCJ — création, édition et stocks."
+                    actions={
+                        <Link
+                            href={route('admin.products.create')}
+                            className={ADMIN_BTN_SM_PRIMARY}
+                        >
+                            <Plus className="size-4" />
+                            Nouveau produit
+                        </Link>
+                    }
+                />
 
                 <div className="md:hidden">
                     <AdminFilterTabs tabs={tabs} />

@@ -38,6 +38,14 @@ export const ADMIN_BTN_PILL_DARK =
 export const ADMIN_BTN_PILL_OUTLINE =
     'font-poppins inline-flex w-full items-center justify-center gap-2 rounded-[32px] border border-black bg-white px-4 py-3 text-sm font-semibold text-black transition-colors hover:bg-neutral-100 sm:w-auto sm:px-[18px] sm:py-[15px] sm:text-[15px]';
 
+/** Bouton compact pour les en-têtes de page admin — primaire bleu */
+export const ADMIN_BTN_SM_PRIMARY =
+    'font-poppins inline-flex items-center gap-1.5 rounded-lg bg-[#0059DD] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#0047b0] disabled:opacity-50 disabled:pointer-events-none';
+
+/** Bouton compact pour les en-têtes de page admin — outline */
+export const ADMIN_BTN_SM_OUTLINE =
+    'font-poppins inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:border-slate-300';
+
 /** Carte admin — écrase les styles shadcn (rounded-xl, ring, card-foreground). */
 export const ADMIN_CARD =
     'rounded-sm border border-neutral-100 bg-white text-black shadow-sm !rounded-sm ring-0 !bg-white !text-black [&_[data-slot=card-description]]:font-poppins [&_[data-slot=card-description]]:text-base [&_[data-slot=card-description]]:text-[#747474]';
