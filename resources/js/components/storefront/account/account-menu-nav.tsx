@@ -1,11 +1,12 @@
-import { router } from '@inertiajs/react';
 import {
     Gift,
     Headphones,
+    LogIn,
     LogOut,
     MapPin,
     Package,
     Settings,
+    UserPlus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { AccountDrawerMenuItem } from '@/components/storefront/account/account-drawer-menu-item';
@@ -72,19 +73,34 @@ export function AccountMenuNav({ onNavigate, compact = false }: Props) {
     );
 }
 
-export function AccountMenuNavGuest() {
+type GuestProps = {
+    canRegister?: boolean;
+    onNavigate?: () => void;
+};
+
+export function AccountMenuNavGuest({ canRegister = false, onNavigate }: GuestProps) {
     return (
-        <div className="py-12 text-center">
-            <p className="font-poppins text-xl text-[#737373]">
-                Connectez-vous pour accéder à votre compte.
-            </p>
-            <button
-                type="button"
-                className="font-poppins mt-4 text-lg font-semibold text-[#0059DD] hover:underline"
-                onClick={() => router.visit(route('login'))}
-            >
-                Se connecter
-            </button>
-        </div>
+        <nav className="overflow-hidden rounded-xl">
+            <AccountDrawerMenuItem
+                icon={LogIn}
+                label="Se connecter"
+                href={route('login')}
+                onClick={onNavigate}
+            />
+            {canRegister ? (
+                <AccountDrawerMenuItem
+                    icon={UserPlus}
+                    label="Créer un compte"
+                    href={route('auth.customer.register')}
+                    onClick={onNavigate}
+                />
+            ) : null}
+            <AccountDrawerMenuItem
+                icon={Headphones}
+                label="Aides & Contact"
+                href={route('contact')}
+                onClick={onNavigate}
+            />
+        </nav>
     );
 }

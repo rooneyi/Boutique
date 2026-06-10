@@ -9,6 +9,7 @@ import {
 import { toast } from 'sonner';
 import { preview as accountPreview } from '@/routes/customer/account';
 import type { AccountPreview } from '@/components/storefront/account/account-types';
+import { getStorefrontAuthUser } from '@/lib/storefront-page-props';
 
 type AccountDrawerContextValue = {
     open: boolean;
@@ -39,7 +40,6 @@ export function AccountDrawerProvider({ children }: { children: ReactNode }) {
 
             if (response.status === 401 || response.status === 403) {
                 setAccount(null);
-                toast.error('Connectez-vous pour accéder à votre compte.');
                 return;
             }
 
@@ -58,7 +58,12 @@ export function AccountDrawerProvider({ children }: { children: ReactNode }) {
 
     const openAccount = useCallback(() => {
         setOpen(true);
-        void refresh();
+        if (getStorefrontAuthUser()?.role === 'CUSTOMER') {
+            void refresh();
+        } else {
+            setAccount(null);
+            setLoading(false);
+        }
     }, [refresh]);
 
     const closeAccount = useCallback(() => {

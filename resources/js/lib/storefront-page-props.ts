@@ -9,6 +9,7 @@ export type StorefrontPageProps = {
     auth?: {
         user?: AuthUser | null;
     };
+    canRegister?: boolean;
     cartCount?: number;
     favoritesCount?: number;
 };
@@ -26,4 +27,8 @@ export function getStorefrontPageProps(): StorefrontPageProps {
 
 export function getStorefrontAuthUser(): AuthUser | null | undefined {
     return cached.auth?.user;
+}
+
+export function getStorefrontCanRegister(): boolean {
+    return cached.canRegister ?? false;
 }

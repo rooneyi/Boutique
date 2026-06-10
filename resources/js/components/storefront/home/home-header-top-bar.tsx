@@ -5,17 +5,17 @@ import { cn } from '@/lib/utils';
 
 type Props = {
     isAdmin?: boolean;
-    canRegister?: boolean;
-    isGuest?: boolean;
-    accountHref?: string;
+    onAccountClick?: () => void;
+    accountActive?: boolean;
+    isLoggedIn?: boolean;
 };
 
 /** Barre noire — Figma header top banner (122:2114) */
 export function HomeHeaderTopBar({
     isAdmin = false,
-    canRegister = false,
-    isGuest = true,
-    accountHref = route('login'),
+    onAccountClick,
+    accountActive = false,
+    isLoggedIn = false,
 }: Props) {
     return (
         <div className="bg-black text-white">
@@ -56,10 +56,14 @@ export function HomeHeaderTopBar({
                         </Link>
                     ) : null}
 
-                    {!isAdmin && (canRegister && isGuest ? (
-                        <Link
-                            href={route('auth.customer.register')}
-                            className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+                    {!isAdmin && onAccountClick ? (
+                        <button
+                            type="button"
+                            onClick={onAccountClick}
+                            className={cn(
+                                'flex items-center gap-2.5 transition-opacity hover:opacity-80',
+                                accountActive && 'opacity-100 ring-1 ring-white/40 ring-offset-1 ring-offset-black rounded-sm',
+                            )}
                         >
                             <img
                                 src={HEADER_ASSETS.iconUser}
@@ -69,26 +73,10 @@ export function HomeHeaderTopBar({
                                 className="size-6 shrink-0"
                             />
                             <span className="font-poppins text-sm font-normal leading-normal text-white">
-                                Rejoignez-nous
+                                {isLoggedIn ? 'Mon compte' : 'Se connecter'}
                             </span>
-                        </Link>
-                    ) : !isAdmin && !isGuest ? (
-                        <Link
-                            href={accountHref}
-                            className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
-                        >
-                            <img
-                                src={HEADER_ASSETS.iconUser}
-                                alt=""
-                                width={24}
-                                height={24}
-                                className="size-6 shrink-0"
-                            />
-                            <span className="font-poppins text-sm font-normal leading-normal text-white">
-                                Mon compte
-                            </span>
-                        </Link>
-                    ) : null)}
+                        </button>
+                    ) : null}
 
                     <div
                         className={cn(

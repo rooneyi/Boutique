@@ -5,6 +5,8 @@ import { CartDrawer } from '@/components/storefront/cart/cart-drawer';
 import { CartDrawerProvider } from '@/components/storefront/cart/cart-drawer-context';
 import { FavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer';
 import { FavoritesDrawerProvider } from '@/components/storefront/favorites/favorites-drawer-context';
+import { NotificationsDrawer } from '@/components/storefront/notifications/notifications-drawer';
+import { NotificationsDrawerProvider } from '@/components/storefront/notifications/notifications-drawer-context';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
@@ -77,12 +79,15 @@ createInertiaApp({
             <TooltipProvider delayDuration={0}>
                 <CartDrawerProvider>
                     <FavoritesDrawerProvider>
-                        <AccountDrawerProvider>
-                            {app}
-                            <CartDrawer />
-                            <FavoritesDrawer />
-                            <AccountDrawer />
-                        </AccountDrawerProvider>
+                        <NotificationsDrawerProvider>
+                            <AccountDrawerProvider>
+                                {app}
+                                <CartDrawer />
+                                <FavoritesDrawer />
+                                <NotificationsDrawer />
+                                <AccountDrawer />
+                            </AccountDrawerProvider>
+                        </NotificationsDrawerProvider>
                     </FavoritesDrawerProvider>
                 </CartDrawerProvider>
                 <Toaster />

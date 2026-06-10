@@ -231,18 +231,21 @@ Route::get('about', [AboutController::class, 'index'])->name('about');
 Route::get('contact', [ContactController::class, 'index'])->name('contact');
 Route::post('contact', [ContactController::class, 'store'])->name('contact.store');
 
+Route::prefix('customer')->name('customer.')->group(function () {
+    Route::get('products', [CustomerProductController::class, 'index'])->name('products.index');
+    Route::get('products/{product}', [CustomerProductController::class, 'show'])->name('products.show');
+
+    Route::get('cart', [CartController::class, 'index'])->name('cart');
+    Route::get('cart/preview', [CartController::class, 'preview'])->name('cart.preview');
+    Route::post('cart/items', [CartController::class, 'store'])->name('cart.items.store');
+    Route::patch('cart/items/{product}', [CartController::class, 'update'])->name('cart.items.update');
+    Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+
+    Route::get('checkout', [CheckoutController::class, 'create'])->name('checkout');
+});
+
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::prefix('customer')->name('customer.')->group(function () {
-        Route::get('products', [CustomerProductController::class, 'index'])->name('products.index');
-        Route::get('products/{product}', [CustomerProductController::class, 'show'])->name('products.show');
-
-        Route::get('cart', [CartController::class, 'index'])->name('cart');
-        Route::get('cart/preview', [CartController::class, 'preview'])->name('cart.preview');
-        Route::post('cart/items', [CartController::class, 'store'])->name('cart.items.store');
-        Route::patch('cart/items/{product}', [CartController::class, 'update'])->name('cart.items.update');
-        Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
-
-        Route::get('checkout', [CheckoutController::class, 'create'])->name('checkout');
         Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
         Route::get('account', [AccountController::class, 'index'])->name('account');

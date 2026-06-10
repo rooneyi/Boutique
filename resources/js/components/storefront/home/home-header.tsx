@@ -4,13 +4,10 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { InertiaPropsSync } from '@/components/storefront/inertia-props-sync';
 import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
-import { HeaderCartButton } from '@/components/storefront/header/header-cart-button';
-import { HeaderFavoritesButton } from '@/components/storefront/header/header-favorites-button';
-import {
-    HeaderIconPill,
-    SF_HEADER_ICON_PILL_BELL,
-    SF_HEADER_ICON_PILL_HEART,
-} from '@/components/storefront/header/header-icon-pill';
+import { useOptionalCartDrawer } from '@/components/storefront/cart/cart-drawer-context';
+import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
+import { useOptionalNotificationsDrawer } from '@/components/storefront/notifications/notifications-drawer-context';
+import { HeaderIconToolbar } from '@/components/storefront/header/header-icon-toolbar';
 import { HomeHeaderTopBar } from '@/components/storefront/home/home-header-top-bar';
 import { StorefrontLogo } from '@/components/storefront/storefront-logo';
 import { ADMIN_MAIN_NAV, ADMIN_STOCK_NAV } from '@/lib/admin-nav';
@@ -60,7 +57,6 @@ const NAV_ITEMS = [
 
 export function HomeHeader({
     user,
-    canRegister = false,
     activeNav = 'home',
     chrome = 'storefront',
     adminPath = '',
@@ -71,25 +67,24 @@ export function HomeHeader({
     const [mobileOpen, setMobileOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const accountDrawer = useOptionalAccountDrawer();
+    const cartDrawer = useOptionalCartDrawer();
+    const favoritesDrawer = useOptionalFavoritesDrawer();
+    const notificationsDrawer = useOptionalNotificationsDrawer();
 
     function openAccount() {
-        if (user?.role === 'CUSTOMER') {
-            if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) {
-                router.visit(route('customer.account'));
-                return;
-            }
-            accountDrawer?.openAccount();
-        } else {
-            router.visit(route('login'));
+        if (user?.role === 'ADMIN') {
+            router.visit(route('admin.dashboard'));
+            return;
         }
+        if (user?.role === 'VENDOR') {
+            router.visit(route('login'));
+            return;
+        }
+        cartDrawer?.closeCart();
+        favoritesDrawer?.closeFavorites();
+        notificationsDrawer?.closeNotifications();
+        accountDrawer?.openAccount();
     }
-
-    const accountHref =
-        user?.role === 'ADMIN'
-            ? '/admin/dashboard'
-            : user?.role === 'CUSTOMER'
-              ? route('customer.account')
-              : route('login');
 
     useEffect(() => {
         if (!isAdmin) {
@@ -153,9 +148,9 @@ export function HomeHeader({
             <header className="sticky top-0 z-50">
             <HomeHeaderTopBar
                 isAdmin={isAdmin}
-                canRegister={canRegister}
-                isGuest={!user}
-                accountHref={accountHref}
+                onAccountClick={isAdmin ? undefined : openAccount}
+                accountActive={accountDrawer?.open ?? false}
+                isLoggedIn={user?.role === 'CUSTOMER'}
             />
 
             <div className="relative bg-white">
@@ -217,40 +212,7 @@ export function HomeHeader({
                                 {searchField}
                             </form>
                         )}
-                        {!isAdmin && (
-                            <div className="hidden items-center gap-3 lg:flex">
-                                <HeaderIconPill
-                                    aria-label="Notifications"
-                                    className={SF_HEADER_ICON_PILL_BELL}
-                                >
-                                    <img
-                                        src={HEADER_ASSETS.iconBell}
-                                        alt=""
-                                        width={17}
-                                        height={20}
-                                        className="h-[19.5px] w-[16.514px] object-contain"
-                                    />
-                                </HeaderIconPill>
-                                {user?.role === 'CUSTOMER' ? (
-                                    <HeaderFavoritesButton />
-                                ) : (
-                                    <HeaderIconPill
-                                        aria-label="Favoris"
-                                        className={SF_HEADER_ICON_PILL_HEART}
-                                        onClick={() => router.visit(route('login'))}
-                                    >
-                                        <img
-                                            src={HEADER_ASSETS.iconHeart}
-                                            alt=""
-                                            width={22}
-                                            height={19}
-                                            className="h-[18.716px] w-[21.5px] object-contain"
-                                        />
-                                    </HeaderIconPill>
-                                )}
-                                <HeaderCartButton />
-                            </div>
-                        )}
+                        {!isAdmin && <HeaderIconToolbar />}
                         {isAdmin && (
                             <Button variant="ghost" size="icon" className="rounded-full" asChild>
                                 <Link href={route('profile.edit')} aria-label="Paramètres">
@@ -393,27 +355,18 @@ export function HomeHeader({
                                 </Link>
                             </>
                         )}
-                        {!isAdmin &&
-                            (user?.role === 'CUSTOMER' ? (
-                                <button
-                                    type="button"
-                                    className="font-poppins mt-2 block w-full py-2 text-left text-base"
-                                    onClick={() => {
-                                        closeMobileMenu();
-                                        openAccount();
-                                    }}
-                                >
-                                    Mon compte
-                                </button>
-                            ) : (
-                                <Link
-                                    href={accountHref}
-                                    className="font-poppins mt-2 block py-2 text-base"
-                                    onClick={closeMobileMenu}
-                                >
-                                    {user ? 'Mon compte' : 'Connexion'}
-                                </Link>
-                            ))}
+                        {!isAdmin && (
+                            <button
+                                type="button"
+                                className="font-poppins mt-2 block w-full py-2 text-left text-base"
+                                onClick={() => {
+                                    closeMobileMenu();
+                                    openAccount();
+                                }}
+                            >
+                                Mon compte
+                            </button>
+                        )}
                         {isAdmin && (
                             <Link
                                 href={route('profile.edit')}

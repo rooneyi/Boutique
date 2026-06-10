@@ -13,6 +13,9 @@ type Props = {
 const inputClass =
     'font-poppins w-full rounded-[20px] border border-[#6b7280] bg-white px-6 py-2.5 text-sm text-black placeholder:text-[#6b7280] focus-visible:border-black focus-visible:ring-black/10';
 
+const inputErrorClass =
+    'font-poppins w-full rounded-[20px] border border-red-500 bg-white px-6 py-2.5 text-sm text-black placeholder:text-[#6b7280] focus-visible:border-red-500 focus-visible:ring-red-200';
+
 const labelClass = 'font-poppins text-sm font-medium text-black';
 
 export function CheckoutShippingStep({ data, errors, setData }: Props) {
@@ -58,9 +61,9 @@ export function CheckoutShippingStep({ data, errors, setData }: Props) {
 
                 <div className="space-y-5">
                     <div className="grid gap-5 sm:grid-cols-2">
-                        <div className="space-y-3">
+                        <div className="space-y-1.5">
                             <Label htmlFor="shipping_full_name" className={labelClass}>
-                                Nom complet
+                                Nom complet <span className="text-red-500">*</span>
                             </Label>
                             <input
                                 id="shipping_full_name"
@@ -68,23 +71,21 @@ export function CheckoutShippingStep({ data, errors, setData }: Props) {
                                 value={data.shipping_full_name}
                                 onChange={(e) => setData('shipping_full_name', e.target.value)}
                                 placeholder="Entrez votre nom complet"
-                                className={inputClass}
-                                required
+                                className={errors.shipping_full_name ? inputErrorClass : inputClass}
                             />
                             <InputError message={errors.shipping_full_name} />
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-1.5">
                             <Label htmlFor="shipping_whatsapp" className={labelClass}>
-                                Numéro Whatsapp
+                                Numéro WhatsApp <span className="text-red-500">*</span>
                             </Label>
                             <input
                                 id="shipping_whatsapp"
                                 type="tel"
                                 value={data.shipping_whatsapp}
                                 onChange={(e) => setData('shipping_whatsapp', e.target.value)}
-                                placeholder="Ex: +225 07 XX XX XX"
-                                className={inputClass}
-                                required
+                                placeholder="Ex: +243 07 XX XX XX"
+                                className={errors.shipping_whatsapp ? inputErrorClass : inputClass}
                             />
                             <InputError message={errors.shipping_whatsapp} />
                         </div>
@@ -92,9 +93,9 @@ export function CheckoutShippingStep({ data, errors, setData }: Props) {
 
                     {!isPickup ? (
                         <>
-                            <div className="space-y-3">
+                            <div className="space-y-1.5">
                                 <Label htmlFor="shipping_address" className={labelClass}>
-                                    Adresse complète
+                                    Adresse complète <span className="text-red-500">*</span>
                                 </Label>
                                 <input
                                     id="shipping_address"
@@ -102,16 +103,15 @@ export function CheckoutShippingStep({ data, errors, setData }: Props) {
                                     value={data.shipping_address}
                                     onChange={(e) => setData('shipping_address', e.target.value)}
                                     placeholder="Entrez votre adresse complète"
-                                    className={inputClass}
-                                    required
+                                    className={errors.shipping_address ? inputErrorClass : inputClass}
                                 />
                                 <InputError message={errors.shipping_address} />
                             </div>
 
                             <div className="grid gap-5 sm:grid-cols-2">
-                                <div className="space-y-3">
+                                <div className="space-y-1.5">
                                     <Label htmlFor="shipping_city" className={labelClass}>
-                                        Ville / Commune
+                                        Ville / Commune <span className="text-red-500">*</span>
                                     </Label>
                                     <input
                                         id="shipping_city"
@@ -119,14 +119,13 @@ export function CheckoutShippingStep({ data, errors, setData }: Props) {
                                         value={data.shipping_city}
                                         onChange={(e) => setData('shipping_city', e.target.value)}
                                         placeholder="Entrez votre ville"
-                                        className={inputClass}
-                                        required
+                                        className={errors.shipping_city ? inputErrorClass : inputClass}
                                     />
                                     <InputError message={errors.shipping_city} />
                                 </div>
-                                <div className="space-y-3">
+                                <div className="space-y-1.5">
                                     <Label htmlFor="shipping_district" className={labelClass}>
-                                        Quartier
+                                        Quartier <span className="text-red-500">*</span>
                                     </Label>
                                     <input
                                         id="shipping_district"
@@ -136,8 +135,7 @@ export function CheckoutShippingStep({ data, errors, setData }: Props) {
                                             setData('shipping_district', e.target.value)
                                         }
                                         placeholder="Entrez votre quartier"
-                                        className={inputClass}
-                                        required
+                                        className={errors.shipping_district ? inputErrorClass : inputClass}
                                     />
                                     <InputError message={errors.shipping_district} />
                                 </div>

@@ -38,16 +38,7 @@ export function AddToCartButton({
     function handleClick(e: React.MouseEvent) {
         e.preventDefault();
         e.stopPropagation();
-        if (!user) {
-            toast.info('Connectez-vous pour ajouter des articles au panier.', {
-                action: {
-                    label: 'Connexion',
-                    onClick: () => router.visit(route('login')),
-                },
-            });
-            return;
-        }
-        if (user.role !== 'CUSTOMER') {
+        if (user && user.role !== 'CUSTOMER') {
             toast.message('Compte client requis', {
                 description: 'Les achats en ligne sont réservés aux comptes clients.',
             });

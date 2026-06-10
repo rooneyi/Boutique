@@ -92,14 +92,13 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
 
                     <div className="flex items-center gap-2">
                         {!user && (
-                            <>
-                                <Button variant="outline" size="sm" className="rounded-sm font-poppins" asChild>
-                                    <Link href={route('login')}>Connexion</Link>
-                                </Button>
-                                <Button size="sm" className="hidden rounded-sm bg-[#0059DD] font-poppins hover:bg-[#0047b0] sm:inline-flex" asChild>
-                                    <Link href={route('auth.customer.register')}>Inscription</Link>
-                                </Button>
-                            </>
+                            <Button
+                                size="sm"
+                                className="rounded-sm bg-[#0059DD] font-poppins hover:bg-[#0047b0]"
+                                onClick={() => accountDrawer?.openAccount()}
+                            >
+                                Se connecter
+                            </Button>
                         )}
 
                         {user && isCustomer && (

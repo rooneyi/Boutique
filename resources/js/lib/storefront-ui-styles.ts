@@ -83,7 +83,7 @@ export const SF_NAV_ITEM =
     'font-poppins flex h-[47px] min-w-[100px] shrink-0 flex-col items-center justify-center gap-0.5 px-5 py-2 text-base font-normal whitespace-nowrap text-black transition-colors hover:text-[#0059DD]';
 
 export const SF_NAV_ITEM_ACTIVE =
-    'font-poppins flex h-[47px] min-w-[100px] shrink-0 flex-col items-center justify-center gap-0.5 px-5 py-1.5 text-base font-semibold whitespace-nowrap text-black';
+    'font-poppins flex h-[47px] min-w-[100px] shrink-0 flex-col items-center justify-center gap-0.5 px-5 py-1.5 text-base font-semibold whitespace-nowrap text-[#0059DD]';
 
 export const SF_NAV_ACTIVE_DOT = 'size-[5px] shrink-0 rounded-full bg-[#0059DD]';
 

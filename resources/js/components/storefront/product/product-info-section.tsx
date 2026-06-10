@@ -75,8 +75,8 @@ export function ProductInfoSection({
                                 className={cn(
                                     'pb-3 font-poppins text-lg font-medium transition-colors',
                                     tab === t.id
-                                        ? 'border-b-2 border-black text-black'
-                                        : 'text-[#747474] hover:text-black',
+                                        ? 'border-b-2 border-[#0059DD] text-[#0059DD]'
+                                        : 'text-[#747474] hover:text-[#0059DD]',
                                 )}
                             >
                                 {t.label}

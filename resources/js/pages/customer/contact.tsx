@@ -1,7 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import { FlashToaster } from '@/components/flash-toaster';
 import { ContactForm } from '@/components/storefront/contact/contact-form';
-import { ContactHero } from '@/components/storefront/contact/contact-hero';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 
@@ -34,7 +33,6 @@ export default function Contact() {
                     activeNav="contact"
                 />
                 <main>
-                    <ContactHero />
                     <ContactForm
                         subjects={subjects}
                         success={flash?.success}

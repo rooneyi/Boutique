@@ -1,7 +1,7 @@
 import {
     HeaderIconPill,
     SF_HEADER_ICON_IMG_ACTIVE,
-    SF_HEADER_ICON_PILL_HEART,
+    SF_HEADER_ICON_PILL_BELL,
 } from '@/components/storefront/header/header-icon-pill';
 import { HEADER_ASSETS } from '@/lib/header-assets';
 import { cn } from '@/lib/utils';
@@ -12,25 +12,25 @@ type Props = {
     onClick?: () => void;
 };
 
-export function HeaderFavoritesButton({
+export function HeaderNotificationsButton({
     className,
     active = false,
     onClick,
 }: Props) {
     return (
         <HeaderIconPill
-            aria-label="Mes favoris"
-            className={cn(SF_HEADER_ICON_PILL_HEART, className)}
+            aria-label="Notifications"
+            className={cn(SF_HEADER_ICON_PILL_BELL, className)}
             active={active}
             onClick={onClick}
         >
             <img
-                src={HEADER_ASSETS.iconHeart}
+                src={HEADER_ASSETS.iconBell}
                 alt=""
-                width={22}
-                height={19}
+                width={17}
+                height={20}
                 className={cn(
-                    'h-[18.716px] w-[21.5px] object-contain transition-[filter] duration-200',
+                    'h-[19.5px] w-[16.514px] object-contain transition-[filter] duration-200',
                     active && SF_HEADER_ICON_IMG_ACTIVE,
                 )}
             />

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
 import { useOptionalFavoritesDrawer } from '@/components/storefront/favorites/favorites-drawer-context';
 import { useStorefrontAuth } from '@/hooks/use-storefront-auth';
 import { router } from '@inertiajs/react';
@@ -6,7 +7,6 @@ import { Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { destroy as deleteFavorite, store as postFavorite } from '@/routes/customer/favorites';
-import { route } from '@/lib/route';
 import { SF_FAVORITE_RED, SF_FAVORITE_RED_FILL } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
@@ -37,6 +37,7 @@ export function FavoriteButton({
 }: Props) {
     const user = useStorefrontAuth();
     const favoritesDrawer = useOptionalFavoritesDrawer();
+    const accountDrawer = useOptionalAccountDrawer();
     const [liked, setLiked] = useState(favorited);
 
     useEffect(() => {
@@ -56,12 +57,7 @@ export function FavoriteButton({
         e.stopPropagation();
 
         if (!user) {
-            toast.info('Connectez-vous pour enregistrer des favoris.', {
-                action: {
-                    label: 'Connexion',
-                    onClick: () => router.visit(route('login')),
-                },
-            });
+            accountDrawer?.openAccount();
             return;
         }
         if (user.role !== 'CUSTOMER') {

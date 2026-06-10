@@ -128,7 +128,7 @@ export function HomeTestimonial({ testimonials = [] }: Props) {
                                 className={cn(
                                     'rounded-full transition-all duration-300 ease-out',
                                     i === index
-                                        ? 'size-[11px] bg-black ring-4 ring-black/10'
+                                        ? 'size-[11px] bg-[#0059DD] ring-4 ring-[#0059DD]/20'
                                         : 'size-[11px] bg-neutral-300 hover:bg-neutral-400',
                                 )}
                             />

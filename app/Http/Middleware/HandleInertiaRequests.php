@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Laravel\Fortify\Features;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -42,9 +43,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'cartCount' => $request->user()?->role === 'CUSTOMER'
-                ? app(CartService::class)->count()
-                : 0,
+            'canRegister' => Features::enabled(Features::registration()),
+            'cartCount' => app(CartService::class)->count(),
             'favoritesCount' => $request->user()?->role === 'CUSTOMER'
                 ? (int) ($request->user()->customer?->favoriteProducts()->count() ?? 0)
                 : 0,

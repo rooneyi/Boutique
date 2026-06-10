@@ -11,9 +11,14 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { route } from '@/lib/route';
+import { getStorefrontAuthUser, getStorefrontCanRegister } from '@/lib/storefront-page-props';
 
 export function AccountDrawer() {
     const { open, closeAccount, account, loading } = useAccountDrawer();
+    const canRegister = getStorefrontCanRegister();
+    const isCustomer = getStorefrontAuthUser()?.role === 'CUSTOMER';
+
+    const drawerTitle = isCustomer ? 'Mon compte' : 'Se connecter';
 
     return (
         <Sheet open={open} onOpenChange={(next) => !next && closeAccount()}>
@@ -26,22 +31,27 @@ export function AccountDrawer() {
             >
                 <div className="relative shrink-0 px-5 pt-10">
                     <SheetTitle className="font-poppins text-[36px] font-semibold leading-normal text-black">
-                        Mon compte
+                        {drawerTitle}
                     </SheetTitle>
+                    {!isCustomer && (
+                        <p className="font-poppins mt-1 text-sm text-[#737373]">
+                            Connectez-vous ou créez un compte pour continuer.
+                        </p>
+                    )}
                     <Button
                         type="button"
                         variant="ghost"
                         size="icon"
                         className="absolute top-[52px] right-[26px] size-10 rounded-full text-black hover:bg-neutral-100"
                         onClick={closeAccount}
-                        aria-label="Fermer le compte"
+                        aria-label="Fermer"
                     >
                         <X className="size-10" strokeWidth={1.25} />
                     </Button>
                 </div>
 
                 <SheetDescription className="sr-only">
-                    Profil et paramètres de votre compte client
+                    {isCustomer ? 'Profil et paramètres de votre compte client' : 'Connectez-vous ou créez un compte'}
                 </SheetDescription>
 
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-10">
@@ -68,7 +78,12 @@ export function AccountDrawer() {
                             </Button>
                         </div>
                     ) : (
-                        <AccountMenuNavGuest />
+                        <div className="mx-auto max-w-[751px] px-[18px]">
+                            <AccountMenuNavGuest
+                                canRegister={canRegister}
+                                onNavigate={closeAccount}
+                            />
+                        </div>
                     )}
                 </div>
             </SheetContent>

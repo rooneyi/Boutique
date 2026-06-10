@@ -10,6 +10,7 @@ import { CheckoutPaymentSummary } from '@/components/storefront/checkout/checkou
 import { CheckoutShippingStep } from '@/components/storefront/checkout/checkout-shipping-step';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
+import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
 import { route } from '@/lib/route';
 import { SF_PAGE_MAIN, SF_PAGE_TITLE } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
@@ -49,24 +50,47 @@ export default function CustomerCheckout() {
         usePage<PageProps>().props;
 
     const [step, setStep] = useState<CheckoutStep>('shipping');
-    const { data, setData, post, processing, errors } = useForm<CheckoutFormData>(defaults);
+    const { data, setData, post, processing, errors, setError, clearErrors } = useForm<CheckoutFormData>(defaults);
+    const accountDrawer = useOptionalAccountDrawer();
+
+    const isCustomer = auth?.user?.role === 'CUSTOMER';
 
     function validateShipping(): boolean {
-        if (!data.shipping_full_name.trim() || !data.shipping_whatsapp.trim()) {
-            return false;
+        clearErrors();
+        const isPickup = data.delivery_method === 'store_pickup';
+        let valid = true;
+
+        if (!data.shipping_full_name.trim()) {
+            setError('shipping_full_name', 'Le nom complet est requis.');
+            valid = false;
         }
-        if (data.delivery_method === 'home_delivery') {
-            return (
-                !!data.shipping_address.trim() &&
-                !!data.shipping_city.trim() &&
-                !!data.shipping_district.trim()
-            );
+        if (!data.shipping_whatsapp.trim()) {
+            setError('shipping_whatsapp', 'Le numéro WhatsApp est requis.');
+            valid = false;
         }
-        return true;
+        if (!isPickup) {
+            if (!data.shipping_address.trim()) {
+                setError('shipping_address', "L'adresse complète est requise.");
+                valid = false;
+            }
+            if (!data.shipping_city.trim()) {
+                setError('shipping_city', 'La ville ou commune est requise.');
+                valid = false;
+            }
+            if (!data.shipping_district.trim()) {
+                setError('shipping_district', 'Le quartier est requis.');
+                valid = false;
+            }
+        }
+        return valid;
     }
 
     function goToPayment() {
         if (!validateShipping()) {
+            return;
+        }
+        if (!isCustomer) {
+            accountDrawer?.openAccount();
             return;
         }
         setStep('payment');
