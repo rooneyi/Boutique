@@ -124,7 +124,7 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
 
     return (
         <AdminCard className="overflow-hidden">
-            <AdminCardHeader className="pb-2">
+            <AdminCardHeader className="flex flex-col gap-4 pb-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h3 className={ADMIN_H3}>Évolution des ventes</h3>
                     <AdminCardDescription>
@@ -145,13 +145,14 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                 )}
             </AdminCardHeader>
 
-            <AdminCardContent className="pb-4 pr-2">
+            <AdminCardContent className="pb-2">
                 {hasData ? (
-                    <ResponsiveContainer width="100%" height={340}>
+                    <div className="mx-auto h-[340px] w-full min-w-0 max-w-full">
+                        <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart
                             data={series}
-                            margin={{ top: 12, right: 8, left: 4, bottom: 4 }}
-                            barCategoryGap="18%"
+                            margin={{ top: 16, right: 20, left: 12, bottom: 8 }}
+                            barCategoryGap="20%"
                         >
                             <defs>
                                 <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -174,6 +175,7 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                                 tickMargin={10}
                                 interval={series.length > 10 ? 'preserveStartEnd' : 0}
                                 minTickGap={series.length > 10 ? 24 : 8}
+                                padding={{ left: 24, right: 24 }}
                                 tick={{
                                     fontSize: 11,
                                     fontFamily: 'Poppins, sans-serif',
@@ -254,7 +256,8 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                                 activeDot={{ r: 5, fill: '#0059DD', strokeWidth: 0 }}
                             />
                         </ComposedChart>
-                    </ResponsiveContainer>
+                        </ResponsiveContainer>
+                    </div>
                 ) : (
                     <div className="flex h-[340px] flex-col items-center justify-center gap-3">
                         <div className="flex size-14 items-center justify-center rounded-full bg-neutral-100">
