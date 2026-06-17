@@ -76,9 +76,12 @@ export function AccountMenuNav({ onNavigate, compact = false }: Props) {
 type GuestProps = {
     canRegister?: boolean;
     onNavigate?: () => void;
+    compact?: boolean;
 };
 
-export function AccountMenuNavGuest({ canRegister = false, onNavigate }: GuestProps) {
+export function AccountMenuNavGuest({ canRegister = false, onNavigate, compact = false }: GuestProps) {
+    const itemClass = compact ? 'px-4 py-3.5 [&_svg]:size-6 [&_span>span]:text-base' : undefined;
+
     return (
         <nav className="overflow-hidden rounded-xl">
             <AccountDrawerMenuItem
@@ -86,6 +89,7 @@ export function AccountMenuNavGuest({ canRegister = false, onNavigate }: GuestPr
                 label="Se connecter"
                 href={route('login')}
                 onClick={onNavigate}
+                className={itemClass}
             />
             {canRegister ? (
                 <AccountDrawerMenuItem
@@ -93,6 +97,7 @@ export function AccountMenuNavGuest({ canRegister = false, onNavigate }: GuestPr
                     label="Créer un compte"
                     href={route('auth.customer.register')}
                     onClick={onNavigate}
+                    className={itemClass}
                 />
             ) : null}
             <AccountDrawerMenuItem
@@ -100,6 +105,7 @@ export function AccountMenuNavGuest({ canRegister = false, onNavigate }: GuestPr
                 label="Aides & Contact"
                 href={route('contact')}
                 onClick={onNavigate}
+                className={itemClass}
             />
         </nav>
     );
