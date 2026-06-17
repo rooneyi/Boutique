@@ -80,6 +80,10 @@ export function HomeHeader({
             router.visit(route('login'));
             return;
         }
+        if (accountDrawer?.open) {
+            accountDrawer.closeAccount();
+            return;
+        }
         cartDrawer?.closeCart();
         favoritesDrawer?.closeFavorites();
         notificationsDrawer?.closeNotifications();
@@ -149,6 +153,7 @@ export function HomeHeader({
             <HomeHeaderTopBar
                 isAdmin={isAdmin}
                 onAccountClick={isAdmin ? undefined : openAccount}
+                onAccountClose={isAdmin ? undefined : () => accountDrawer?.closeAccount()}
                 accountActive={accountDrawer?.open ?? false}
                 isLoggedIn={user?.role === 'CUSTOMER'}
             />

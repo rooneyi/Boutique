@@ -1,4 +1,6 @@
 import { Link } from '@inertiajs/react';
+import { useRef } from 'react';
+import { AccountGuestPanel } from '@/components/storefront/account/account-guest-panel';
 import { HEADER_ASSETS, HEADER_SOCIAL_LINKS } from '@/lib/header-assets';
 import { route } from '@/lib/route';
 import { cn } from '@/lib/utils';
@@ -6,6 +8,7 @@ import { cn } from '@/lib/utils';
 type Props = {
     isAdmin?: boolean;
     onAccountClick?: () => void;
+    onAccountClose?: () => void;
     accountActive?: boolean;
     isLoggedIn?: boolean;
 };
@@ -14,11 +17,15 @@ type Props = {
 export function HomeHeaderTopBar({
     isAdmin = false,
     onAccountClick,
+    onAccountClose,
     accountActive = false,
     isLoggedIn = false,
 }: Props) {
+    const accountAnchorRef = useRef<HTMLDivElement>(null);
+    const showGuestPanel = accountActive && !isLoggedIn;
+
     return (
-        <div className="bg-black text-white">
+        <div className="relative bg-black text-white">
             <div className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between px-4 py-[15px] sm:px-8 lg:px-[102px]">
                 <div className="flex items-center gap-3">
                     {HEADER_SOCIAL_LINKS.map((social) => (
@@ -57,25 +64,36 @@ export function HomeHeaderTopBar({
                     ) : null}
 
                     {!isAdmin && onAccountClick ? (
-                        <button
-                            type="button"
-                            onClick={onAccountClick}
-                            className={cn(
-                                'flex items-center gap-2.5 transition-opacity hover:opacity-80',
-                                accountActive && 'opacity-100 ring-1 ring-white/40 ring-offset-1 ring-offset-black rounded-sm',
+                        <div ref={accountAnchorRef} className="relative">
+                            <button
+                                type="button"
+                                onClick={onAccountClick}
+                                className={cn(
+                                    'flex items-center gap-2.5 transition-opacity hover:opacity-80',
+                                    accountActive && 'opacity-100',
+                                )}
+                                aria-expanded={showGuestPanel}
+                                aria-haspopup={!isLoggedIn ? 'dialog' : undefined}
+                            >
+                                <img
+                                    src={HEADER_ASSETS.iconUser}
+                                    alt=""
+                                    width={24}
+                                    height={24}
+                                    className="size-6 shrink-0"
+                                />
+                                <span className="font-poppins text-sm font-normal leading-normal text-white">
+                                    {isLoggedIn ? 'Mon compte' : 'Se connecter'}
+                                </span>
+                            </button>
+                            {!isLoggedIn && onAccountClose && (
+                                <AccountGuestPanel
+                                    open={showGuestPanel}
+                                    onClose={onAccountClose}
+                                    anchorRef={accountAnchorRef}
+                                />
                             )}
-                        >
-                            <img
-                                src={HEADER_ASSETS.iconUser}
-                                alt=""
-                                width={24}
-                                height={24}
-                                className="size-6 shrink-0"
-                            />
-                            <span className="font-poppins text-sm font-normal leading-normal text-white">
-                                {isLoggedIn ? 'Mon compte' : 'Se connecter'}
-                            </span>
-                        </button>
+                        </div>
                     ) : null}
 
                     <div
