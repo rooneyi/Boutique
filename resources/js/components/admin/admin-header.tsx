@@ -89,12 +89,6 @@ const STOCK_NAV: NavItem[] = [
         icon: ShoppingBag,
         match: (path) => path.endsWith('/out-of-stock'),
     },
-    {
-        label: 'Terminés',
-        href: route('admin.products.discontinued'),
-        icon: ShoppingBag,
-        match: (path) => path.endsWith('/discontinued'),
-    },
 ];
 
 function MainNavLink({ item, path }: { item: NavItem; path: string }) {

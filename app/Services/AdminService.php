@@ -203,7 +203,7 @@ class AdminService
     public function paginateAdminProducts(string $filter = 'all')
     {
         $query = Product::query()
-            ->with(['vendor.user', 'category'])
+            ->with(['vendor.user', 'category', 'variants'])
             ->latest('id');
 
         match ($filter) {
@@ -215,6 +215,8 @@ class AdminService
         };
 
         return $query->paginate(20)->through(function (Product $p) {
+            $colors = $p->variants->pluck('color')->unique()->values();
+
             return [
                 'id' => $p->id,
                 'name' => $p->name,
@@ -223,6 +225,9 @@ class AdminService
                 'status' => $p->status,
                 'category' => $p->category?->name,
                 'vendor' => ['shop_name' => $p->vendor?->shop_name ?? '—'],
+                'variants_count' => $p->variants->count(),
+                'colors_count' => $colors->count(),
+                'colors' => $colors->all(),
             ];
         });
     }

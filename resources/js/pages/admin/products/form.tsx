@@ -1,5 +1,9 @@
 import { Head, Form, Link } from '@inertiajs/react';
-import { ProductColorPicker } from '@/components/admin/product-color-picker';
+import {
+    AdminProductVariantEditor,
+    groupsFromVariants,
+    type ColorGroup,
+} from '@/components/admin/admin-product-variant-editor';
 import {
     AdminCard,
     AdminCardContent,
@@ -14,14 +18,13 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { route } from '@/lib/route';
 import {
     ADMIN_BTN_SM_OUTLINE,
     ADMIN_BTN_PRIMARY,
     ADMIN_H3,
-    ADMIN_MUTED,
     ADMIN_PAGE_SECTION,
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
@@ -48,36 +51,11 @@ type Product = {
     variants?: VariantPayload[];
 };
 
-type VariantRow = {
-    color: string;
-    color_hex: string;
-    size: string;
-    sku: string;
-    stock: string;
-};
-
 type Props = {
     categories: Category[];
     sizes: string[];
     product?: Product | null;
 };
-
-function emptyVariantRow(size = 'M'): VariantRow {
-    return { color: 'Noir', color_hex: '#000000', size, sku: '', stock: '0' };
-}
-
-function rowsFromProduct(variants: VariantPayload[] | undefined, defaultSize: string): VariantRow[] {
-    if (!variants?.length) {
-        return [emptyVariantRow(defaultSize)];
-    }
-    return variants.map((v) => ({
-        color: v.color,
-        color_hex: v.color_hex ?? '#000000',
-        size: v.size,
-        sku: v.sku ?? '',
-        stock: String(v.stock),
-    }));
-}
 
 export default function CreateProduct({ categories, sizes, product }: Props) {
     const isEditing = !!product;
@@ -90,8 +68,8 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
     const [lifecycleStatus, setLifecycleStatus] = useState<'IN_STOCK' | 'DISCONTINUED'>(() =>
         product?.status === 'DISCONTINUED' ? 'DISCONTINUED' : 'IN_STOCK',
     );
-    const [variantRows, setVariantRows] = useState<VariantRow[]>(() =>
-        rowsFromProduct(product?.variants, defaultSize),
+    const [variantGroups, setVariantGroups] = useState<ColorGroup[]>(() =>
+        groupsFromVariants(product?.variants, defaultSize),
     );
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,18 +83,6 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
         }
     };
 
-    function updateRow(index: number, patch: Partial<VariantRow>) {
-        setVariantRows((rows) => rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
-    }
-
-    function addRow() {
-        setVariantRows((rows) => [...rows, emptyVariantRow(defaultSize)]);
-    }
-
-    function removeRow(index: number) {
-        setVariantRows((rows) => (rows.length <= 1 ? rows : rows.filter((_, i) => i !== index)));
-    }
-
     return (
         <>
             <Head title={isEditing ? 'Éditer Produit' : 'Créer Produit'} />
@@ -126,8 +92,8 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
                     title={isEditing ? 'Éditer le produit' : 'Nouveau produit'}
                     description={
                         isEditing
-                            ? 'Mettez à jour les informations et les articles (couleur / taille).'
-                            : 'Renseignez la catégorie, le prix et au moins un article en stock.'
+                            ? 'Un produit, plusieurs déclinaisons (couleur × taille).'
+                            : 'Créez le produit puis ses couleurs et tailles en stock.'
                     }
                     actions={
                         <Link href={route('admin.products.index')} className={ADMIN_BTN_SM_OUTLINE}>
@@ -140,7 +106,7 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
                     <AdminCardHeader>
                         <h3 className={ADMIN_H3}>Informations</h3>
                         <AdminCardDescription>
-                            Catégorie obligatoire · au moins un article
+                            Catégorie obligatoire · au moins une couleur et une taille
                         </AdminCardDescription>
                     </AdminCardHeader>
                     <AdminCardContent>
@@ -241,138 +207,13 @@ export default function CreateProduct({ categories, sizes, product }: Props) {
                                         <InputError message={errors.category_id} />
                                     </div>
 
-                                    <div className="space-y-4">
-                                        <div className="flex flex-wrap items-center justify-between gap-2">
-                                            <div>
-                                                <Label className={labelCn}>Articles en stock</Label>
-                                                <p className={cn(ADMIN_MUTED, 'mt-1 text-sm')}>
-                                                    Une ligne = couleur + taille (réf. SKU optionnelle)
-                                                </p>
-                                            </div>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                className="font-poppins"
-                                                onClick={addRow}
-                                                disabled={processing}
-                                            >
-                                                <Plus className="mr-1 size-4" />
-                                                Ajouter une ligne
-                                            </Button>
-                                        </div>
-
-                                        <InputError message={errors.variants as string} />
-
-                                        <div className="space-y-3">
-                                            {variantRows.map((row, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="grid gap-3 rounded-lg border border-neutral-200 p-4 sm:grid-cols-2 lg:grid-cols-6"
-                                                >
-                                                    <input
-                                                        type="hidden"
-                                                        name={`variants[${index}][color]`}
-                                                        value={row.color}
-                                                    />
-                                                    <input
-                                                        type="hidden"
-                                                        name={`variants[${index}][color_hex]`}
-                                                        value={row.color_hex}
-                                                    />
-                                                    <input
-                                                        type="hidden"
-                                                        name={`variants[${index}][size]`}
-                                                        value={row.size}
-                                                    />
-                                                    <input
-                                                        type="hidden"
-                                                        name={`variants[${index}][sku]`}
-                                                        value={row.sku}
-                                                    />
-                                                    <input
-                                                        type="hidden"
-                                                        name={`variants[${index}][stock]`}
-                                                        value={row.stock}
-                                                    />
-
-                                                    <ProductColorPicker
-                                                        color={row.color}
-                                                        colorHex={row.color_hex}
-                                                        disabled={processing}
-                                                        onChange={(patch) => updateRow(index, patch)}
-                                                    />
-
-                                                    <div className="grid gap-1">
-                                                        <Label className="text-sm font-medium text-[#747474]">
-                                                            Taille
-                                                        </Label>
-                                                        <Select
-                                                            value={row.size}
-                                                            onValueChange={(v) => updateRow(index, { size: v })}
-                                                        >
-                                                            <SelectTrigger className="font-poppins">
-                                                                <SelectValue />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {sizes.map((s) => (
-                                                                    <SelectItem key={s} value={s}>
-                                                                        {s}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-
-                                                    <div className="grid gap-1 sm:col-span-2">
-                                                        <Label className="text-sm font-medium text-[#747474]">
-                                                            Réf. article (SKU)
-                                                        </Label>
-                                                        <Input
-                                                            value={row.sku}
-                                                            onChange={(e) =>
-                                                                updateRow(index, { sku: e.target.value })
-                                                            }
-                                                            placeholder="PCJ-ROBE-NOIR-M"
-                                                            disabled={processing}
-                                                            className="font-poppins"
-                                                        />
-                                                    </div>
-
-                                                    <div className="grid gap-1">
-                                                        <Label className="text-sm font-medium text-[#747474]">
-                                                            Stock
-                                                        </Label>
-                                                        <Input
-                                                            type="number"
-                                                            min={0}
-                                                            value={row.stock}
-                                                            onChange={(e) =>
-                                                                updateRow(index, { stock: e.target.value })
-                                                            }
-                                                            required
-                                                            disabled={processing}
-                                                            className="font-poppins"
-                                                        />
-                                                    </div>
-
-                                                    <div className="flex items-end justify-end sm:col-span-2 lg:col-span-1">
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="text-[#747474] hover:text-red-600"
-                                                            onClick={() => removeRow(index)}
-                                                            disabled={processing || variantRows.length <= 1}
-                                                            aria-label="Supprimer la ligne"
-                                                        >
-                                                            <Trash2 className="size-5" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    <AdminProductVariantEditor
+                                        groups={variantGroups}
+                                        sizes={sizes}
+                                        processing={processing}
+                                        onChange={setVariantGroups}
+                                        errors={errors.variants as string | undefined}
+                                    />
 
                                     <div className="grid gap-2">
                                         <Label className={labelCn}>Visibilité catalogue</Label>

@@ -53,7 +53,6 @@ export const ADMIN_STOCK_NAV = [
     { label: 'En stock', href: route('admin.products.in-stock'), match: (p: string) => p.endsWith('/in-stock') },
     { label: 'Faibles stocks', href: route('admin.products.low-stock'), match: (p: string) => p.endsWith('/low-stock') },
     { label: 'Ruptures', href: route('admin.products.out-of-stock'), match: (p: string) => p.endsWith('/out-of-stock') },
-    { label: 'Terminés', href: route('admin.products.discontinued'), match: (p: string) => p.endsWith('/discontinued') },
 ] as const;
 
 export function resolveAdminNavKey(path: string): AdminNavKey {

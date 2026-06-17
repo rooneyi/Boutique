@@ -40,7 +40,24 @@ type Product = {
     quantity: number;
     status?: string;
     category: string | { id: number; name: string } | null;
+    variants_count?: number;
+    colors_count?: number;
+    colors?: string[];
 };
+
+function variantsSummary(product: Product): string {
+    const count = product.variants_count ?? 0;
+    const colors = product.colors ?? [];
+    if (count === 0) {
+        return 'Aucune déclinaison';
+    }
+    const colorPart =
+        colors.length > 0
+            ? colors.slice(0, 3).join(', ') + (colors.length > 3 ? '…' : '')
+            : `${product.colors_count ?? 0} couleur(s)`;
+
+    return `${count} déclinaison${count > 1 ? 's' : ''} · ${colorPart}`;
+}
 
 function categoryLabel(category: Product['category']): string {
     if (category == null) {
@@ -109,7 +126,6 @@ export default function AdminProducts() {
         { label: 'En stock', href: route('admin.products.in-stock'), active: filter === 'in-stock' },
         { label: 'Faible stock', href: route('admin.products.low-stock'), active: filter === 'low-stock' },
         { label: 'Ruptures', href: route('admin.products.out-of-stock'), active: filter === 'out-of-stock' },
-        { label: 'Terminés', href: route('admin.products.discontinued'), active: filter === 'discontinued' },
     ];
 
     return (
@@ -156,7 +172,7 @@ export default function AdminProducts() {
                                             <TableHead
                                                 className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD, 'text-right')}
                                             >
-                                                Stock
+                                                Stock total
                                             </TableHead>
                                             <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_LG)}>
                                                 Catégorie
@@ -175,7 +191,7 @@ export default function AdminProducts() {
                                                         {product.name}
                                                     </span>
                                                     <span className={ADMIN_MOBILE_META}>
-                                                        {categoryLabel(product.category)}
+                                                        {variantsSummary(product)}
                                                     </span>
                                                     <span className={ADMIN_MOBILE_META}>
                                                         €{Number(product.price).toFixed(2)} · Stock{' '}
@@ -201,7 +217,10 @@ export default function AdminProducts() {
                                                     {product.quantity}
                                                 </TableCell>
                                                 <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_LG)}>
-                                                    {categoryLabel(product.category)}
+                                                    <span>{categoryLabel(product.category)}</span>
+                                                    <span className="mt-0.5 hidden font-poppins text-xs text-[#999] sm:block">
+                                                        {variantsSummary(product)}
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <AdminBadge variant={stockBadgeVariant(product)}>
