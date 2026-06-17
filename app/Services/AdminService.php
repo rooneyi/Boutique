@@ -120,9 +120,13 @@ class AdminService
 
         $buckets = match ($period) {
             'day' => $this->chartBucketsByHour(),
-            'week' => $this->chartBucketsByDay(Carbon::now()->subDays(6)->startOfDay(), 7, 'D'),
+            'week' => $this->chartBucketsByDay(Carbon::now()->subDays(6)->startOfDay(), 7, 'ddd D/M'),
             'year' => $this->chartBucketsByMonth(Carbon::now()->subMonths(11)->startOfMonth(), 12),
-            default => $this->chartBucketsByDay($start->copy()->startOfDay(), (int) $start->diffInDays(Carbon::now()) + 1, 'd MMM'),
+            default => $this->chartBucketsByDay(
+                $start->copy()->startOfDay(),
+                (int) $start->copy()->startOfDay()->diffInDays(Carbon::now()->startOfDay()) + 1,
+                'D MMM',
+            ),
         };
 
         foreach ($orders as $order) {

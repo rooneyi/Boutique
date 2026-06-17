@@ -4,7 +4,6 @@ import {
     Bar,
     CartesianGrid,
     ComposedChart,
-    ResponsiveContainer,
     Tooltip,
     XAxis,
     YAxis,
@@ -15,7 +14,8 @@ import {
     AdminCardDescription,
     AdminCardHeader,
 } from '@/components/admin/admin-card';
-import { ADMIN_H3, ADMIN_MUTED } from '@/lib/admin-ui-styles';
+import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
+import { ADMIN_H3 } from '@/lib/admin-ui-styles';
 
 export type ChartPoint = {
     label: string;
@@ -30,7 +30,18 @@ type Props = {
 
 type NormalizedPoint = ChartPoint & { revenue: number; orders: number };
 
-function formatMoney(value: number) {
+const chartConfig = {
+    revenue: {
+        label: "Chiffre d'affaires",
+        color: '#0059DD',
+    },
+    orders: {
+        label: 'Commandes',
+        color: '#00C49F',
+    },
+} satisfies ChartConfig;
+
+function formatAxisMoney(value: number) {
     if (value >= 1000) {
         return `$${(value / 1000).toFixed(1)}k`;
     }
@@ -38,7 +49,7 @@ function formatMoney(value: number) {
 }
 
 function formatMoneyFull(value: number) {
-    return new Intl.NumberFormat('fr-FR', {
+    return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
         maximumFractionDigits: 2,
@@ -53,8 +64,7 @@ function normalizeData(data: ChartPoint[]): NormalizedPoint[] {
     }));
 }
 
-/** Plafond d'axe avec marge haute pour que la courbe ne colle pas au bord. */
-function axisTop(values: number[], paddingRatio = 0.18, floor = 1): number {
+function axisTop(values: number[], paddingRatio = 0.2, floor = 1): number {
     const max = Math.max(0, ...values);
     if (max <= 0) {
         return floor;
@@ -62,6 +72,16 @@ function axisTop(values: number[], paddingRatio = 0.18, floor = 1): number {
 
     const padded = max * (1 + paddingRatio);
     return max >= 10 ? Math.ceil(padded) : Math.ceil(padded * 10) / 10;
+}
+
+function xAxisInterval(count: number): number | 'preserveStartEnd' {
+    if (count <= 10) {
+        return 0;
+    }
+    if (count <= 20) {
+        return 1;
+    }
+    return 'preserveStartEnd';
 }
 
 type TooltipProps = {
@@ -115,15 +135,16 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
 
     const revenueMax = useMemo(() => axisTop(series.map((p) => p.revenue)), [series]);
     const ordersMax = useMemo(
-        () => Math.max(1, Math.ceil(axisTop(series.map((p) => p.orders), 0.25, 1))),
+        () => Math.max(1, Math.ceil(axisTop(series.map((p) => p.orders), 0.3, 1))),
         [series],
     );
 
-    const barSize = Math.max(10, Math.min(36, Math.floor(520 / Math.max(series.length, 1))));
-    const showDots = series.length <= 16;
+    const barSize = Math.max(8, Math.min(28, Math.floor(640 / Math.max(series.length, 1))));
+    const showDots = series.length <= 14;
+    const denseLabels = series.length > 12;
 
     return (
-        <AdminCard className="overflow-hidden">
+        <AdminCard>
             <AdminCardHeader className="flex flex-col gap-4 pb-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h3 className={ADMIN_H3}>Évolution des ventes</h3>
@@ -132,7 +153,7 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                     </AdminCardDescription>
                 </div>
                 {hasData && (
-                    <div className="flex items-center gap-5 font-poppins text-xs">
+                    <div className="flex flex-wrap items-center gap-5 font-poppins text-xs">
                         <span className="flex items-center gap-1.5 text-[#444]">
                             <span className="inline-block h-0.5 w-5 rounded-full bg-[#0059DD]" />
                             Chiffre d&apos;affaires
@@ -145,19 +166,26 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                 )}
             </AdminCardHeader>
 
-            <AdminCardContent className="pb-2">
+            <AdminCardContent className="min-w-0 pb-2">
                 {hasData ? (
-                    <div className="mx-auto h-[340px] w-full min-w-0 max-w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <ChartContainer
+                        config={chartConfig}
+                        className="aspect-auto h-[380px] w-full min-w-0"
+                    >
                         <ComposedChart
                             data={series}
-                            margin={{ top: 16, right: 20, left: 12, bottom: 8 }}
-                            barCategoryGap="20%"
+                            margin={{
+                                top: 12,
+                                right: 4,
+                                left: 4,
+                                bottom: denseLabels ? 28 : 8,
+                            }}
+                            barCategoryGap="24%"
                         >
                             <defs>
                                 <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#0059DD" stopOpacity={0.22} />
-                                    <stop offset="100%" stopColor="#0059DD" stopOpacity={0.02} />
+                                    <stop offset="0%" stopColor="#0059DD" stopOpacity={0.25} />
+                                    <stop offset="100%" stopColor="#0059DD" stopOpacity={0.03} />
                                 </linearGradient>
                             </defs>
 
@@ -165,17 +193,19 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                                 vertical={false}
                                 strokeDasharray="3 3"
                                 stroke="#e5e7eb"
-                                strokeOpacity={0.8}
+                                strokeOpacity={0.85}
                             />
 
                             <XAxis
                                 dataKey="label"
                                 tickLine={false}
                                 axisLine={false}
-                                tickMargin={10}
-                                interval={series.length > 10 ? 'preserveStartEnd' : 0}
-                                minTickGap={series.length > 10 ? 24 : 8}
-                                padding={{ left: 24, right: 24 }}
+                                tickMargin={8}
+                                interval={xAxisInterval(series.length)}
+                                minTickGap={denseLabels ? 32 : 12}
+                                angle={denseLabels ? -35 : 0}
+                                textAnchor={denseLabels ? 'end' : 'middle'}
+                                height={denseLabels ? 56 : 32}
                                 tick={{
                                     fontSize: 11,
                                     fontFamily: 'Poppins, sans-serif',
@@ -187,11 +217,11 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                                 yAxisId="left"
                                 tickLine={false}
                                 axisLine={false}
-                                tickMargin={8}
-                                width={56}
+                                tickMargin={6}
+                                width={52}
                                 domain={[0, revenueMax]}
                                 allowDataOverflow={false}
-                                tickFormatter={formatMoney}
+                                tickFormatter={formatAxisMoney}
                                 tick={{
                                     fontSize: 11,
                                     fontFamily: 'Poppins, sans-serif',
@@ -204,8 +234,8 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                                 orientation="right"
                                 tickLine={false}
                                 axisLine={false}
-                                tickMargin={8}
-                                width={28}
+                                tickMargin={6}
+                                width={32}
                                 domain={[0, ordersMax]}
                                 allowDecimals={false}
                                 allowDataOverflow={false}
@@ -226,8 +256,8 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                                 dataKey="orders"
                                 name="orders"
                                 fill="#00C49F"
-                                fillOpacity={0.35}
-                                radius={[4, 4, 0, 0]}
+                                fillOpacity={0.4}
+                                radius={[3, 3, 0, 0]}
                                 barSize={barSize}
                                 isAnimationActive={false}
                             />
@@ -246,7 +276,7 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                                 dot={
                                     showDots
                                         ? {
-                                              r: 3.5,
+                                              r: 3,
                                               fill: '#0059DD',
                                               stroke: '#fff',
                                               strokeWidth: 1.5,
@@ -256,10 +286,9 @@ export function AdminSalesChart({ data, periodLabel }: Props) {
                                 activeDot={{ r: 5, fill: '#0059DD', strokeWidth: 0 }}
                             />
                         </ComposedChart>
-                        </ResponsiveContainer>
-                    </div>
+                    </ChartContainer>
                 ) : (
-                    <div className="flex h-[340px] flex-col items-center justify-center gap-3">
+                    <div className="flex h-[380px] flex-col items-center justify-center gap-3">
                         <div className="flex size-14 items-center justify-center rounded-full bg-neutral-100">
                             <svg
                                 className="size-7 text-neutral-400"
