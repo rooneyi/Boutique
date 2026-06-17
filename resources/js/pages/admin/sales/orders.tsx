@@ -149,7 +149,7 @@ export default function AdminSalesOrders({ orders }: Props) {
                                                     'text-right font-semibold text-neutral-900',
                                                 )}
                                             >
-                                                €{Number(order.total).toFixed(2)}
+                                                ${Number(order.total).toFixed(2)}
                                             </TableCell>
                                             <TableCell
                                                 className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}

@@ -54,9 +54,9 @@ function variantsSummary(product: Product): string {
     const colorPart =
         colors.length > 0
             ? colors.slice(0, 3).join(', ') + (colors.length > 3 ? '…' : '')
-            : `€{product.colors_count ?? 0} couleur(s)`;
+            : `${product.colors_count ?? 0} couleur(s)`;
 
-    return `€{count} déclinaison€{count > 1 ? 's' : ''} · €{colorPart}`;
+    return `${count} déclinaison${count > 1 ? 's' : ''} · ${colorPart}`;
 }
 
 function categoryLabel(category: Product['category']): string {
@@ -194,7 +194,7 @@ export default function AdminProducts() {
                                                         {variantsSummary(product)}
                                                     </span>
                                                     <span className={ADMIN_MOBILE_META}>
-                                                        €{Number(product.price).toFixed(2)} · Stock{' '}
+                                                        ${Number(product.price).toFixed(2)} · Stock{' '}
                                                         {product.quantity}
                                                     </span>
                                                 </TableCell>
@@ -205,7 +205,7 @@ export default function AdminProducts() {
                                                         'text-right',
                                                     )}
                                                 >
-                                                    €{Number(product.price).toFixed(2)}
+                                                    ${Number(product.price).toFixed(2)}
                                                 </TableCell>
                                                 <TableCell
                                                     className={cn(

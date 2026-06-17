@@ -114,7 +114,7 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                                 {c.name}
                                                 <span className={ADMIN_MOBILE_META}>{c.email}</span>
                                                 <span className={ADMIN_MOBILE_META}>
-                                                    {c.orders_count} cmd. · €
+                                                    {c.orders_count} cmd. · $
                                                     {Number(c.total_spent).toFixed(2)}
                                                     {c.last_order_at
                                                         ? ` · ${new Date(c.last_order_at).toLocaleDateString('fr-FR')}`
@@ -138,7 +138,7 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                                     'text-right font-semibold text-neutral-900',
                                                 )}
                                             >
-                                                €{Number(c.total_spent).toFixed(2)}
+                                                ${Number(c.total_spent).toFixed(2)}
                                             </TableCell>
                                             <TableCell
                                                 className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_LG)}

@@ -102,7 +102,7 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                     />
                     <AdminStatCard
                         label="Total dépensé"
-                        value={`€${Number(customer.total_spent).toFixed(2)}`}
+                        value={`$${Number(customer.total_spent).toFixed(2)}`}
                         hint="Montant cumulé"
                         icon={Wallet}
                         accent
@@ -150,7 +150,7 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                                             {statusLabel(order.status)}
                                         </AdminBadge>
                                         <span className="font-poppins font-semibold text-neutral-900">
-                                            €{Number(order.total).toFixed(2)}
+                                            ${Number(order.total).toFixed(2)}
                                         </span>
                                     </div>
                                     <AdminDataTable>
@@ -194,7 +194,7 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                                                             'text-right font-semibold text-neutral-900',
                                                         )}
                                                     >
-                                                        €{Number(it.line_total).toFixed(2)}
+                                                        ${Number(it.line_total).toFixed(2)}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
