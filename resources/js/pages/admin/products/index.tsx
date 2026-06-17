@@ -194,7 +194,7 @@ export default function AdminProducts() {
                                                         {variantsSummary(product)}
                                                     </span>
                                                     <span className={ADMIN_MOBILE_META}>
-                                                        ${Number(product.price).toFixed(2)} · Stock{' '}
+                                                        {`$${Number(product.price).toFixed(2)}`} · Stock{' '}
                                                         {product.quantity}
                                                     </span>
                                                 </TableCell>
@@ -205,7 +205,7 @@ export default function AdminProducts() {
                                                         'text-right',
                                                     )}
                                                 >
-                                                    ${Number(product.price).toFixed(2)}
+                                                    {`$${Number(product.price).toFixed(2)}`}
                                                 </TableCell>
                                                 <TableCell
                                                     className={cn(

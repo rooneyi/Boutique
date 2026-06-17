@@ -116,13 +116,13 @@ export default function Orders() {
                                                 {formatDate(order.created_at)}
                                             </p>
                                             <p className="font-poppins text-base font-semibold text-[#0059DD] sm:hidden">
-                                                ${Number(order.total_amount).toFixed(2)}
+                                                {`$${Number(order.total_amount).toFixed(2)}`}
                                             </p>
                                         </div>
 
                                         <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
                                             <p className="hidden font-poppins text-xl font-semibold text-[#0059DD] sm:block">
-                                                ${Number(order.total_amount).toFixed(2)}
+                                                {`$${Number(order.total_amount).toFixed(2)}`}
                                             </p>
                                             <Button
                                                 variant="outline"

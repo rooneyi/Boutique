@@ -140,7 +140,7 @@ export default function AdminUsers({ users }: Props) {
                                                               'text-right',
                                                           )}
                                                       >
-                                                          ${Number(user.total_spent).toFixed(2)}
+                                                          {`$${Number(user.total_spent).toFixed(2)}`}
                                                       </TableCell>
                                                       <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                           {user.last_order_at

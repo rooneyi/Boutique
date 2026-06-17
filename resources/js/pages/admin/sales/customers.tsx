@@ -138,7 +138,7 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                                     'text-right font-semibold text-neutral-900',
                                                 )}
                                             >
-                                                ${Number(c.total_spent).toFixed(2)}
+                                                {`$${Number(c.total_spent).toFixed(2)}`}
                                             </TableCell>
                                             <TableCell
                                                 className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_LG)}

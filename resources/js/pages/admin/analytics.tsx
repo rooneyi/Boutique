@@ -146,7 +146,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                                     </li>
                                     <li>
                                         <span className="font-semibold">CA :</span>{' '}
-                                        ${Number(analytics.best_sales_day.revenue).toFixed(2)}
+                                        {`$${Number(analytics.best_sales_day.revenue).toFixed(2)}`}
                                     </li>
                                     <li>
                                         <span className="font-semibold">Commandes :</span>{' '}
