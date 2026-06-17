@@ -5,7 +5,7 @@ import { FlashToaster } from '@/components/flash-toaster';
 import { CartPageLine } from '@/components/storefront/cart/cart-page-line';
 import { CartSuggestions } from '@/components/storefront/cart/cart-suggestions';
 import { CartSummaryPanel } from '@/components/storefront/cart/cart-summary-panel';
-import { HomeCurated } from '@/components/storefront/home/home-curated';
+import { HomeCurated, type CuratedProduct } from '@/components/storefront/home/home-curated';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { StorefrontBreadcrumbs } from '@/components/storefront/storefront-breadcrumbs';
@@ -40,11 +40,12 @@ type PageProps = {
     total: number;
     suggestedProducts: SuggestedProduct[];
     canRegister: boolean;
+    curatedProducts: CuratedProduct[];
     auth?: { user?: AuthUser | null };
 };
 
 export default function CustomerCart() {
-    const { auth, canRegister, lines, subtotal, shipping, total, suggestedProducts } =
+    const { auth, canRegister, lines, subtotal, shipping, total, suggestedProducts, curatedProducts } =
         usePage<PageProps>().props;
     const [busyProductId, setBusyProductId] = useState<number | null>(null);
 
@@ -151,7 +152,7 @@ export default function CustomerCart() {
                     {lines.length > 0 ? (
                         <>
                             <CartSuggestions products={suggestedProducts} />
-                            <HomeCurated />
+                            <HomeCurated products={curatedProducts} />
                         </>
                     ) : null}
                 </main>

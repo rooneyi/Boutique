@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { FlashToaster } from '@/components/flash-toaster';
 import { FavoritesSuggestedCarousel } from '@/components/storefront/favorites/favorites-suggested-carousel';
-import { HomeCurated } from '@/components/storefront/home/home-curated';
+import { HomeCurated, type CuratedProduct } from '@/components/storefront/home/home-curated';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { HomeProductShowcaseCard } from '@/components/storefront/home/home-product-showcase-card';
@@ -36,11 +36,12 @@ type PageProps = {
     products: PaginatedProducts;
     suggestedProducts: Product[];
     canRegister: boolean;
+    curatedProducts: CuratedProduct[];
     auth?: { user?: AuthUser | null };
 };
 
 export default function CustomerFavorites() {
-    const { auth, canRegister, products, suggestedProducts } = usePage<PageProps>().props;
+    const { auth, canRegister, products, suggestedProducts, curatedProducts } = usePage<PageProps>().props;
     const items = products.data ?? [];
 
     return (
@@ -124,7 +125,7 @@ export default function CustomerFavorites() {
                     </section>
 
                     <FavoritesSuggestedCarousel products={suggestedProducts} />
-                    <HomeCurated />
+                    <HomeCurated products={curatedProducts} />
                 </main>
 
                 <HomeFooter />

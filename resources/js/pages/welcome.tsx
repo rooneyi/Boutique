@@ -3,7 +3,7 @@ import { FlashToaster } from '@/components/flash-toaster';
 import { HomeBenefits } from '@/components/storefront/home/home-benefits';
 import { HomeBrandCta } from '@/components/storefront/home/home-brand-cta';
 import { HomeCategories } from '@/components/storefront/home/home-categories';
-import { HomeCurated } from '@/components/storefront/home/home-curated';
+import { HomeCurated, type CuratedProduct } from '@/components/storefront/home/home-curated';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { HomeHero } from '@/components/storefront/home/home-hero';
@@ -35,6 +35,7 @@ type AuthUser = {
 type PageProps = {
     canRegister: boolean;
     featuredProducts: FeaturedProduct[];
+    curatedProducts: CuratedProduct[];
     highlightCategories: { id: number; name: string; count: number }[];
     testimonials: HomeTestimonialItem[];
     auth?: {
@@ -43,7 +44,7 @@ type PageProps = {
 };
 
 export default function Welcome() {
-    const { auth, canRegister, featuredProducts, testimonials } = usePage<PageProps>().props;
+    const { auth, canRegister, featuredProducts, curatedProducts, testimonials } = usePage<PageProps>().props;
     const user = auth?.user;
 
     return (
@@ -58,7 +59,7 @@ export default function Welcome() {
                     <HomeNouveautes products={featuredProducts} />
                     <HomeTestimonial testimonials={testimonials} />
                     <HomeBenefits />
-                    <HomeCurated />
+                    <HomeCurated products={curatedProducts} />
                     <HomeBrandCta />
                 </main>
                 <HomeFooter />

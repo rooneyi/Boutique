@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\CartService;
 use App\Support\CatalogProduct;
+use App\Support\StorefrontCurated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,6 +66,7 @@ class CartController extends Controller
             'total' => $subtotal,
             'suggestedProducts' => $suggestedProducts,
             'canRegister' => Features::enabled(Features::registration()),
+            'curatedProducts' => StorefrontCurated::products(4),
         ]);
     }
 

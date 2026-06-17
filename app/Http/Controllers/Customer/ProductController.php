@@ -10,6 +10,7 @@ use App\Models\ProductReview;
 use App\Models\ProductVariant;
 use App\Services\ProductVariantService;
 use App\Support\CatalogProduct;
+use App\Support\StorefrontCurated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -160,6 +161,7 @@ class ProductController extends Controller
                 'color' => $colorFilter,
             ],
             'canRegister' => Features::enabled(Features::registration()),
+            'curatedProducts' => StorefrontCurated::products(4),
         ]);
     }
 
@@ -240,6 +242,7 @@ class ProductController extends Controller
             'reviews' => $reviews,
             'user_review' => $userReview,
             'can_review' => $canReview,
+            'curatedProducts' => StorefrontCurated::products(4, $product->id),
         ]);
     }
 

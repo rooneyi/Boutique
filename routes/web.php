@@ -21,6 +21,7 @@ use App\Models\ProductReview;
 use App\Services\AdminService;
 use App\Services\CustomerService;
 use App\Support\CatalogProduct;
+use App\Support\StorefrontCurated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -221,6 +222,7 @@ Route::get('/', function () {
     return Inertia::render('welcome', [
         'canRegister' => Features::enabled(Features::registration()),
         'featuredProducts' => $featured,
+        'curatedProducts' => StorefrontCurated::products(4),
         'highlightCategories' => $highlightCategories,
         'testimonials' => $testimonials,
     ]);

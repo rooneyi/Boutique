@@ -1,45 +1,29 @@
 import { Link } from '@inertiajs/react';
 import { StorefrontHorizontalScroll } from '@/components/storefront/storefront-horizontal-scroll';
-import { HOME_ASSETS } from '@/lib/home-assets';
 import { route } from '@/lib/route';
 import { cn } from '@/lib/utils';
 
-const ITEMS = [
-    {
-        title: 'LE MANIFESTE',
-        image: HOME_ASSETS.selectionManifeste,
-        description:
-            'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
-    },
-    {
-        title: 'STREET WEAR',
-        image: HOME_ASSETS.wearLook1,
-        description:
-            'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
-    },
-    {
-        title: 'STREET WEAR',
-        image: HOME_ASSETS.wearLook1,
-        description:
-            'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
-    },
-    {
-        title: 'SIGNATURE PCJ',
-        image: HOME_ASSETS.wearLook2,
-        description:
-            'Worem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero',
-    },
-] as const;
+export type CuratedProduct = {
+    id: number;
+    name: string;
+    description: string;
+    image_path: string | null;
+};
 
 type Props = {
     /** Figma collection/1440 (209:4986) vs accueil */
     variant?: 'page' | 'collection';
+    products?: CuratedProduct[];
 };
 
 /** Figma collection/1440 — section 209:4986 */
-export function HomeCurated({ variant = 'page' }: Props) {
+export function HomeCurated({ variant = 'page', products = [] }: Props) {
     const isCollection = variant === 'collection';
-    const items = isCollection ? ITEMS : ITEMS.slice(0, 3);
+    const items = products.slice(0, isCollection ? 4 : 3);
+
+    if (items.length === 0) {
+        return null;
+    }
 
     return (
         <section
@@ -77,12 +61,7 @@ export function HomeCurated({ variant = 'page' }: Props) {
                     </p>
                     <Link
                         href={route('customer.products.index')}
-                        className={cn(
-                            'font-poppins inline-block py-3 text-[13px] font-semibold text-black',
-                            isCollection
-                                ? 'border-b border-[#0059dd] pr-2.5'
-                                : 'border-b border-black',
-                        )}
+                        className="font-poppins inline-block border-b border-[#0059DD] py-3 pr-2.5 text-[13px] font-semibold text-black"
                     >
                         VOIR LA COLLECTION
                     </Link>
@@ -98,24 +77,30 @@ export function HomeCurated({ variant = 'page' }: Props) {
                 )}
                 scrollStep={isCollection ? 496 : 400}
             >
-                {items.map((item, index) => (
+                {items.map((product) => (
                     <Link
-                        key={`${item.title}-${index}`}
-                        href={route('customer.products.index')}
-                        className="w-[min(492px,85vw)] shrink-0 p-2"
+                        key={product.id}
+                        href={route('customer.products.show', product.id)}
+                        className="w-[min(492px,85vw)] shrink-0 p-2 transition-opacity hover:opacity-95"
                     >
-                        <div className="aspect-[492/682] overflow-hidden">
-                            <img
-                                src={item.image}
-                                alt=""
-                                className="size-full object-cover"
-                            />
+                        <div className="aspect-[492/682] overflow-hidden rounded-sm bg-neutral-100">
+                            {product.image_path ? (
+                                <img
+                                    src={product.image_path}
+                                    alt=""
+                                    className="size-full object-cover"
+                                />
+                            ) : (
+                                <div className="flex size-full items-center justify-center bg-neutral-200 font-poppins text-sm text-[#747474]">
+                                    {product.name}
+                                </div>
+                            )}
                         </div>
                         <p className="mt-2.5 font-poppins text-2xl font-semibold text-black">
-                            {item.title}
+                            {product.name}
                         </p>
                         <p className="font-poppins text-base font-medium text-[#737373]">
-                            {item.description}
+                            {product.description}
                         </p>
                     </Link>
                 ))}

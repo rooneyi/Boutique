@@ -5,7 +5,7 @@ import { CollectionHero } from '@/components/storefront/collection/collection-he
 import { CollectionPagination } from '@/components/storefront/collection/collection-pagination';
 import { CollectionToolbar } from '@/components/storefront/collection/collection-toolbar';
 import { HomeProductShowcaseCard } from '@/components/storefront/home/home-product-showcase-card';
-import { HomeCurated } from '@/components/storefront/home/home-curated';
+import { HomeCurated, type CuratedProduct } from '@/components/storefront/home/home-curated';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 
@@ -58,11 +58,12 @@ type PageProps = {
     totalProducts: number;
     filters: Filters;
     canRegister: boolean;
+    curatedProducts: CuratedProduct[];
     auth?: { user?: AuthUser | null };
 };
 
 export default function BrowseProducts() {
-    const { auth, canRegister, products, categories, colorOptions, totalProducts, filters } =
+    const { auth, canRegister, products, categories, colorOptions, totalProducts, filters, curatedProducts } =
         usePage<PageProps>().props;
     const items = products.data ?? [];
 
@@ -123,7 +124,7 @@ export default function BrowseProducts() {
                         </div>
                     </section>
 
-                    <HomeCurated variant="collection" />
+                    <HomeCurated variant="collection" products={curatedProducts} />
                 </main>
 
                 <HomeFooter />

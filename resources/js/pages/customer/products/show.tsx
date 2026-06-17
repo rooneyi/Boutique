@@ -2,7 +2,7 @@ import { Head, usePage } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import type { ProductVariantPayload } from '@/components/storefront/product/product-purchase-panel';
 import { FlashToaster } from '@/components/flash-toaster';
-import { HomeCurated } from '@/components/storefront/home/home-curated';
+import { HomeCurated, type CuratedProduct } from '@/components/storefront/home/home-curated';
 import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { ProductBreadcrumbs } from '@/components/storefront/product/product-breadcrumbs';
@@ -55,6 +55,7 @@ type PageProps = {
     user_review: UserReview;
     can_review: boolean;
     canRegister: boolean;
+    curatedProducts: CuratedProduct[];
     auth?: { user?: AuthUser | null };
 };
 
@@ -66,6 +67,7 @@ export default function ProductDetail() {
         reviews,
         user_review,
         can_review,
+        curatedProducts,
     } = usePage<PageProps>().props;
 
     const [galleryImage, setGalleryImage] = useState<string | null>(product.image_path ?? null);
@@ -113,7 +115,7 @@ export default function ProductDetail() {
                     />
 
                     <ProductWearSection />
-                    <HomeCurated />
+                    <HomeCurated products={curatedProducts} />
                 </main>
 
                 <HomeFooter />
