@@ -28,7 +28,11 @@ export function AccountDrawer() {
                 side="right"
                 size={isGuestDrawer ? 'default' : 'wide'}
                 showCloseButton={false}
-                className="flex flex-col overflow-hidden border-0 bg-white p-0"
+                className={cn(
+                    'flex flex-col overflow-hidden border-0 bg-white p-0',
+                    isGuestDrawer &&
+                        'top-4 right-4 bottom-auto h-auto max-h-[min(85dvh,480px)] rounded-2xl shadow-xl inset-y-auto',
+                )}
                 overlayClassName="bg-black/60 backdrop-blur-[2px]"
             >
                 <div className={cn('relative shrink-0', isGuestDrawer ? 'px-4 pt-6' : 'px-5 pt-10')}>
@@ -64,7 +68,11 @@ export function AccountDrawer() {
                     {isCustomer ? 'Profil et paramètres de votre compte client' : 'Connectez-vous ou créez un compte'}
                 </SheetDescription>
 
-                <div className={cn('min-h-0 flex-1 overflow-y-auto pb-10', isGuestDrawer ? 'px-4' : 'px-5')}>
+                <div
+                    className={cn(
+                        isGuestDrawer ? 'overflow-y-auto px-4 pb-5' : 'min-h-0 flex-1 overflow-y-auto px-5 pb-10',
+                    )}
+                >
                     {loading && !account ? (
                         <div className="flex items-center justify-center py-24">
                             <Loader2 className="size-8 animate-spin text-[#737373]" aria-hidden />
