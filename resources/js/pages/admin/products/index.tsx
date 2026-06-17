@@ -54,9 +54,9 @@ function variantsSummary(product: Product): string {
     const colorPart =
         colors.length > 0
             ? colors.slice(0, 3).join(', ') + (colors.length > 3 ? '…' : '')
-            : `${product.colors_count ?? 0} couleur(s)`;
+            : `€{product.colors_count ?? 0} couleur(s)`;
 
-    return `${count} déclinaison${count > 1 ? 's' : ''} · ${colorPart}`;
+    return `€{count} déclinaison€{count > 1 ? 's' : ''} · €{colorPart}`;
 }
 
 function categoryLabel(category: Product['category']): string {

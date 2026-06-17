@@ -105,7 +105,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <AdminStatCard
                         label="Chiffre d'affaires"
-                        value={`€${Number(analytics.total_sales).toFixed(2)}`}
+                        value={`$${Number(analytics.total_sales).toFixed(2)}`}
                         hint={`Période : ${periodLabels[period]}`}
                         icon={Wallet}
                         accent
@@ -118,7 +118,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                     />
                     <AdminStatCard
                         label="Panier moyen"
-                        value={`€${Number(analytics.average_order).toFixed(2)}`}
+                        value={`$${Number(analytics.average_order).toFixed(2)}`}
                         hint="Montant moyen par commande"
                         icon={BarChart3}
                     />
@@ -146,7 +146,7 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                                     </li>
                                     <li>
                                         <span className="font-semibold">CA :</span>{' '}
-                                        €{Number(analytics.best_sales_day.revenue).toFixed(2)}
+                                        ${Number(analytics.best_sales_day.revenue).toFixed(2)}
                                     </li>
                                     <li>
                                         <span className="font-semibold">Commandes :</span>{' '}

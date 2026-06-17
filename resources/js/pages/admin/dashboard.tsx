@@ -108,7 +108,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <AdminStatCard
                         label="Chiffre d'affaires"
-                        value={`€${stats.total_sales.toFixed(2)}`}
+                        value={`$${stats.total_sales.toFixed(2)}`}
                         hint="Total plateforme"
                         icon={TrendingUp}
                         accent
@@ -186,7 +186,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                             <div className={ADMIN_LIST_ROW}>
                                 <p className={ADMIN_MUTED}>Panier moyen</p>
                                 <p className="font-poppins text-2xl font-semibold text-[#0059DD]">
-                                    €{stats.avg_order_value.toFixed(2)}
+                                    ${stats.avg_order_value.toFixed(2)}
                                 </p>
                             </div>
                             <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-center">
@@ -244,7 +244,7 @@ export default function AdminDashboard({ stats: statsProp }: { stats?: AdminStat
                                                 Montant
                                             </span>
                                             <span className="font-poppins font-semibold text-slate-900">
-                                                €{order.total.toFixed(2)}
+                                                ${order.total.toFixed(2)}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between gap-2 md:col-span-2 md:block">
