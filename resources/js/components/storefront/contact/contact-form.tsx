@@ -83,23 +83,6 @@ export function ContactForm({
                                 <InputError message={errors.email} />
                             </div>
                         </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="message" className={FIELD_LABEL}>
-                                Message
-                            </Label>
-                            <Textarea
-                                id="message"
-                                name="message"
-                                required
-                                rows={5}
-                                disabled={processing}
-                                className={cn(FIELD_INPUT, 'min-h-[140px] resize-y py-3')}
-                                placeholder="Décrivez votre demande…"
-                            />
-                            <InputError message={errors.message} />
-                        </div>
-
                         <div className="space-y-2">
                             <Label htmlFor="subject" className={FIELD_LABEL}>
                                 Sujet
@@ -132,6 +115,23 @@ export function ContactForm({
                             </div>
                             <InputError message={errors.subject} />
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="message" className={FIELD_LABEL}>
+                                Message
+                            </Label>
+                            <Textarea
+                                id="message"
+                                name="message"
+                                required
+                                rows={5}
+                                disabled={processing}
+                                className={cn(FIELD_INPUT, 'min-h-[140px] resize-y py-3')}
+                                placeholder="Décrivez votre demande…"
+                            />
+                            <InputError message={errors.message} />
+                        </div>
+
+                        
 
                         <div className="flex items-start gap-2 pt-1">
                             <ShieldCheck
