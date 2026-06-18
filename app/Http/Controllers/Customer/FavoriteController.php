@@ -61,6 +61,9 @@ class FavoriteController extends Controller
             'canRegister' => Features::enabled(Features::registration()),
             'curatedProducts' => StorefrontCurated::products(4),
         ]);
+    }
+
+    public function preview(): JsonResponse
     {
         $customer = $this->customer();
 

@@ -18,6 +18,7 @@ type AuthUser = {
 
 type PageProps = {
     cartCount?: number;
+    notificationsCount?: number;
     auth?: { user?: AuthUser | null };
 };
 
@@ -26,7 +27,7 @@ const ICON_IDLE = 'text-[#333333]';
 
 export function HeaderIconToolbar() {
     const { url, props } = usePage<PageProps>();
-    const { auth, cartCount = 0 } = props;
+    const { auth, cartCount = 0, notificationsCount = 0 } = props;
     const user = auth?.user;
 
     const accountDrawer = useOptionalAccountDrawer();
@@ -74,7 +75,7 @@ export function HeaderIconToolbar() {
         <div className="hidden items-center gap-3 md:flex">
             <HeaderIconPill
                 aria-label="Notifications"
-                className={SF_HEADER_ICON_PILL_BELL}
+                className={cn(SF_HEADER_ICON_PILL_BELL, 'relative')}
                 active={notificationsActive}
                 onClick={openNotifications}
             >
@@ -85,6 +86,18 @@ export function HeaderIconToolbar() {
                     )}
                     aria-hidden
                 />
+                {notificationsCount > 0 ? (
+                    <span
+                        className={cn(
+                            'absolute -top-1 -right-1 flex min-h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold leading-none',
+                            notificationsActive
+                                ? 'bg-white text-[#0059DD]'
+                                : 'bg-[#0059DD] text-white',
+                        )}
+                    >
+                        {notificationsCount > 99 ? '99+' : notificationsCount}
+                    </span>
+                ) : null}
             </HeaderIconPill>
 
             <HeaderIconPill

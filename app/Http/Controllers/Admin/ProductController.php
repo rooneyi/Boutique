@@ -8,6 +8,7 @@ use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\CustomerNotificationService;
 use App\Services\ProductService;
 use App\Services\ProductVariantService;
 use App\Support\BoutiqueStore;
@@ -22,6 +23,7 @@ class ProductController extends Controller
     public function __construct(
         private ProductService $productService,
         private ProductVariantService $variantService,
+        private CustomerNotificationService $customerNotifications,
     ) {}
 
     public function create(): Response
@@ -82,6 +84,10 @@ class ProductController extends Controller
         );
 
         $this->productService->syncVariants($product, $this->parseVariants($request));
+
+        if ($product->status !== 'DISCONTINUED') {
+            $this->customerNotifications->notifyNewProduct($product->fresh());
+        }
 
         return redirect()->route('admin.products.index')->with('success', 'Produit créé.');
     }

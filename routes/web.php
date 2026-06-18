@@ -10,6 +10,7 @@ use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Customer\ContactController;
 use App\Http\Controllers\Customer\FavoriteController;
+use App\Http\Controllers\Customer\NotificationController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\Customer\ProductReviewController;
@@ -244,6 +245,8 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::delete('cart/items/{product}', [CartController::class, 'destroy'])->name('cart.items.destroy');
 
     Route::get('checkout', [CheckoutController::class, 'create'])->name('checkout');
+
+    Route::get('notifications/preview', [NotificationController::class, 'preview'])->name('notifications.preview');
 });
 
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
@@ -257,6 +260,9 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
         Route::get('favorites/preview', [FavoriteController::class, 'preview'])->name('favorites.preview');
         Route::post('favorites/{product}', [FavoriteController::class, 'store'])->name('favorites.store');
         Route::delete('favorites/{product}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+
+        Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+        Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
 
         Route::post('products/{product}/reviews', [ProductReviewController::class, 'store'])->name('products.reviews.store');
 

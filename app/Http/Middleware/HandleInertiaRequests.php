@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\CartService;
+use App\Services\CustomerNotificationService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Laravel\Fortify\Features;
@@ -47,6 +48,9 @@ class HandleInertiaRequests extends Middleware
             'cartCount' => app(CartService::class)->count(),
             'favoritesCount' => $request->user()?->role === 'CUSTOMER'
                 ? (int) ($request->user()->customer?->favoriteProducts()->count() ?? 0)
+                : 0,
+            'notificationsCount' => $request->user()?->role === 'CUSTOMER'
+                ? app(CustomerNotificationService::class)->unreadCountFor($request->user()->customer)
                 : 0,
             'flash' => [
                 'success' => $request->session()->get('success'),
