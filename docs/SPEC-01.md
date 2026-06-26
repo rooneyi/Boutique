@@ -56,6 +56,8 @@ L’application permet à **plusieurs vendeurs** de créer et gérer leur boutiq
 
 ## 7. Cas d’utilisation principaux (synthèse)
 
+> Détail complet et statut d’implémentation : **[cas-utilisation.md](./cas-utilisation.md)**.
+
 ### Vendeur
 
 1. S’inscrire  

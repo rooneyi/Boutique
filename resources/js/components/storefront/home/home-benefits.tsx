@@ -7,17 +7,17 @@ const BENEFITS = [
     {
         icon: Truck,
         title: 'Livraison gratuite',
-        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit mattis.',
+        text: 'Profitez de la livraison offerte sur vos commandes éligibles, directement à domicile ou en boutique.',
     },
     {
         icon: ShoppingBasket,
         title: 'Retrait en magasin',
-        text: 'Gorem ipsum dolor sit amet, consectetur adipiscing elit. ac aliquet odio mattis.',
+        text: 'Récupérez votre commande en magasin à l\'heure qui vous convient, sans frais supplémentaires.',
     },
     {
         icon: ShieldCheck,
         title: 'Garantie',
-        text: 'Consectetur adipiscing elit. Nunc vulputate libero interdum, ac aliquet odio mattis.',
+        text: 'Chaque article est contrôlé avant expédition. Votre satisfaction est notre priorité.',
     },
 ] as const;
 

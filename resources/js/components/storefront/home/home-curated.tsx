@@ -57,7 +57,7 @@ export function HomeCurated({ variant = 'page', products = [] }: Props) {
                                 : 'text-base leading-[1.5] sm:text-lg sm:leading-[28px] lg:text-xl lg:leading-[30px]',
                         )}
                     >
-                        Lorem ipsum sit dolor amet pelentesque
+                        Une sélection d&apos;articles coups de cœur, pensés pour compléter votre garde-robe PCJ.
                     </p>
                     <Link
                         href={route('customer.products.index')}

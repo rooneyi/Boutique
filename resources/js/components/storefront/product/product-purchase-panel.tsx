@@ -122,7 +122,7 @@ export function ProductPurchasePanel({ product, onVariantImageChange }: Props) {
     }
 
     return (
-        <div className="flex w-full max-w-[542px] flex-col gap-6 sm:gap-9 lg:mx-auto">
+        <div className="flex w-full flex-col gap-6 sm:gap-9 lg:mx-auto">
             <div className="space-y-2.5">
                 <h1 className="font-poppins text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold text-black">
                     {product.name}
@@ -211,63 +211,65 @@ export function ProductPurchasePanel({ product, onVariantImageChange }: Props) {
                 </span>
             </p>
 
-            <div className="space-y-2.5">
-                <p className="font-poppins text-lg font-semibold text-black sm:text-xl lg:text-[28px]">
-                    Quantité :
-                </p>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                    <div className="flex items-center justify-center gap-8 rounded-[20px] border border-[#5B5E64]/60 px-3 py-2 sm:justify-start sm:gap-12">
-                        <button
-                            type="button"
-                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                            disabled={maxQty <= 0}
-                            className="flex size-9 items-center justify-center text-black disabled:opacity-40"
-                            aria-label="Diminuer"
-                        >
-                            <Minus className="size-6" />
-                        </button>
-                        <span className="font-poppins text-2xl text-black">{quantity}</span>
-                        <button
-                            type="button"
-                            onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
-                            disabled={quantity >= maxQty}
-                            className="flex size-9 items-center justify-center text-black disabled:opacity-40"
-                            aria-label="Augmenter"
-                        >
-                            <Plus className="size-6" />
-                        </button>
-                    </div>
-                    <p className="font-poppins text-xl font-medium text-black sm:text-2xl lg:text-[28px]">
-                        {lineTotal.toFixed(2)} $
+            <div className="flex flex-col gap-6 sm:gap-9">
+                <div className="space-y-2.5">
+                    <p className="font-poppins text-lg font-semibold text-black sm:text-xl lg:text-[28px]">
+                        Quantité :
                     </p>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="flex items-center justify-center gap-8 rounded-[20px] border border-[#5B5E64]/60 px-3 py-2 sm:justify-start sm:gap-12">
+                            <button
+                                type="button"
+                                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                disabled={maxQty <= 0}
+                                className="flex size-9 items-center justify-center text-black disabled:opacity-40"
+                                aria-label="Diminuer"
+                            >
+                                <Minus className="size-6" />
+                            </button>
+                            <span className="font-poppins text-2xl text-black">{quantity}</span>
+                            <button
+                                type="button"
+                                onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
+                                disabled={quantity >= maxQty}
+                                className="flex size-9 items-center justify-center text-black disabled:opacity-40"
+                                aria-label="Augmenter"
+                            >
+                                <Plus className="size-6" />
+                            </button>
+                        </div>
+                        <p className="font-poppins text-xl font-medium text-black sm:text-2xl lg:text-[28px]">
+                            {lineTotal.toFixed(2)} $
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-                <AddToCartButton
-                    productId={product.id}
-                    variantId={activeVariant?.id}
-                    quantity={quantity}
-                    disabled={!activeVariant || maxQty <= 0}
-                    label="AJOUTER AU PANIER"
-                    className="h-14 min-h-14 flex-1 rounded-full bg-black font-poppins text-base font-semibold uppercase text-white hover:bg-neutral-800"
-                />
-                <FavoriteButton
-                    productId={product.id}
-                    favorited={product.is_favorite}
-                    className="size-[50px] shrink-0 rounded-full border border-black bg-white"
-                />
-            </div>
+                <div className="flex flex-wrap items-center gap-2.5">
+                    <AddToCartButton
+                        productId={product.id}
+                        variantId={activeVariant?.id}
+                        quantity={quantity}
+                        disabled={!activeVariant || maxQty <= 0}
+                        label="AJOUTER AU PANIER"
+                        className="h-14 min-h-14 flex-1 rounded-full bg-black font-poppins text-base font-semibold uppercase text-white hover:bg-neutral-800"
+                    />
+                    <FavoriteButton
+                        productId={product.id}
+                        favorited={product.is_favorite}
+                        className="size-[50px] shrink-0 rounded-full border border-black bg-white"
+                    />
+                </div>
 
-            <a
-                href="https://wa.me/243991934590"
-                target="_blank"
-                rel="noreferrer"
-                className="flex h-14 w-full items-center justify-center gap-2 rounded-full border border-black bg-white font-poppins text-base font-semibold text-black transition-colors hover:bg-neutral-50"
-            >
-                <MessageCircle className="size-6" aria-hidden />
-                Commander via WhatsApp
-            </a>
+                <a
+                    href="https://wa.me/243991934590"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex h-14 w-full items-center justify-center gap-2 rounded-full border border-black bg-white font-poppins text-base font-semibold text-black transition-colors hover:bg-neutral-50"
+                >
+                    <MessageCircle className="size-6" aria-hidden />
+                    Commander via WhatsApp
+                </a>
+            </div>
         </div>
     );
 }

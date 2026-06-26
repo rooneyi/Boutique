@@ -22,8 +22,8 @@ export function ProductGallery({ images, alt }: Props) {
     };
 
     return (
-        <div className="flex flex-col gap-3 lg:flex-row lg:gap-2.5">
-            <div className="relative order-1 flex min-h-[min(400px,55vh)] flex-1 items-end justify-end overflow-hidden rounded-xl p-4 lg:order-2 lg:min-h-[754px]">
+        <div className="flex h-full w-full min-h-0 flex-col gap-3 lg:flex-row lg:gap-2.5">
+            <div className="relative order-1 flex min-h-[min(400px,55vh)] flex-1 items-end justify-end overflow-hidden rounded-xl lg:order-2 lg:min-h-0 lg:h-full lg:p-0">
                 {mainSrc ? (
                     <img
                         src={mainSrc}
@@ -36,7 +36,7 @@ export function ProductGallery({ images, alt }: Props) {
                     </div>
                 )}
                 {galleryImages.length > 1 && (
-                    <div className="relative z-10 flex gap-2.5">
+                    <div className="relative z-10 m-4 flex gap-2.5">
                         <Button
                             type="button"
                             variant="outline"
@@ -65,7 +65,7 @@ export function ProductGallery({ images, alt }: Props) {
                 className={cn(
                     'order-2 flex flex-row gap-2.5 pb-1',
                     SF_SCROLL_X,
-                    'lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0',
+                    'lg:order-1 lg:h-full lg:shrink-0 lg:flex-col lg:justify-start lg:overflow-visible lg:pb-0',
                 )}
             >
                 {galleryImages.map((src, index) => (

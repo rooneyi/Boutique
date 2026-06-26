@@ -12,6 +12,10 @@ Ce fichier est la **porte d’entrée** de la documentation fonctionnelle éclat
 | **SPEC-01 … SPEC-06** | Spécifications fonctionnelles détaillées par thème. |
 | **ARCHITECTURE.md** | Principles techniques, couches, exemples de flux code (non fonctionnel détaillé). |
 | **AUDIT.md** | Revue orientée audit (sécurité, conformité, risques). |
+| **cas-utilisation.md** | Cas d’utilisation **implémentés** (Client, Invité, Admin) — référence PCJ. |
+| **diagramme-classes.drawio** | Diagramme de classes UML (modèles Eloquent, relations, énumérations). |
+| **diagrammes-sequence.drawio** | Diagrammes de séquence UML regroupés (8 onglets). |
+| **sequences/** | Fichiers draw.io individuels (`diagramme-sequence-*.drawio`). |
 | **STYLE-VENDOR-FRONT.md** | Charte graphique de l’espace vendeur (police, titres, couleurs, boutons). |
 
 Les SPEC décrivent le **quoi** (besoins métier) ; l’architecture et l’audit décrivent le **comment** ou les **contrôles** ; la charte vendeur décrit le **style UI** du périmètre vendeur.

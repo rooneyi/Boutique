@@ -20,8 +20,8 @@ export function CollectionHero() {
                         GARDONS NOTRE ATTITUDE
                     </h1>
                     <p className="font-poppins text-[13px] leading-normal text-white/95">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate
-                        libero et velit interdum, ac aliquet.
+                        Des pièces pensées pour exprimer qui vous êtes. Explorez la collection PCJ
+                        et trouvez le style qui vous correspond.
                     </p>
                 </div>
                 <div className="relative mt-4 h-[451px] w-full max-w-[300px]">
@@ -51,8 +51,8 @@ export function CollectionHero() {
                             GARDONS NOTRE ATTITUDE
                         </h1>
                         <p className="font-poppins text-xl leading-normal text-white/95">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate
-                            libero et velit interdum, ac aliquet.
+                            Des pièces pensées pour exprimer qui vous êtes. Explorez la collection
+                            PCJ et trouvez le style qui vous correspond.
                         </p>
                     </div>
                 </div>

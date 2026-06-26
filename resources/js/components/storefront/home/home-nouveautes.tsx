@@ -23,7 +23,7 @@ export function HomeNouveautes({ products }: Props) {
                 <div className="mb-10 space-y-1 p-5 text-center">
                     <h2 className={SF_SECTION_TITLE}>Nouveautés</h2>
                     <p className={SF_SECTION_SUBTITLE}>
-                        Lorem ipsum sit dolor amet pelentesque
+                        Les dernières pièces arrivées en boutique, sélectionnées pour affirmer votre attitude.
                     </p>
                 </div>
 

@@ -22,9 +22,9 @@ export function HomeBrandCta() {
                         BRAND
                     </h2>
                     <p className="max-w-lg font-poppins text-lg font-normal leading-[30px] text-[#292d32] md:text-xl">
-                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas
-                        porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies,
-                        purus lectus malesuada libero.
+                        PCJ, c&apos;est une marque qui célèbre l&apos;attitude et le style personnel.
+                        Chaque collection raconte une histoire — la vôtre. Des coupes affirmées, des
+                        matières soignées et une mode qui vous ressemble.
                     </p>
                     <Link
                         href={route('customer.products.index')}

@@ -1,5 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ProductVariantPayload } from '@/components/storefront/product/product-purchase-panel';
 import { FlashToaster } from '@/components/flash-toaster';
 import { HomeCurated, type CuratedProduct } from '@/components/storefront/home/home-curated';
@@ -71,6 +71,31 @@ export default function ProductDetail() {
     } = usePage<PageProps>().props;
 
     const [galleryImage, setGalleryImage] = useState<string | null>(product.image_path ?? null);
+    const purchaseColumnRef = useRef<HTMLDivElement>(null);
+    const [galleryHeight, setGalleryHeight] = useState<number | undefined>(undefined);
+
+    useLayoutEffect(() => {
+        const node = purchaseColumnRef.current;
+        if (!node) {
+            return;
+        }
+
+        const syncHeight = () => {
+            const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+            setGalleryHeight(isDesktop ? Math.round(node.getBoundingClientRect().height) : undefined);
+        };
+
+        syncHeight();
+
+        const observer = new ResizeObserver(syncHeight);
+        observer.observe(node);
+        window.addEventListener('resize', syncHeight);
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('resize', syncHeight);
+        };
+    }, [product.id, product.variants.length]);
 
     const images = useMemo(() => {
         const src = galleryImage ?? product.image_path;
@@ -95,14 +120,19 @@ export default function ProductDetail() {
                     <ProductBreadcrumbs productName={product.name} />
 
                     <section className="px-4 pb-12 sm:px-8 lg:px-14">
-                        <div className="mx-auto flex max-w-[1440px] flex-col gap-8 lg:flex-row lg:gap-7">
-                            <div className="min-w-0 flex-1">
+                        <div className="mx-auto flex max-w-[1440px] flex-col gap-8 lg:flex-row lg:items-start lg:gap-7">
+                            <div
+                                className="flex min-h-0 min-w-0 flex-1 flex-col"
+                                style={galleryHeight !== undefined ? { height: galleryHeight } : undefined}
+                            >
                                 <ProductGallery images={images} alt={product.name} />
                             </div>
-                            <ProductPurchasePanel
-                                product={product}
-                                onVariantImageChange={setGalleryImage}
-                            />
+                            <div ref={purchaseColumnRef} className="w-full shrink-0 lg:w-[542px]">
+                                <ProductPurchasePanel
+                                    product={product}
+                                    onVariantImageChange={setGalleryImage}
+                                />
+                            </div>
                         </div>
                     </section>
 

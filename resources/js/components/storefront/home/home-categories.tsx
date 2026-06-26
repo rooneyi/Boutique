@@ -34,7 +34,7 @@ export function HomeCategories() {
                 <div className="space-y-1 p-5 text-center">
                     <h2 className={SF_SECTION_TITLE}>Catégories</h2>
                     <p className={SF_SECTION_SUBTITLE}>
-                        Lorem ipsum sit dolor amet pelentesque
+                        Explorez nos pulls, t-shirts et casquettes — des essentiels pour votre style au quotidien.
                     </p>
                 </div>
 

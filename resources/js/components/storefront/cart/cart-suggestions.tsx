@@ -28,7 +28,7 @@ export function CartSuggestions({ products }: Props) {
                 <div className="mb-7 px-4 py-5 sm:px-12 lg:px-[50px]">
                     <h2 className={SF_SECTION_TITLE}>Vous pourriez aimer aussi</h2>
                     <p className={`${SF_SECTION_SUBTITLE} mt-1`}>
-                        Lorem ipsum sit dolor amet pelentesque
+                        Découvrez d&apos;autres pièces qui pourraient compléter votre look.
                     </p>
                 </div>
 
