@@ -86,7 +86,7 @@ export default function BrowseProducts() {
                         <div className="mx-auto w-full max-w-[1440px]">
                             <CollectionToolbar filters={filters} />
 
-                            <div className="mt-0 flex flex-col gap-6 px-4 sm:px-8 lg:flex-row lg:items-start lg:gap-2.5 lg:px-7">
+                            <div className="mt-0 flex flex-col gap-6 px-4 sm:px-8 lg:flex-row lg:items-start lg:gap-2.5 lg:px-14">
                                 <CollectionFilters
                                     categories={categories}
                                     colorOptions={colorOptions ?? []}

@@ -45,6 +45,32 @@ function sortQueryParams(filters: Filters, sort: string) {
     };
 }
 
+function collectionBreadcrumbItems(filters: Filters) {
+    const hasActiveFilter =
+        (filters.category && filters.category !== 'all') ||
+        Boolean(filters.q) ||
+        Boolean(filters.color) ||
+        Boolean(filters.price_filter_active);
+
+    const items = [
+        { label: 'Accueil', href: route('home') },
+        {
+            label: 'Collection',
+            href: hasActiveFilter ? route('customer.products.index') : undefined,
+        },
+    ];
+
+    if (filters.q) {
+        items.push({ label: `« ${filters.q} »` });
+    } else if (filters.category && filters.category !== 'all') {
+        items.push({ label: filters.category });
+    } else if (filters.color) {
+        items.push({ label: filters.color });
+    }
+
+    return items;
+}
+
 export function CollectionToolbar({ filters }: Props) {
     const activeSort = filters.sort || 'popular';
 
@@ -59,22 +85,14 @@ export function CollectionToolbar({ filters }: Props) {
         });
     };
 
-    const breadcrumbItems = [
-        { label: 'Accueil', href: route('home') },
-        {
-            label: filters.q ? `Collection · « ${filters.q} »` : 'Collection',
-        },
-    ];
+    const breadcrumbItems = collectionBreadcrumbItems(filters);
 
     return (
-        <div className="flex items-center justify-between gap-3 px-4 py-[15px] sm:px-8 lg:px-12 xl:px-[48px]">
-            <StorefrontBreadcrumbs
-                className="gap-2.5 text-base font-medium text-[rgba(91,94,100,0.62)] [&_a]:text-[rgba(91,94,100,0.62)] [&_svg]:size-6 [&_span:last-child]:text-black"
-                items={breadcrumbItems}
-            />
+        <div className="flex flex-col gap-4 px-4 py-4 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-14 lg:py-[15px]">
+            <StorefrontBreadcrumbs className="min-w-0 flex-1" items={breadcrumbItems} />
 
             <Select value={activeSort} onValueChange={onSortChange}>
-                <SelectTrigger className="font-poppins h-[33px] w-auto gap-1 rounded-[13px] border border-black px-2.5 text-[8.5px] font-semibold shadow-none sm:h-[50px] sm:min-w-[220px] sm:rounded-[20px] sm:gap-1.5 sm:px-3.5 sm:text-[13px]">
+                <SelectTrigger className="font-poppins h-[33px] w-full shrink-0 gap-1 rounded-[13px] border border-black px-2.5 text-[8.5px] font-semibold shadow-none sm:h-[50px] sm:w-auto sm:min-w-[220px] sm:rounded-[20px] sm:gap-1.5 sm:px-3.5 sm:text-[13px] lg:max-w-[280px]">
                     <SlidersHorizontal className="size-2.5 shrink-0 sm:size-4" aria-hidden />
                     <span className="whitespace-nowrap">
                         TRIER PAR :{' '}

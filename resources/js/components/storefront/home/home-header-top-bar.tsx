@@ -95,24 +95,6 @@ export function HomeHeaderTopBar({
                             )}
                         </div>
                     ) : null}
-
-                    <div
-                        className={cn(
-                            'flex items-center gap-2.5',
-                            isAdmin && 'hidden sm:flex',
-                        )}
-                    >
-                        <img
-                            src={HEADER_ASSETS.iconGlobe}
-                            alt=""
-                            width={24}
-                            height={24}
-                            className="size-6 shrink-0"
-                        />
-                        <span className="font-poppins text-sm font-normal leading-normal text-white">
-                            Lubumbashi
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>

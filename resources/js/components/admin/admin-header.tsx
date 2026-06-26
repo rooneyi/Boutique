@@ -1,7 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     BarChart3,
-    Globe,
     Instagram,
     LayoutDashboard,
     LogOut,
@@ -161,10 +160,6 @@ export function AdminHeader() {
                         >
                             Voir la boutique
                         </Link>
-                        <div className="flex items-center gap-2 text-white/90">
-                            <Globe className="size-5" strokeWidth={1.5} />
-                            <span className="font-poppins font-normal">Lubumbashi</span>
-                        </div>
                     </div>
                 </div>
             </div>
