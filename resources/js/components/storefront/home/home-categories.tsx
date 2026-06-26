@@ -6,6 +6,7 @@ import { SF_PILL_BTN_LIGHT, SF_SECTION_SUBTITLE, SF_SECTION_TITLE } from '@/lib/
 const CATEGORIES = [
     {
         title: 'Pull',
+        category: 'Pull',
         image: HOME_ASSETS.categoryPull,
         cta: 'VOIR LES PULLS',
         height: 'h-[390px]',
@@ -13,6 +14,7 @@ const CATEGORIES = [
     },
     {
         title: 'T-Shirt',
+        category: 'T-Shirt',
         image: HOME_ASSETS.categoryTshirt,
         cta: 'VOIR LES T-SHIRTS',
         height: 'h-[min(570px,70vh)]',
@@ -20,12 +22,18 @@ const CATEGORIES = [
     },
     {
         title: 'Casquette',
+        category: 'Casquette',
         image: HOME_ASSETS.categoryCap,
         cta: 'VOIR LES CASQUETTES',
         height: 'h-[390px]',
         width: 'w-full max-w-[320px]',
     },
 ] as const;
+
+function collectionCategoryHref(category: string): string {
+    const params = new URLSearchParams({ category, sort: 'popular' });
+    return `${route('customer.products.index')}?${params.toString()}`;
+}
 
 export function HomeCategories() {
     return (
@@ -42,7 +50,7 @@ export function HomeCategories() {
                     {CATEGORIES.map((cat, index) => (
                         <Link
                             key={cat.title}
-                            href={route('customer.products.index')}
+                            href={collectionCategoryHref(cat.category)}
                             className={`relative mx-auto flex w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-[23px] ${
                                 index === 1
                                     ? 'h-[min(350px,55vh)] max-w-none md:h-[min(570px,70vh)] md:max-w-[400px]'

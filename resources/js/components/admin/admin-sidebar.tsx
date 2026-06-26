@@ -47,7 +47,7 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
 
             <aside
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 flex h-full w-[240px] flex-col bg-[#0f172a] transition-transform duration-300 lg:static lg:translate-x-0',
+                    'fixed inset-y-0 left-0 z-50 flex h-full w-[240px] flex-col bg-black transition-transform duration-300 lg:static lg:translate-x-0',
                     mobileOpen ? 'translate-x-0' : '-translate-x-full',
                 )}
             >
@@ -61,14 +61,14 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                             <p className="font-poppins text-sm font-semibold leading-none text-white">
                                 PCJ Admin
                             </p>
-                            <p className="font-poppins mt-0.5 text-[10px] font-normal text-slate-400">
+                            <p className="font-poppins mt-0.5 text-[10px] font-normal text-white/50">
                                 Administration
                             </p>
                         </div>
                     </div>
                     <button
                         type="button"
-                        className="flex size-7 items-center justify-center rounded-md text-slate-400 hover:bg-white/10 hover:text-white lg:hidden"
+                        className="flex size-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white lg:hidden"
                         onClick={onClose}
                         aria-label="Fermer"
                     >
@@ -80,7 +80,7 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                 <nav className="flex-1 overflow-y-auto px-3 pb-3 [scrollbar-width:none]">
                     {/* Section principale */}
                     <div className="mb-1">
-                        <p className="px-3 pb-2 font-poppins text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                        <p className="px-3 pb-2 font-poppins text-[10px] font-semibold uppercase tracking-widest text-white/40">
                             Navigation
                         </p>
                         <ul className="space-y-0.5">
@@ -96,13 +96,13 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                                                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150',
                                                 active
                                                     ? 'bg-[#0059DD] font-semibold text-white'
-                                                    : 'font-medium text-slate-300 hover:bg-white/8 hover:text-white',
+                                                    : 'font-medium text-white/70 hover:bg-white/8 hover:text-white',
                                             )}
                                         >
                                             <Icon
                                                 className={cn(
                                                     'size-[17px] shrink-0',
-                                                    active ? 'text-white' : 'text-slate-400',
+                                                    active ? 'text-white' : 'text-white/50',
                                                 )}
                                                 strokeWidth={active ? 2 : 1.75}
                                             />
@@ -111,7 +111,7 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
 
                                         {/* Sous-nav Produits */}
                                         {item.key === 'products' && isProductsSection && (
-                                            <ul className="ml-9 mt-0.5 space-y-0.5 border-l border-slate-700/60 pl-3">
+                                            <ul className="ml-9 mt-0.5 space-y-0.5 border-l border-white/15 pl-3">
                                                 {ADMIN_STOCK_NAV.map((sub) => {
                                                     const subActive = sub.match(path);
                                                     return (
@@ -123,7 +123,7 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                                                                     'block rounded-md px-2 py-1.5 font-poppins text-xs transition-colors',
                                                                     subActive
                                                                         ? 'font-semibold text-[#60a5fa]'
-                                                                        : 'font-medium text-slate-400 hover:text-slate-200',
+                                                                        : 'font-medium text-white/45 hover:text-white/80',
                                                                 )}
                                                             >
                                                                 {sub.label}
@@ -141,7 +141,7 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
 
                     {/* Section compte */}
                     <div className="mt-5">
-                        <p className="px-3 pb-2 font-poppins text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                        <p className="px-3 pb-2 font-poppins text-[10px] font-semibold uppercase tracking-widest text-white/40">
                             Compte
                         </p>
                         <ul className="space-y-0.5">
@@ -153,13 +153,13 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                                         'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
                                         path.startsWith('/settings') || path.startsWith('/profile')
                                             ? 'bg-[#0059DD] font-semibold text-white'
-                                            : 'text-slate-300 hover:bg-white/8 hover:text-white',
+                                            : 'text-white/70 hover:bg-white/8 hover:text-white',
                                     )}
                                 >
                                     <Settings
                                         className={cn(
                                             'size-[17px] shrink-0',
-                                            path.startsWith('/settings') ? 'text-white' : 'text-slate-400',
+                                            path.startsWith('/settings') ? 'text-white' : 'text-white/50',
                                         )}
                                         strokeWidth={1.75}
                                     />
@@ -171,7 +171,7 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                 </nav>
 
                 {/* Utilisateur */}
-                <div className="shrink-0 border-t border-slate-700/60 px-3 py-3">
+                <div className="shrink-0 border-t border-white/15 px-3 py-3">
                     <div className="flex items-center gap-3 rounded-lg px-2 py-2">
                         <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0059DD]/20 ring-1 ring-[#0059DD]/30">
                             <span className="font-poppins text-xs font-bold text-[#60a5fa]">
@@ -179,10 +179,10 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                             </span>
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="font-poppins truncate text-sm font-semibold leading-tight text-slate-100">
+                            <p className="font-poppins truncate text-sm font-semibold leading-tight text-white">
                                 {user?.name ?? 'Administrateur'}
                             </p>
-                            <p className="font-poppins truncate text-[11px] text-slate-400">
+                            <p className="font-poppins truncate text-[11px] text-white/50">
                                 {user?.email ?? ''}
                             </p>
                         </div>
@@ -190,7 +190,7 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                             href={route('logout')}
                             method="post"
                             as="button"
-                            className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                            className="shrink-0 rounded-md p-1.5 text-white/50 transition-colors hover:bg-red-500/10 hover:text-red-400"
                             aria-label="Déconnexion"
                         >
                             <LogOut className="size-4" strokeWidth={1.75} />
