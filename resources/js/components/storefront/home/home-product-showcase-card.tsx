@@ -35,7 +35,7 @@ export function HomeProductShowcaseCard({ product, size = 'default' }: Props) {
                 'motion-card-lift group relative flex cursor-pointer flex-col justify-end overflow-hidden rounded-[20px] shadow-[0_4px_2px_rgba(0,0,0,0.25)]',
                 isFavorites && 'h-[428px] w-full max-w-[322px]',
                 isCollection &&
-                    'collection-card h-[251.5px] w-[171.5px] shrink-0 lg:h-[503px] lg:w-[343px]',
+                    'collection-card aspect-[171.5/251.5] w-full max-w-none lg:aspect-[343/503]',
                 isCompact &&
                     'h-[252px] w-full lg:h-[428px] lg:max-w-[322px]',
                 !isFavorites &&
