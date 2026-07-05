@@ -50,6 +50,7 @@ class CheckoutController extends Controller
                 'shipping_district' => '',
                 'payment_method' => 'mobile_money',
                 'payment_provider' => 'airtel',
+                'payment_phone' => $user?->customer?->phone ?? '',
                 'customer_note' => '',
             ],
             'whatsappPhone' => '243991934590',
@@ -79,6 +80,13 @@ class CheckoutController extends Controller
             $providerNote = 'Moyen : '.$validated['payment_provider'];
             $validated['customer_note'] = trim(
                 ($validated['customer_note'] ?? '')."\n".$providerNote
+            );
+        }
+
+        if (! empty($validated['payment_phone'])) {
+            $validated['payment_phone'] = PhoneNumber::normalizeE164($validated['payment_phone']);
+            $validated['customer_note'] = trim(
+                ($validated['customer_note'] ?? '')."\nNuméro Mobile Money : ".$validated['payment_phone']
             );
         }
 

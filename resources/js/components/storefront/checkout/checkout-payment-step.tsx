@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 type Props = {
     data: CheckoutFormData;
     errors: Partial<Record<keyof CheckoutFormData | 'cart' | 'payment_confirmed', string>>;
-    paymentConfirmed: boolean;
+    confirmedProvider: PaymentProvider | null;
     setData: <K extends keyof CheckoutFormData>(key: K, value: CheckoutFormData[K]) => void;
     onSelectProvider: (provider: PaymentProvider) => void;
     onWhatsApp: () => void;
@@ -33,7 +33,7 @@ const PAYMENT_OPTIONS: {
 export function CheckoutPaymentStep({
     data,
     errors,
-    paymentConfirmed,
+    confirmedProvider,
     setData,
     onSelectProvider,
     onWhatsApp,
@@ -81,7 +81,7 @@ export function CheckoutPaymentStep({
                             <span className="font-poppins text-xl font-medium uppercase text-black">
                                 {option.label}
                             </span>
-                            {selected && paymentConfirmed ? (
+                            {selected && confirmedProvider === option.provider ? (
                                 <span className="ml-auto flex items-center gap-1 font-poppins text-sm font-medium text-[#08be3f]">
                                     <Check className="size-4" aria-hidden />
                                     Confirmé
@@ -110,6 +110,7 @@ export function CheckoutPaymentStep({
             </div>
 
             <InputError message={errors.payment_confirmed} />
+            <InputError message={errors.payment_phone} />
             <InputError message={errors.cart} />
         </div>
     );

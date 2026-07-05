@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import type { PaymentProvider } from '@/types/checkout';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -6,7 +7,7 @@ type Props = {
     shipping: number;
     total: number;
     processing: boolean;
-    paymentConfirmed: boolean;
+    confirmedProvider: PaymentProvider | null;
     onBack: () => void;
 };
 
@@ -19,9 +20,10 @@ export function CheckoutPaymentSummary({
     shipping,
     total,
     processing,
-    paymentConfirmed,
+    confirmedProvider,
     onBack,
 }: Props) {
+    const paymentConfirmed = confirmedProvider !== null;
     return (
         <aside className="flex h-fit min-h-[531px] w-full shrink-0 flex-col justify-between border-[0.5px] border-black bg-white px-6 py-7 sm:px-9 lg:sticky lg:top-28 lg:w-[471px]">
             <div className="font-poppins flex flex-col gap-[77px] text-xl text-black">

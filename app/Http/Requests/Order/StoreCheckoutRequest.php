@@ -26,6 +26,13 @@ class StoreCheckoutRequest extends FormRequest
             'shipping_district' => [$isPickup ? 'nullable' : 'required', 'string', 'max:120'],
             'payment_method' => ['required', Rule::in(['mobile_money', 'cash_on_delivery'])],
             'payment_provider' => ['nullable', Rule::in(['airtel', 'orange', 'mpesa', 'card'])],
+            'payment_phone' => [
+                Rule::requiredIf(fn () => $this->input('payment_method') === 'mobile_money'
+                    && in_array($this->input('payment_provider'), ['airtel', 'orange', 'mpesa'], true)),
+                'nullable',
+                'string',
+                new ValidPhoneNumber,
+            ],
             'customer_note' => ['nullable', 'string', 'max:1000'],
         ];
     }
@@ -43,6 +50,7 @@ class StoreCheckoutRequest extends FormRequest
             'shipping_city.required' => 'Indiquez votre ville ou commune.',
             'shipping_district.required' => 'Indiquez votre quartier.',
             'payment_method.required' => 'Choisissez un mode de paiement.',
+            'payment_phone.required' => 'Indiquez le numéro Mobile Money utilisé pour le paiement.',
         ];
     }
 }

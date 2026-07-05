@@ -13,6 +13,7 @@ export type CheckoutFormData = {
     shipping_district: string;
     payment_method: PaymentMethod;
     payment_provider: PaymentProvider;
+    payment_phone: string;
     customer_note: string;
 };
 

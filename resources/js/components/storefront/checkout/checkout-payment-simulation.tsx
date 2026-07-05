@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { PaymentProvider } from '@/components/storefront/checkout/checkout-form-data';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { Button } from '@/components/ui/button';
 import { CHECKOUT_PAYMENT_ASSETS } from '@/lib/home-assets';
+import { isValidFullPhone } from '@/lib/phone';
 import { cn } from '@/lib/utils';
 
 function formatCardNumber(value: string): string {
@@ -69,11 +71,18 @@ const PROVIDER_META: Record<
     },
 };
 
+const PROVIDER_PHONE_LABEL: Record<'airtel' | 'orange' | 'mpesa', string> = {
+    airtel: 'Numéro Airtel Money',
+    orange: 'Numéro Orange Money',
+    mpesa: 'Numéro M-Pesa',
+};
+
 type Props = {
     provider: Exclude<PaymentProvider, null>;
     amount: number;
     phone: string;
-    onConfirm: () => void;
+    whatsappPhone?: string;
+    onConfirm: (phone: string) => void;
     onCancel: () => void;
 };
 
@@ -81,9 +90,18 @@ function formatMoney(amount: number): string {
     return `${amount.toFixed(2)} $`;
 }
 
-export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, onCancel }: Props) {
+export function CheckoutPaymentSimulation({
+    provider,
+    amount,
+    phone,
+    whatsappPhone = '',
+    onConfirm,
+    onCancel,
+}: Props) {
     const meta = PROVIDER_META[provider];
     const [pin, setPin] = useState('');
+    const [mobilePhone, setMobilePhone] = useState(phone);
+    const [mobileError, setMobileError] = useState<string | null>(null);
     const [cardNumber, setCardNumber] = useState('');
     const [cardExpiry, setCardExpiry] = useState('');
     const [cardCvv, setCardCvv] = useState('');
@@ -91,15 +109,29 @@ export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, 
     const [step, setStep] = useState<'redirect' | 'confirm'>('redirect');
 
     const isCard = provider === 'card';
+    const isMobileMoney = provider === 'airtel' || provider === 'orange' || provider === 'mpesa';
     const cardValid = isCardFormValid(cardNumber, cardExpiry, cardCvv);
+    const mobileValid = isValidFullPhone(mobilePhone);
+
+    useEffect(() => {
+        setMobilePhone(phone);
+        setMobileError(null);
+        setStep('redirect');
+        setPin('');
+    }, [provider, phone]);
 
     function handleConfirm() {
         if (isCard && !cardValid) {
             setCardError('Renseignez un numéro de carte, une date d’expiration (MM/AA) et un CVV valides.');
             return;
         }
+        if (isMobileMoney && !mobileValid) {
+            setMobileError('Indiquez un numéro Mobile Money valide (9 chiffres ou 10 avec 0).');
+            return;
+        }
         setCardError(null);
-        onConfirm();
+        setMobileError(null);
+        onConfirm(isMobileMoney ? mobilePhone : phone);
     }
 
     if (step === 'redirect') {
@@ -171,11 +203,46 @@ export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, 
                     </div>
 
                     {!isCard ? (
-                        <div className="space-y-1.5">
-                            <p className="font-poppins text-sm font-medium text-black">Numéro de compte</p>
-                            <p className="font-poppins rounded-[12px] border border-black/10 bg-white px-4 py-3 text-sm text-black">
-                                {phone || '—'}
-                            </p>
+                        <div className="space-y-2">
+                            <label
+                                htmlFor="payment-mobile-phone"
+                                className="font-poppins text-sm font-medium text-black"
+                            >
+                                {isMobileMoney
+                                    ? PROVIDER_PHONE_LABEL[provider]
+                                    : 'Numéro de compte'}
+                            </label>
+                            <PhoneInput
+                                id="payment-mobile-phone"
+                                name="payment_phone"
+                                value={mobilePhone}
+                                onChange={(value) => {
+                                    setMobileError(null);
+                                    setMobilePhone(value);
+                                }}
+                                variant="rounded"
+                                hasError={!!mobileError}
+                                placeholder="99 123 4567"
+                            />
+                            {whatsappPhone && whatsappPhone !== mobilePhone ? (
+                                <button
+                                    type="button"
+                                    className="font-poppins text-xs font-medium text-[#0059DD] hover:underline"
+                                    onClick={() => {
+                                        setMobileError(null);
+                                        setMobilePhone(whatsappPhone);
+                                    }}
+                                >
+                                    Utiliser mon numéro WhatsApp
+                                </button>
+                            ) : null}
+                            {mobileError ? (
+                                <p className="font-poppins text-sm text-red-600">{mobileError}</p>
+                            ) : (
+                                <p className="font-poppins text-xs text-[#6b7280]">
+                                    Saisissez le numéro enregistré sur ce réseau Mobile Money.
+                                </p>
+                            )}
                         </div>
                     ) : null}
 
@@ -290,7 +357,7 @@ export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, 
                             )}
                             style={{ backgroundColor: meta.accent }}
                             onClick={handleConfirm}
-                            disabled={isCard && !cardValid}
+                            disabled={(isCard && !cardValid) || (isMobileMoney && !mobileValid)}
                         >
                             J&apos;ai confirmé le paiement
                         </Button>

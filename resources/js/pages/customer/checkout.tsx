@@ -53,7 +53,7 @@ export default function CustomerCheckout() {
 
     const [step, setStep] = useState<CheckoutStep>('shipping');
     const [simulatingProvider, setSimulatingProvider] = useState<PaymentProvider | null>(null);
-    const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+    const [confirmedProvider, setConfirmedProvider] = useState<PaymentProvider | null>(null);
     const { data, setData, post, processing, errors, setError, clearErrors } = useForm<CheckoutFormData>(defaults);
     const accountDrawer = useOptionalAccountDrawer();
 
@@ -109,18 +109,45 @@ export default function CustomerCheckout() {
             return;
         }
 
-        setPaymentConfirmed(false);
+        if (
+            (provider === 'airtel' || provider === 'orange' || provider === 'mpesa') &&
+            !data.payment_phone.trim() &&
+            data.shipping_whatsapp.trim()
+        ) {
+            setData('payment_phone', data.shipping_whatsapp);
+        }
         setSimulatingProvider(provider);
     }
 
-    function confirmPaymentSimulation() {
-        setPaymentConfirmed(true);
+    function confirmPaymentSimulation(confirmedPhone: string) {
+        const provider = simulatingProvider;
+        if (!provider) {
+            return;
+        }
+
+        if (['airtel', 'orange', 'mpesa'].includes(provider)) {
+            if (!isValidFullPhone(confirmedPhone)) {
+                setError(
+                    'payment_phone',
+                    'Indiquez un numéro Mobile Money valide pour confirmer le paiement.',
+                );
+                return;
+            }
+            setData('payment_phone', confirmedPhone);
+            clearErrors('payment_phone');
+        }
+
+        setData('payment_provider', provider);
+        setConfirmedProvider(provider);
         setSimulatingProvider(null);
         clearErrors('payment_confirmed');
     }
 
     function cancelPaymentSimulation() {
         setSimulatingProvider(null);
+        if (confirmedProvider) {
+            setData('payment_provider', confirmedProvider);
+        }
     }
 
     function submit(e: React.FormEvent) {
@@ -130,10 +157,23 @@ export default function CustomerCheckout() {
             return;
         }
 
-        if (!paymentConfirmed) {
+        if (!confirmedProvider) {
             setError(
                 'payment_confirmed',
                 'Veuillez choisir un opérateur et confirmer le paiement avant de valider la commande.',
+            );
+            return;
+        }
+
+        if (
+            data.payment_method === 'mobile_money' &&
+            data.payment_provider &&
+            ['airtel', 'orange', 'mpesa'].includes(data.payment_provider) &&
+            !isValidFullPhone(data.payment_phone)
+        ) {
+            setError(
+                'payment_phone',
+                'Indiquez le numéro Mobile Money utilisé pour le paiement.',
             );
             return;
         }
@@ -162,6 +202,11 @@ export default function CustomerCheckout() {
                 ? `${data.shipping_city || '—'}, ${data.shipping_district || '—'}`
                 : null,
             `Paiement : ${paymentLabel(data)}`,
+            data.payment_phone &&
+            data.payment_provider &&
+            ['airtel', 'orange', 'mpesa'].includes(data.payment_provider)
+                ? `Mobile Money : ${data.payment_phone}`
+                : null,
             data.customer_note ? `Note : ${data.customer_note}` : '',
             '',
             'Articles :',
@@ -212,7 +257,7 @@ export default function CustomerCheckout() {
                                         <CheckoutPaymentStep
                                             data={data}
                                             errors={errors}
-                                            paymentConfirmed={paymentConfirmed}
+                                            confirmedProvider={confirmedProvider}
                                             setData={setData}
                                             onSelectProvider={handleSelectProvider}
                                             onWhatsApp={openWhatsApp}
@@ -237,9 +282,9 @@ export default function CustomerCheckout() {
                                         shipping={shipping}
                                         total={total}
                                         processing={processing}
-                                        paymentConfirmed={paymentConfirmed}
+                                        confirmedProvider={confirmedProvider}
                                         onBack={() => {
-                                            setPaymentConfirmed(false);
+                                            setConfirmedProvider(null);
                                             setStep('shipping');
                                         }}
                                     />
@@ -256,7 +301,12 @@ export default function CustomerCheckout() {
                     <CheckoutPaymentSimulation
                         provider={simulatingProvider}
                         amount={total}
-                        phone={data.shipping_whatsapp}
+                        phone={
+                            data.payment_phone.trim() ||
+                            data.shipping_whatsapp ||
+                            ''
+                        }
+                        whatsappPhone={data.shipping_whatsapp}
                         onConfirm={confirmPaymentSimulation}
                         onCancel={cancelPaymentSimulation}
                     />
