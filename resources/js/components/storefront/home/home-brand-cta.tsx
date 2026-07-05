@@ -10,8 +10,8 @@ export function HomeBrandCta() {
                 <div className="overflow-hidden rounded-[20px] bg-[#bfbfbf] lg:min-h-[619px] lg:rounded-none">
                     <img
                         src={HOME_ASSETS.brandCta}
-                        alt="Collection PCJ"
-                        className="mx-auto h-full max-h-[min(342px,45vh)] w-full object-cover object-top lg:max-h-[620px] lg:max-w-md"
+                        alt="I'AM THE BRAND — Posé Comme Jamais"
+                        className="h-full min-h-[min(400px,55vh)] w-full object-cover object-center lg:min-h-[619px]"
                     />
                 </div>
 

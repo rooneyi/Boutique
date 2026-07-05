@@ -4,6 +4,41 @@ import { Button } from '@/components/ui/button';
 import { CHECKOUT_PAYMENT_ASSETS } from '@/lib/home-assets';
 import { cn } from '@/lib/utils';
 
+function formatCardNumber(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 16);
+    return digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+}
+
+function formatCardExpiry(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    if (digits.length <= 2) {
+        return digits;
+    }
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
+function isCardFormValid(cardNumber: string, cardExpiry: string, cardCvv: string): boolean {
+    const digits = cardNumber.replace(/\D/g, '');
+    if (digits.length < 16) {
+        return false;
+    }
+
+    const [month, year] = cardExpiry.split('/');
+    if (!month || !year || month.length !== 2 || year.length !== 2) {
+        return false;
+    }
+
+    const monthNum = Number(month);
+    if (monthNum < 1 || monthNum > 12) {
+        return false;
+    }
+
+    return cardCvv.replace(/\D/g, '').length === 3;
+}
+
+const inputClassName =
+    'font-poppins w-full rounded-[12px] border border-black/10 bg-white px-4 py-3 text-sm text-black placeholder:text-[#9ca3af] focus:border-[#0059DD] focus:outline-none focus:ring-2 focus:ring-[#0059DD]/20';
+
 const PROVIDER_META: Record<
     Exclude<PaymentProvider, null>,
     { label: string; image: string; accent: string; bg: string }
@@ -49,7 +84,23 @@ function formatMoney(amount: number): string {
 export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, onCancel }: Props) {
     const meta = PROVIDER_META[provider];
     const [pin, setPin] = useState('');
+    const [cardNumber, setCardNumber] = useState('');
+    const [cardExpiry, setCardExpiry] = useState('');
+    const [cardCvv, setCardCvv] = useState('');
+    const [cardError, setCardError] = useState<string | null>(null);
     const [step, setStep] = useState<'redirect' | 'confirm'>('redirect');
+
+    const isCard = provider === 'card';
+    const cardValid = isCardFormValid(cardNumber, cardExpiry, cardCvv);
+
+    function handleConfirm() {
+        if (isCard && !cardValid) {
+            setCardError('Renseignez un numéro de carte, une date d’expiration (MM/AA) et un CVV valides.');
+            return;
+        }
+        setCardError(null);
+        onConfirm();
+    }
 
     if (step === 'redirect') {
         return (
@@ -64,7 +115,9 @@ export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, 
                         <h2 className="font-poppins text-2xl font-semibold text-black">{meta.label}</h2>
                     </div>
                     <p className="font-poppins text-sm text-[#484848]">
-                        Vous allez être redirigé vers la page de paiement sécurisée de votre opérateur.
+                        {isCard
+                            ? 'Vous allez saisir les informations de votre carte sur une page sécurisée.'
+                            : 'Vous allez être redirigé vers la page de paiement sécurisée de votre opérateur.'}
                     </p>
                     <div className="flex w-full flex-col gap-3">
                         <Button
@@ -112,19 +165,21 @@ export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, 
                 </div>
 
                 <div className="space-y-5 px-6 py-6">
-                    <div className="rounded-[16px] border border-black/10 bg-white p-4">
-                        <p className="font-poppins text-sm text-[#6b7280]">Montant à payer</p>
+                    <div className="space-y-1.5">
+                        <p className="font-poppins text-sm font-medium text-black">Montant à payer</p>
                         <p className="font-poppins text-3xl font-bold text-black">{formatMoney(amount)}</p>
                     </div>
 
-                    <div className="space-y-1.5">
-                        <p className="font-poppins text-sm font-medium text-black">Numéro de compte</p>
-                        <p className="font-poppins rounded-[12px] border border-black/10 bg-white px-4 py-3 text-sm text-black">
-                            {phone || '—'}
-                        </p>
-                    </div>
+                    {!isCard ? (
+                        <div className="space-y-1.5">
+                            <p className="font-poppins text-sm font-medium text-black">Numéro de compte</p>
+                            <p className="font-poppins rounded-[12px] border border-black/10 bg-white px-4 py-3 text-sm text-black">
+                                {phone || '—'}
+                            </p>
+                        </div>
+                    ) : null}
 
-                    {provider !== 'card' ? (
+                    {!isCard ? (
                         <div className="space-y-1.5">
                             <label
                                 htmlFor="payment-sim-pin"
@@ -147,10 +202,84 @@ export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, 
                             </p>
                         </div>
                     ) : (
-                        <p className="font-poppins text-sm text-[#484848]">
-                            Saisissez vos coordonnées bancaires sur la page sécurisée, puis confirmez le
-                            paiement.
-                        </p>
+                        <div className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label
+                                    htmlFor="payment-card-number"
+                                    className="font-poppins text-sm font-medium text-black"
+                                >
+                                    Numéro de carte
+                                </label>
+                                <input
+                                    id="payment-card-number"
+                                    type="text"
+                                    inputMode="numeric"
+                                    autoComplete="cc-number"
+                                    value={cardNumber}
+                                    onChange={(e) => {
+                                        setCardError(null);
+                                        setCardNumber(formatCardNumber(e.target.value));
+                                    }}
+                                    placeholder="1234 5678 9012 3456"
+                                    className={inputClassName}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                    <label
+                                        htmlFor="payment-card-expiry"
+                                        className="font-poppins text-sm font-medium text-black"
+                                    >
+                                        Date d&apos;expiration
+                                    </label>
+                                    <input
+                                        id="payment-card-expiry"
+                                        type="text"
+                                        inputMode="numeric"
+                                        autoComplete="cc-exp"
+                                        value={cardExpiry}
+                                        onChange={(e) => {
+                                            setCardError(null);
+                                            setCardExpiry(formatCardExpiry(e.target.value));
+                                        }}
+                                        placeholder="MM/AA"
+                                        className={inputClassName}
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label
+                                        htmlFor="payment-card-cvv"
+                                        className="font-poppins text-sm font-medium text-black"
+                                    >
+                                        CVV
+                                    </label>
+                                    <input
+                                        id="payment-card-cvv"
+                                        type="password"
+                                        inputMode="numeric"
+                                        autoComplete="cc-csc"
+                                        maxLength={3}
+                                        value={cardCvv}
+                                        onChange={(e) => {
+                                            setCardError(null);
+                                            setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 3));
+                                        }}
+                                        placeholder="123"
+                                        className={inputClassName}
+                                    />
+                                </div>
+                            </div>
+
+                            <p className="font-poppins text-xs text-[#6b7280]">
+                                Simulation locale — aucune donnée bancaire n&apos;est enregistrée ni transmise.
+                            </p>
+
+                            {cardError ? (
+                                <p className="font-poppins text-sm text-red-600">{cardError}</p>
+                            ) : null}
+                        </div>
                     )}
 
                     <div className="flex flex-col gap-3 pt-2">
@@ -160,7 +289,8 @@ export function CheckoutPaymentSimulation({ provider, amount, phone, onConfirm, 
                                 'font-poppins h-auto w-full rounded-full py-3 text-base font-semibold text-white',
                             )}
                             style={{ backgroundColor: meta.accent }}
-                            onClick={onConfirm}
+                            onClick={handleConfirm}
+                            disabled={isCard && !cardValid}
                         >
                             J&apos;ai confirmé le paiement
                         </Button>

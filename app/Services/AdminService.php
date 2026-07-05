@@ -8,18 +8,34 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Vendor;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
 class AdminService
 {
+    private function appTimezone(): string
+    {
+        return (string) config('app.timezone', 'Africa/Lubumbashi');
+    }
+
+    private function appNow(): Carbon
+    {
+        return Carbon::now($this->appTimezone());
+    }
+
+    private function toAppTime(?CarbonInterface $value): ?CarbonInterface
+    {
+        return $value?->timezone($this->appTimezone());
+    }
+
     public function analysisWindowStart(string $period): Carbon
     {
         return match ($period) {
-            'day' => Carbon::now()->subDay(),
-            'week' => Carbon::now()->subWeek(),
-            'month' => Carbon::now()->subMonth(),
-            'year' => Carbon::now()->subYear(),
-            default => Carbon::now()->subMonth(),
+            'day' => $this->appNow()->subDay(),
+            'week' => $this->appNow()->subWeek(),
+            'month' => $this->appNow()->subMonth(),
+            'year' => $this->appNow()->subYear(),
+            default => $this->appNow()->subMonth(),
         };
     }
 
@@ -32,7 +48,7 @@ class AdminService
             'total_sales' => (float) Order::sum('total'),
             'total_orders' => Order::count(),
             'avg_order_value' => (float) (Order::avg('total') ?? 0),
-            'new_customers' => Customer::where('created_at', '>=', Carbon::now()->subDays(7))->count(),
+            'new_customers' => Customer::where('created_at', '>=', $this->appNow()->subDays(7))->count(),
             'top_products' => $this->getTopProducts(),
             'recent_orders' => $this->getRecentOrders(),
         ];
@@ -65,10 +81,15 @@ class AdminService
         $start = $this->analysisWindowStart($period);
 
         $ordersInRange = Order::where('created_at', '>=', $start)->get();
-        $byDay = $ordersInRange->groupBy(fn (Order $o) => $o->created_at->format('Y-m-d'));
+        $byDay = $ordersInRange->groupBy(
+            fn (Order $o) => $this->toAppTime($o->created_at)?->format('Y-m-d') ?? '',
+        );
         $bestSalesDay = $byDay
             ->map(fn ($group, string $day) => [
                 'date' => $day,
+                'display_date' => Carbon::parse($day, $this->appTimezone())
+                    ->locale('fr')
+                    ->isoFormat('D MMMM YYYY'),
                 'revenue' => (float) $group->sum(fn (Order $o) => (float) $o->total),
                 'orders' => $group->count(),
             ])
@@ -101,6 +122,10 @@ class AdminService
             'best_sales_day' => $bestSalesDay,
             'high_demand_out_of_stock' => $highDemandOutOfStock,
             'chart_series' => $this->getSalesChartSeries($period),
+            'period_bounds' => [
+                'from' => $start->copy()->timezone($this->appTimezone())->toDateString(),
+                'to' => $this->appNow()->toDateString(),
+            ],
         ]);
     }
 
@@ -120,20 +145,25 @@ class AdminService
 
         $buckets = match ($period) {
             'day' => $this->chartBucketsByHour(),
-            'week' => $this->chartBucketsByDay(Carbon::now()->subDays(6)->startOfDay(), 7, 'ddd D/M'),
-            'year' => $this->chartBucketsByMonth(Carbon::now()->subMonths(11)->startOfMonth(), 12),
+            'week' => $this->chartBucketsByDay($this->appNow()->subDays(6)->startOfDay(), 7, 'ddd D/M'),
+            'year' => $this->chartBucketsByMonth($this->appNow()->subMonths(11)->startOfMonth(), 12),
             default => $this->chartBucketsByDay(
                 $start->copy()->startOfDay(),
-                (int) $start->copy()->startOfDay()->diffInDays(Carbon::now()->startOfDay()) + 1,
+                (int) $start->copy()->startOfDay()->diffInDays($this->appNow()->startOfDay()) + 1,
                 'D MMM',
             ),
         };
 
         foreach ($orders as $order) {
+            $at = $this->toAppTime($order->created_at);
+            if (! $at) {
+                continue;
+            }
+
             $key = match ($period) {
-                'day' => $order->created_at->format('Y-m-d H:00'),
-                'year' => $order->created_at->format('Y-m'),
-                default => $order->created_at->format('Y-m-d'),
+                'day' => $at->format('Y-m-d H:00'),
+                'year' => $at->format('Y-m'),
+                default => $at->format('Y-m-d'),
             };
 
             if (! isset($buckets[$key])) {
@@ -154,7 +184,7 @@ class AdminService
     {
         $buckets = [];
         for ($i = 23; $i >= 0; $i--) {
-            $t = Carbon::now()->subHours($i)->startOfHour();
+            $t = $this->appNow()->subHours($i)->startOfHour();
             $key = $t->format('Y-m-d H:00');
             $buckets[$key] = [
                 'label' => $t->format('H\h'),
@@ -268,7 +298,7 @@ class AdminService
                     $segment = 'frequent';
                 } elseif ($ordersCount === 0) {
                     $segment = 'never_ordered';
-                } elseif ($lastAt && $lastAt->lt(Carbon::now()->subDays(180))) {
+                } elseif ($lastAt && $lastAt->timezone($this->appTimezone())->lt($this->appNow()->subDays(180))) {
                     $segment = 'inactive';
                 } else {
                     $segment = 'active';
@@ -340,7 +370,7 @@ class AdminService
                     'customer_name' => $order->customer?->user?->name ?? 'Inconnu',
                     'total' => (float) $order->total,
                     'status' => $order->status,
-                    'created_at' => $order->created_at?->format('d/m/Y H:i') ?? '',
+                    'created_at' => $this->toAppTime($order->created_at)?->format('d/m/Y H:i') ?? '',
                 ];
             })
             ->toArray();

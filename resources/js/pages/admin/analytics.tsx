@@ -25,7 +25,7 @@ type Period = 'day' | 'week' | 'month' | 'year';
 
 type TopProduct = { id: number; name: string; price: number; stock: number; total_sold: number };
 type TopCustomer = { id: number; name: string; email: string; orders_count: number };
-type BestDay = { date: string; revenue: number; orders: number } | null;
+type BestDay = { date: string; display_date: string; revenue: number; orders: number } | null;
 type DemandRow = { id: number; name: string; units_sold: number };
 
 type Analytics = {
@@ -38,6 +38,7 @@ type Analytics = {
     best_sales_day: BestDay;
     high_demand_out_of_stock: DemandRow[];
     chart_series: { label: string; revenue: number; orders: number }[];
+    period_bounds?: { from: string; to: string };
 };
 
 type Props = {
@@ -52,24 +53,22 @@ const periodLabels: Record<Period, string> = {
     year: 'Année',
 };
 
-function periodRange(p: Period): { from: Date; to: Date } {
-    const to = new Date();
-    const from = new Date(to);
-    switch (p) {
-        case 'day':   from.setDate(from.getDate() - 1);       break;
-        case 'week':  from.setDate(from.getDate() - 6);       break;
-        case 'month': from.setMonth(from.getMonth() - 1);     break;
-        case 'year':  from.setFullYear(from.getFullYear() - 1); break;
-    }
-    return { from, to };
+function parseLocalDate(isoDate: string): Date {
+    const [year, month, day] = isoDate.split('-').map(Number);
+    return new Date(year, month - 1, day);
 }
 
-function fmtDate(d: Date) {
-    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+function fmtDate(isoDate: string) {
+    return parseLocalDate(isoDate).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    });
 }
 
 export default function AdminAnalytics({ period, analytics }: Props) {
-    const { from, to } = periodRange(period);
+    const periodFrom = analytics.period_bounds?.from;
+    const periodTo = analytics.period_bounds?.to;
     const setPeriod = (p: Period) => {
         router.get(route('admin.analytics.sales'), { period: p }, { preserveState: true, replace: true });
     };
@@ -134,7 +133,9 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                         <AdminCardHeader>
                             <h3 className={ADMIN_H3}>Période la plus forte</h3>
                             <AdminCardDescription>
-                                CA de {fmtDate(from)} à {fmtDate(to)}
+                                {periodFrom && periodTo
+                                    ? `CA du ${fmtDate(periodFrom)} au ${fmtDate(periodTo)}`
+                                    : `Période : ${periodLabels[period]}`}
                             </AdminCardDescription>
                         </AdminCardHeader>
                         <AdminCardContent className="font-poppins text-sm text-black">
@@ -142,7 +143,8 @@ export default function AdminAnalytics({ period, analytics }: Props) {
                                 <ul className="space-y-2">
                                     <li>
                                         <span className="font-semibold">Meilleur jour :</span>{' '}
-                                        {new Date(analytics.best_sales_day.date).toLocaleDateString('fr-FR')}
+                                        {analytics.best_sales_day.display_date ??
+                                            fmtDate(analytics.best_sales_day.date)}
                                     </li>
                                     <li>
                                         <span className="font-semibold">CA :</span>{' '}
