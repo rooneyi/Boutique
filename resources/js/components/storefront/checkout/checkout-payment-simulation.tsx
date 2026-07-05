@@ -3,7 +3,7 @@ import type { PaymentProvider } from '@/components/storefront/checkout/checkout-
 import { PhoneInput } from '@/components/ui/phone-input';
 import { Button } from '@/components/ui/button';
 import { CHECKOUT_PAYMENT_ASSETS } from '@/lib/home-assets';
-import { isValidFullPhone } from '@/lib/phone';
+import { isValidMobileMoneyPhone, mobileMoneyPhoneError, mobileMoneyPhoneHint, mobileMoneyPhonePlaceholder } from '@/lib/phone';
 import { cn } from '@/lib/utils';
 
 function formatCardNumber(value: string): string {
@@ -111,7 +111,10 @@ export function CheckoutPaymentSimulation({
     const isCard = provider === 'card';
     const isMobileMoney = provider === 'airtel' || provider === 'orange' || provider === 'mpesa';
     const cardValid = isCardFormValid(cardNumber, cardExpiry, cardCvv);
-    const mobileValid = isValidFullPhone(mobilePhone);
+    const mobileValid =
+        isMobileMoney && (provider === 'airtel' || provider === 'orange' || provider === 'mpesa')
+            ? isValidMobileMoneyPhone(mobilePhone, provider)
+            : false;
 
     useEffect(() => {
         setMobilePhone(phone);
@@ -126,7 +129,11 @@ export function CheckoutPaymentSimulation({
             return;
         }
         if (isMobileMoney && !mobileValid) {
-            setMobileError('Indiquez un numéro Mobile Money valide (9 chiffres ou 10 avec 0).');
+            setMobileError(
+                provider === 'airtel' || provider === 'orange' || provider === 'mpesa'
+                    ? mobileMoneyPhoneError(provider)
+                    : 'Indiquez un numéro Mobile Money valide.',
+            );
             return;
         }
         setCardError(null);
@@ -222,7 +229,14 @@ export function CheckoutPaymentSimulation({
                                 }}
                                 variant="rounded"
                                 hasError={!!mobileError}
-                                placeholder="99 123 4567"
+                                placeholder={
+                                    isMobileMoney &&
+                                    (provider === 'airtel' ||
+                                        provider === 'orange' ||
+                                        provider === 'mpesa')
+                                        ? mobileMoneyPhonePlaceholder(provider)
+                                        : '99 123 4567'
+                                }
                             />
                             {whatsappPhone && whatsappPhone !== mobilePhone ? (
                                 <button
@@ -240,7 +254,12 @@ export function CheckoutPaymentSimulation({
                                 <p className="font-poppins text-sm text-red-600">{mobileError}</p>
                             ) : (
                                 <p className="font-poppins text-xs text-[#6b7280]">
-                                    Saisissez le numéro enregistré sur ce réseau Mobile Money.
+                                    {isMobileMoney &&
+                                    (provider === 'airtel' ||
+                                        provider === 'orange' ||
+                                        provider === 'mpesa')
+                                        ? mobileMoneyPhoneHint(provider)
+                                        : 'Saisissez le numéro enregistré sur ce réseau Mobile Money.'}
                                 </p>
                             )}
                         </div>

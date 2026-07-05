@@ -119,4 +119,49 @@ class PhoneNumber
 
         return (bool) preg_match('/^\d{9,15}$/', $digits);
     }
+
+    /**
+     * @var array<string, list<string>>
+     */
+    public const MOBILE_MONEY_PREFIXES = [
+        'airtel' => ['097', '098', '099'],
+        'orange' => ['084', '085', '086', '089'],
+        'mpesa' => ['081', '082', '083'],
+    ];
+
+    public static function matchesMobileMoneyProvider(?string $phone, string $provider): bool
+    {
+        if (! self::isValidE164($phone)) {
+            return false;
+        }
+
+        $normalized = self::normalizeE164($phone);
+
+        if ($normalized === null || ! str_starts_with($normalized, '+243')) {
+            return false;
+        }
+
+        $national = '0'.substr($normalized, 4);
+        $prefix = substr($national, 0, 3);
+        $prefixes = self::MOBILE_MONEY_PREFIXES[$provider] ?? [];
+
+        return in_array($prefix, $prefixes, true);
+    }
+
+    public static function mobileMoneyPrefixMessage(string $provider): string
+    {
+        $labels = [
+            'airtel' => 'Airtel Money',
+            'orange' => 'Orange Money',
+            'mpesa' => 'M-Pesa (Vodacom)',
+        ];
+
+        $prefixes = implode(', ', self::MOBILE_MONEY_PREFIXES[$provider] ?? []);
+
+        return sprintf(
+            'Ce numéro ne correspond pas à %s. Les numéros commencent par %s.',
+            $labels[$provider] ?? $provider,
+            $prefixes,
+        );
+    }
 }

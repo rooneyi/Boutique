@@ -89,3 +89,72 @@ export function isValidFullPhone(full: string): boolean {
 
     return built !== null && built === trimmed;
 }
+
+export type MobileMoneyProvider = 'airtel' | 'orange' | 'mpesa';
+
+export const MOBILE_MONEY_PREFIXES: Record<MobileMoneyProvider, readonly string[]> = {
+    airtel: ['097', '098', '099'],
+    orange: ['084', '085', '086', '089'],
+    mpesa: ['081', '082', '083'],
+};
+
+export function getNationalPrefix3(full: string): string | null {
+    const trimmed = full.trim().replace(/\s/g, '');
+
+    if (!isValidFullPhone(trimmed)) {
+        return null;
+    }
+
+    const { dial, national } = parseFullPhone(trimmed);
+
+    if (dial !== DEFAULT_PHONE_DIAL) {
+        return null;
+    }
+
+    const digits = national.replace(/\D/g, '');
+    const withZero = digits.startsWith('0') ? digits : `0${digits}`;
+
+    if (withZero.length !== 10) {
+        return null;
+    }
+
+    return withZero.slice(0, 3);
+}
+
+export function isValidMobileMoneyPhone(full: string, provider: MobileMoneyProvider): boolean {
+    const prefix = getNationalPrefix3(full);
+
+    if (!prefix) {
+        return false;
+    }
+
+    return MOBILE_MONEY_PREFIXES[provider].includes(prefix);
+}
+
+export function mobileMoneyPhoneError(provider: MobileMoneyProvider): string {
+    const labels: Record<MobileMoneyProvider, string> = {
+        airtel: 'Airtel Money',
+        orange: 'Orange Money',
+        mpesa: 'M-Pesa (Vodacom)',
+    };
+
+    const prefixes = MOBILE_MONEY_PREFIXES[provider].join(', ');
+
+    return `Ce numéro ne correspond pas à ${labels[provider]}. Les numéros commencent par ${prefixes}.`;
+}
+
+export function mobileMoneyPhonePlaceholder(provider: MobileMoneyProvider): string {
+    const examples: Record<MobileMoneyProvider, string> = {
+        airtel: '099 123 4567',
+        orange: '084 123 4567',
+        mpesa: '081 123 4567',
+    };
+
+    return examples[provider];
+}
+
+export function mobileMoneyPhoneHint(provider: MobileMoneyProvider): string {
+    const prefixes = MOBILE_MONEY_PREFIXES[provider].join(', ');
+
+    return `Numéros acceptés : ${prefixes}.`;
+}

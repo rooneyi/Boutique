@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Rules\ValidMobileMoneyPhone;
 use App\Rules\ValidPhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -31,7 +32,7 @@ class StoreCheckoutRequest extends FormRequest
                     && in_array($this->input('payment_provider'), ['airtel', 'orange', 'mpesa'], true)),
                 'nullable',
                 'string',
-                new ValidPhoneNumber,
+                new ValidMobileMoneyPhone,
             ],
             'customer_note' => ['nullable', 'string', 'max:1000'],
         ];

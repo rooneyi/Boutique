@@ -13,7 +13,7 @@ import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
 import { route } from '@/lib/route';
-import { isValidFullPhone } from '@/lib/phone';
+import { isValidFullPhone, isValidMobileMoneyPhone, mobileMoneyPhoneError } from '@/lib/phone';
 import { SF_PAGE_MAIN, SF_PAGE_TITLE } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
@@ -126,11 +126,8 @@ export default function CustomerCheckout() {
         }
 
         if (['airtel', 'orange', 'mpesa'].includes(provider)) {
-            if (!isValidFullPhone(confirmedPhone)) {
-                setError(
-                    'payment_phone',
-                    'Indiquez un numéro Mobile Money valide pour confirmer le paiement.',
-                );
+            if (!isValidMobileMoneyPhone(confirmedPhone, provider)) {
+                setError('payment_phone', mobileMoneyPhoneError(provider));
                 return;
             }
             setData('payment_phone', confirmedPhone);
