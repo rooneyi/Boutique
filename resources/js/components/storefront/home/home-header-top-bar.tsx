@@ -37,7 +37,7 @@ export function HomeHeaderTopBar({
 
     return (
         <div className="relative bg-black text-white">
-            <div className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between px-4 py-[15px] sm:px-8 lg:px-[102px]">
+            <div className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between px-4 py-[15px] sm:px-8 lg:px-[100px]">
                 <div className="flex items-center gap-3">
                     {HEADER_SOCIAL_LINKS.map((social) => (
                         <a
