@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -25,13 +26,26 @@ type Props = {
 
 export function ProductColorPicker({ color, colorHex, onChange, disabled, labelClassName }: Props) {
     const preset = findPresetByName(color);
-    const selectValue = preset ? preset.name : color.trim() ? CUSTOM_COLOR_VALUE : '';
+    const [isCustomMode, setIsCustomMode] = useState(() => !preset && color.trim().length > 0);
+
+    useEffect(() => {
+        if (findPresetByName(color)) {
+            setIsCustomMode(false);
+        }
+    }, [color]);
+
+    const selectValue = isCustomMode ? CUSTOM_COLOR_VALUE : (preset?.name ?? '');
 
     const handlePresetChange = (value: string) => {
         if (value === CUSTOM_COLOR_VALUE) {
-            onChange({ color: color.trim() || 'Couleur', color_hex: colorHex || '#000000' });
+            setIsCustomMode(true);
+            onChange({
+                color: preset ? 'Couleur' : color.trim() || 'Couleur',
+                color_hex: colorHex || '#000000',
+            });
             return;
         }
+        setIsCustomMode(false);
         const match = CATALOG_COLOR_PRESETS.find((p) => p.name === value);
         if (match) {
             onChange({ color: match.name, color_hex: match.hex });
@@ -40,13 +54,16 @@ export function ProductColorPicker({ color, colorHex, onChange, disabled, labelC
 
     const handleHexChange = (hex: string) => {
         const fromHex = findPresetByHex(hex);
+        if (fromHex) {
+            setIsCustomMode(false);
+        }
         onChange({
             color: fromHex?.name ?? (color.trim() || 'Couleur'),
             color_hex: hex,
         });
     };
 
-    const isCustom = selectValue === CUSTOM_COLOR_VALUE;
+    const isCustom = isCustomMode;
 
     return (
         <div className="grid gap-2 sm:col-span-2">
