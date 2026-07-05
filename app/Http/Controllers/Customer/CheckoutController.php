@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Data\OrderData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreCheckoutRequest;
 use App\Models\Product;
-use App\Data\OrderData;
+use App\Models\ProductVariant;
 use App\Services\CartService;
 use App\Services\OrderService;
+use App\Support\PhoneNumber;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,6 +32,7 @@ class CheckoutController extends Controller
         }
 
         $user = auth()->user();
+        $user?->loadMissing('customer');
         $subtotal = $this->cartService->total();
 
         return Inertia::render('customer/checkout', [
@@ -41,7 +44,7 @@ class CheckoutController extends Controller
             'defaults' => [
                 'delivery_method' => 'home_delivery',
                 'shipping_full_name' => $user->name ?? '',
-                'shipping_whatsapp' => '',
+                'shipping_whatsapp' => $user?->customer?->phone ?? '',
                 'shipping_address' => '',
                 'shipping_city' => '',
                 'shipping_district' => '',
@@ -64,6 +67,7 @@ class CheckoutController extends Controller
 
         $customer = auth()->user()->customer;
         $validated = $request->validated();
+        $validated['shipping_whatsapp'] = PhoneNumber::normalizeE164($validated['shipping_whatsapp']);
 
         if ($validated['delivery_method'] === 'store_pickup') {
             $validated['shipping_address'] = $validated['shipping_address'] ?: 'Retrait en boutique';
@@ -100,7 +104,14 @@ class CheckoutController extends Controller
                 }
 
                 $qty = (int) $line['quantity'];
-                if ($product->stock < $qty) {
+                $variantId = isset($line['variant_id']) ? (int) $line['variant_id'] : null;
+                $variant = $variantId
+                    ? ProductVariant::query()->where('product_id', $product->id)->find($variantId)
+                    : null;
+
+                $availableStock = $variant ? $variant->stock : $product->stock;
+
+                if ($availableStock < $qty) {
                     return back()->withErrors([
                         'cart' => "Stock insuffisant pour « {$product->name} ».",
                     ]);
@@ -109,6 +120,7 @@ class CheckoutController extends Controller
                 $unit = (float) $product->price;
                 $items[] = [
                     'product_id' => $product->id,
+                    'variant_id' => $variant?->id,
                     'quantity' => $qty,
                     'price' => $unit,
                 ];

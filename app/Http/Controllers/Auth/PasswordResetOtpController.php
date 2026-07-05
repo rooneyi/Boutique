@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\User;
+use App\Rules\ValidPhoneNumber;
 use App\Services\PasswordResetOtpService;
+use App\Support\PhoneNumber;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -40,11 +42,13 @@ class PasswordResetOtpController extends Controller
     public function sendPhone(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'phone' => ['required', 'string', 'max:50'],
+            'phone' => ['required', 'string', new ValidPhoneNumber],
         ]);
 
+        $normalizedPhone = PhoneNumber::normalizeE164($validated['phone']);
+
         $customer = Customer::query()
-            ->where('phone', $validated['phone'])
+            ->where('phone', $normalizedPhone)
             ->with('user')
             ->first();
 
@@ -54,7 +58,7 @@ class PasswordResetOtpController extends Controller
             ]);
         }
 
-        $this->startFlow($request, $customer->user, 'phone', $validated['phone']);
+        $this->startFlow($request, $customer->user, 'phone', $normalizedPhone);
 
         return redirect()->route('auth.forgot-password.verify');
     }

@@ -8,6 +8,7 @@ import { HomeHeader } from '@/components/storefront/home/home-header';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { Spinner } from '@/components/ui/spinner';
 import {
     AUTH_BTN_PRIMARY,
@@ -121,14 +122,11 @@ export default function CustomerProfileEdit() {
                                             </div>
 
                                             <div className="space-y-1">
-                                                <Input
+                                                <PhoneInput
                                                     id="phone"
-                                                    type="tel"
                                                     name="phone"
-                                                    defaultValue={profile.phone ?? ''}
-                                                    autoComplete="tel"
-                                                    placeholder="Téléphone"
-                                                    className={AUTH_INPUT_UNDERLINE}
+                                                    defaultValue={profile.phone}
+                                                    placeholder="0XX XXX XX XX"
                                                 />
                                                 <InputError message={errors.phone} />
                                             </div>

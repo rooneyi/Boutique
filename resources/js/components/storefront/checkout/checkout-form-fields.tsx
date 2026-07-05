@@ -1,6 +1,7 @@
 import { Brush, Smartphone, Truck, Wallet } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
@@ -57,13 +58,13 @@ export function CheckoutFormFields({ data, errors, setData }: Props) {
                             <Label htmlFor="shipping_whatsapp" className={labelClass}>
                                 Numéro Whatsapp
                             </Label>
-                            <input
+                            <PhoneInput
                                 id="shipping_whatsapp"
-                                type="tel"
                                 value={data.shipping_whatsapp}
-                                onChange={(e) => setData('shipping_whatsapp', e.target.value)}
-                                placeholder="Ex: +225 07 XX XX XX"
-                                className={inputClass}
+                                onChange={(phone) => setData('shipping_whatsapp', phone)}
+                                variant="rounded"
+                                hasError={!!errors.shipping_whatsapp}
+                                placeholder="0XX XXX XX XX"
                                 required
                             />
                             <InputError message={errors.shipping_whatsapp} />

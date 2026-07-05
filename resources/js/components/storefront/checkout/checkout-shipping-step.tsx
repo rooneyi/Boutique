@@ -2,6 +2,7 @@ import { MapPin, Store, Truck } from 'lucide-react';
 import InputError from '@/components/input-error';
 import type { CheckoutFormData } from '@/components/storefront/checkout/checkout-form-data';
 import { Label } from '@/components/ui/label';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -79,13 +80,14 @@ export function CheckoutShippingStep({ data, errors, setData }: Props) {
                             <Label htmlFor="shipping_whatsapp" className={labelClass}>
                                 Numéro WhatsApp <span className="text-red-500">*</span>
                             </Label>
-                            <input
+                            <PhoneInput
                                 id="shipping_whatsapp"
-                                type="tel"
                                 value={data.shipping_whatsapp}
-                                onChange={(e) => setData('shipping_whatsapp', e.target.value)}
-                                placeholder="Ex: +243 07 XX XX XX"
-                                className={errors.shipping_whatsapp ? inputErrorClass : inputClass}
+                                onChange={(phone) => setData('shipping_whatsapp', phone)}
+                                variant="rounded"
+                                hasError={!!errors.shipping_whatsapp}
+                                placeholder="0XX XXX XX XX"
+                                required
                             />
                             <InputError message={errors.shipping_whatsapp} />
                         </div>

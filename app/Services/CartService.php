@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\PublicStorage;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
 
 class CartService
 {
@@ -144,9 +144,7 @@ class CartService
             $qty = (int) $row['quantity'];
             $price = (float) $product->price;
 
-            $imagePath = $variant?->image
-                ? Storage::disk('public')->url($variant->image)
-                : ($product->image ? Storage::disk('public')->url($product->image) : null);
+            $imagePath = PublicStorage::url($variant?->image ?? $product->image);
 
             $name = $product->name;
             if ($variant) {

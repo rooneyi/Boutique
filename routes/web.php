@@ -1,6 +1,8 @@
 <?php
 
 use App\Data\CustomerRegisterData;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\PasswordResetOtpController;
@@ -9,19 +11,21 @@ use App\Http\Controllers\Customer\AccountController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Customer\ContactController;
+use App\Http\Controllers\Customer\DeliveryController;
 use App\Http\Controllers\Customer\FavoriteController;
 use App\Http\Controllers\Customer\NotificationController;
 use App\Http\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\Customer\ProductReviewController;
-use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Customer\RefundPolicyController;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductReview;
+use App\Rules\ValidPhoneNumber;
 use App\Services\AdminService;
 use App\Services\CustomerService;
 use App\Support\CatalogProduct;
+use App\Support\PhoneNumber;
 use App\Support\StorefrontCurated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -109,7 +113,7 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
             'first_name' => ['required', 'string', 'max:120'],
             'last_name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'string', 'max:50'],
+            'phone' => ['required', 'string', new ValidPhoneNumber],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
@@ -117,7 +121,7 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'],
+            'phone' => PhoneNumber::normalizeE164($validated['phone']),
             'password' => $validated['password'],
         ]);
 
@@ -230,6 +234,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('about', [AboutController::class, 'index'])->name('about');
+
+Route::get('livraison', [DeliveryController::class, 'index'])->name('delivery');
+Route::get('politique-de-remboursement', [RefundPolicyController::class, 'index'])->name('refund-policy');
 
 Route::get('contact', [ContactController::class, 'index'])->name('contact');
 Route::post('contact', [ContactController::class, 'store'])->name('contact.store');

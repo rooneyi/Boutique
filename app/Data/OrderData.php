@@ -5,7 +5,7 @@ namespace App\Data;
 class OrderData
 {
     /**
-     * @param array<array{product_id: int, quantity: int, price: float}> $items
+     * @param  array<array{product_id: int, variant_id?: ?int, quantity: int, price: float}>  $items
      */
     public function __construct(
         public int $customer_id,

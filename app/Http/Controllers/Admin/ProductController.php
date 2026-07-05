@@ -12,9 +12,9 @@ use App\Services\CustomerNotificationService;
 use App\Services\ProductService;
 use App\Services\ProductVariantService;
 use App\Support\BoutiqueStore;
+use App\Support\PublicStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -40,6 +40,8 @@ class ProductController extends Controller
         $this->authorize('update', $product);
 
         $product->load('variants');
+        $this->productService->reconcileVariantStocksToProduct($product);
+        $product->load('variants');
 
         return Inertia::render('admin/products/form', [
             'categories' => Category::orderBy('name')->get(['id', 'name']),
@@ -51,7 +53,7 @@ class ProductController extends Controller
                 'price' => (float) $product->price,
                 'category_id' => $product->category_id,
                 'status' => $product->status,
-                'image_path' => $product->image ? Storage::disk('public')->url($product->image) : null,
+                'image_path' => PublicStorage::url($product->image),
                 'variants' => $product->variants()
                     ->orderBy('color')
                     ->orderBy('size')

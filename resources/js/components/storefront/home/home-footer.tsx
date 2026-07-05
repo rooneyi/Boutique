@@ -2,7 +2,6 @@ import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { StorefrontLogo } from '@/components/storefront/storefront-logo';
 import { CHECKOUT_PAYMENT_ASSETS } from '@/lib/home-assets';
-import { HEADER_ASSETS } from '@/lib/header-assets';
 import { route } from '@/lib/route';
 import { cn } from '@/lib/utils';
 
@@ -24,14 +23,18 @@ function InstagramIcon({ className }: { className?: string }) {
     );
 }
 
+function FacebookIcon({ className }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+            <path d="M13.5 8H16V5.5C15.6 5.2 14.5 5 13.2 5 10.5 5 8.8 6.6 8.8 9.3V11H6v3h2.8v7.5H13V14h2.5l.4-3H13v-1.5c0-.9.5-1.5 1.5-1.5z" />
+        </svg>
+    );
+}
+
 const FOOTER_SOCIAL = [
     { href: 'https://instagram.com', label: 'Instagram', Icon: InstagramIcon },
     { href: 'https://www.tiktok.com', label: 'TikTok', Icon: TikTokIcon },
-    {
-        href: 'https://wa.me/243991934590',
-        label: 'WhatsApp',
-        image: HEADER_ASSETS.social.whatsapp,
-    },
+    { href: 'https://facebook.com', label: 'Facebook', Icon: FacebookIcon },
 ] as const;
 
 const FOOTER_NAV = [
@@ -41,7 +44,10 @@ const FOOTER_NAV = [
     { label: 'Contact', href: route('contact') },
 ] as const;
 
-const FOOTER_INFO = ['Livraison', "Conditions d'utilisation", 'Politique de remboursement'] as const;
+const FOOTER_INFO = [
+    { label: 'Livraison', href: route('delivery') },
+    { label: 'Politique de remboursement', href: route('refund-policy') },
+] as const;
 
 /** Ordre Figma footer 1440 */
 const PAYMENT_METHODS = [
@@ -82,11 +88,7 @@ function BrandSocial() {
                     className="text-white/90 transition-colors hover:text-white"
                     aria-label={social.label}
                 >
-                    {'image' in social ? (
-                        <img src={social.image} alt="" className="size-5" />
-                    ) : (
-                        <social.Icon className="size-5" />
-                    )}
+                    <social.Icon className="size-5" />
                 </a>
             ))}
         </div>
@@ -133,8 +135,10 @@ function FooterNavLinks() {
 function FooterInfoLinks() {
     return (
         <nav className="flex flex-col gap-[13px] font-poppins text-[15px] font-medium leading-normal lg:text-[17px]">
-            {FOOTER_INFO.map((label) => (
-                <span key={label}>{label}</span>
+            {FOOTER_INFO.map((item) => (
+                <Link key={item.label} href={item.href} className="hover:opacity-80">
+                    {item.label}
+                </Link>
             ))}
         </nav>
     );
@@ -147,11 +151,7 @@ function FooterContactLinks() {
                 href="tel:+243123456789"
                 className="flex items-center gap-2.5 whitespace-nowrap hover:opacity-80"
             >
-                <img
-                    src={HEADER_ASSETS.social.whatsapp}
-                    alt=""
-                    className="size-[23px] shrink-0"
-                />
+                <PhoneFooterIcon className="size-5 shrink-0" />
                 +243 123 456 789
             </a>
             <a
@@ -229,6 +229,19 @@ export function HomeFooter() {
                 </div>
             </div>
         </footer>
+    );
+}
+
+function PhoneFooterIcon({ className }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden>
+            <path
+                d="M6.6 4.5c.4-.9 1.5-1.2 2.3-.7l2.1 1.2c.7.4.9 1.3.5 2l-1 1.7c.8 1.6 2.1 2.9 3.7 3.7l1.7-1c.7-.4 1.6-.2 2 .5l1.2 2.1c.5.8.2 1.9-.7 2.3l-2 .8c-3 .9-6.4-.5-8.6-2.7S5.8 7.5 6.6 4.5z"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
     );
 }
 

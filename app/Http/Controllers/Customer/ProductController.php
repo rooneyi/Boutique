@@ -10,9 +10,9 @@ use App\Models\ProductReview;
 use App\Models\ProductVariant;
 use App\Services\ProductVariantService;
 use App\Support\CatalogProduct;
+use App\Support\PublicStorage;
 use App\Support\StorefrontCurated;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -40,7 +40,10 @@ class ProductController extends Controller
 
         $categoryFilter = $request->string('category')->toString();
         if ($categoryFilter !== '' && $categoryFilter !== 'all') {
-            $query->whereHas('category', fn ($q) => $q->where('name', $categoryFilter));
+            $query->whereHas(
+                'category',
+                fn ($q) => $q->whereRaw('LOWER(name) = ?', [mb_strtolower($categoryFilter)]),
+            );
         }
 
         if ($search !== '') {
@@ -223,9 +226,7 @@ class ProductController extends Controller
                 'price' => (float) $product->price,
                 'stock' => $product->stock,
                 'category' => $category?->name ?? '',
-                'image_path' => $product->image
-                    ? Storage::disk('public')->url($product->image)
-                    : null,
+                'image_path' => PublicStorage::url($product->image),
                 'vendor' => [
                     'id' => $product->vendor->id,
                     'shop_name' => $product->vendor->shop_name,

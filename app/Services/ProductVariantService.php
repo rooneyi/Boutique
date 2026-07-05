@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\PublicStorage;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class ProductVariantService
 {
@@ -58,9 +58,7 @@ class ProductVariantService
             'size' => $variant->size,
             'sku' => $variant->sku,
             'stock' => $variant->stock,
-            'image_path' => $variant->image
-                ? Storage::disk('public')->url($variant->image)
-                : null,
+            'image_path' => PublicStorage::url($variant->image),
         ];
     }
 }

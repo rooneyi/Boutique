@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { FlashToaster } from '@/components/flash-toaster';
 import type { CartLine } from '@/components/storefront/cart/cart-types';
 import { CheckoutBreadcrumbs } from '@/components/storefront/checkout/checkout-breadcrumbs';
-import type { CheckoutFormData, CheckoutStep } from '@/components/storefront/checkout/checkout-form-data';
+import type { CheckoutFormData, CheckoutStep, PaymentProvider } from '@/components/storefront/checkout/checkout-form-data';
 import { CheckoutOrderSummary } from '@/components/storefront/checkout/checkout-order-summary';
+import { CheckoutPaymentSimulation } from '@/components/storefront/checkout/checkout-payment-simulation';
 import { CheckoutPaymentStep } from '@/components/storefront/checkout/checkout-payment-step';
 import { CheckoutPaymentSummary } from '@/components/storefront/checkout/checkout-payment-summary';
 import { CheckoutShippingStep } from '@/components/storefront/checkout/checkout-shipping-step';
@@ -12,6 +13,7 @@ import { HomeFooter } from '@/components/storefront/home/home-footer';
 import { HomeHeader } from '@/components/storefront/home/home-header';
 import { useOptionalAccountDrawer } from '@/components/storefront/account/account-drawer-context';
 import { route } from '@/lib/route';
+import { isValidFullPhone } from '@/lib/phone';
 import { SF_PAGE_MAIN, SF_PAGE_TITLE } from '@/lib/storefront-ui-styles';
 import { cn } from '@/lib/utils';
 
@@ -50,6 +52,8 @@ export default function CustomerCheckout() {
         usePage<PageProps>().props;
 
     const [step, setStep] = useState<CheckoutStep>('shipping');
+    const [simulatingProvider, setSimulatingProvider] = useState<PaymentProvider | null>(null);
+    const [paymentConfirmed, setPaymentConfirmed] = useState(false);
     const { data, setData, post, processing, errors, setError, clearErrors } = useForm<CheckoutFormData>(defaults);
     const accountDrawer = useOptionalAccountDrawer();
 
@@ -64,8 +68,11 @@ export default function CustomerCheckout() {
             setError('shipping_full_name', 'Le nom complet est requis.');
             valid = false;
         }
-        if (!data.shipping_whatsapp.trim()) {
-            setError('shipping_whatsapp', 'Le numéro WhatsApp est requis.');
+        if (!data.shipping_whatsapp.trim() || !isValidFullPhone(data.shipping_whatsapp)) {
+            setError(
+                'shipping_whatsapp',
+                'Le numéro doit contenir 9 chiffres après l’indicatif, ou 10 chiffres en commençant par 0.',
+            );
             valid = false;
         }
         if (!isPickup) {
@@ -97,12 +104,40 @@ export default function CustomerCheckout() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function handleSelectProvider(provider: PaymentProvider) {
+        if (!provider) {
+            return;
+        }
+
+        setPaymentConfirmed(false);
+        setSimulatingProvider(provider);
+    }
+
+    function confirmPaymentSimulation() {
+        setPaymentConfirmed(true);
+        setSimulatingProvider(null);
+        clearErrors('payment_confirmed');
+    }
+
+    function cancelPaymentSimulation() {
+        setSimulatingProvider(null);
+    }
+
     function submit(e: React.FormEvent) {
         e.preventDefault();
         if (step === 'shipping') {
             goToPayment();
             return;
         }
+
+        if (!paymentConfirmed) {
+            setError(
+                'payment_confirmed',
+                'Veuillez choisir un opérateur et confirmer le paiement avant de valider la commande.',
+            );
+            return;
+        }
+
         post(route('customer.checkout.store'));
     }
 
@@ -177,7 +212,9 @@ export default function CustomerCheckout() {
                                         <CheckoutPaymentStep
                                             data={data}
                                             errors={errors}
+                                            paymentConfirmed={paymentConfirmed}
                                             setData={setData}
+                                            onSelectProvider={handleSelectProvider}
                                             onWhatsApp={openWhatsApp}
                                         />
                                     )}
@@ -198,8 +235,13 @@ export default function CustomerCheckout() {
                                     <CheckoutPaymentSummary
                                         subtotal={subtotal}
                                         shipping={shipping}
+                                        total={total}
                                         processing={processing}
-                                        onBack={() => setStep('shipping')}
+                                        paymentConfirmed={paymentConfirmed}
+                                        onBack={() => {
+                                            setPaymentConfirmed(false);
+                                            setStep('shipping');
+                                        }}
                                     />
                                 )}
                             </form>
@@ -209,6 +251,16 @@ export default function CustomerCheckout() {
 
                 <HomeFooter />
                 <FlashToaster />
+
+                {simulatingProvider ? (
+                    <CheckoutPaymentSimulation
+                        provider={simulatingProvider}
+                        amount={total}
+                        phone={data.shipping_whatsapp}
+                        onConfirm={confirmPaymentSimulation}
+                        onCancel={cancelPaymentSimulation}
+                    />
+                ) : null}
             </div>
         </>
     );

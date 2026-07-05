@@ -47,11 +47,6 @@ export function AccountProfileSection({ account, compact = false }: Props) {
                     <p className={statValueClass}>{account.orders_count}</p>
                     <p className={statLabelClass}>Achat(s)</p>
                 </div>
-                <div className="mx-2 h-[90px] w-px bg-[#e0e0e0]" aria-hidden />
-                <div className="flex flex-col items-center px-3 py-2.5">
-                    <p className={statValueClass}>{account.tokens_count}</p>
-                    <p className={statLabelClass}>Jeton(s)</p>
-                </div>
             </div>
         </div>
     );

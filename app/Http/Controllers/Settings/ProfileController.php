@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Support\PhoneNumber;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -70,8 +71,11 @@ class ProfileController extends Controller
 
         if ($user->role === 'CUSTOMER') {
             $user->loadMissing('customer');
+            $phone = $request->validated('phone');
             $user->customer?->update([
-                'phone' => $request->validated('phone'),
+                'phone' => $phone !== null && $phone !== ''
+                    ? PhoneNumber::normalizeE164($phone)
+                    : null,
             ]);
         }
 

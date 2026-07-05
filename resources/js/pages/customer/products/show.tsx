@@ -99,10 +99,7 @@ export default function ProductDetail() {
 
     const images = useMemo(() => {
         const src = galleryImage ?? product.image_path;
-        if (!src) {
-            return [];
-        }
-        return Array.from({ length: 5 }, () => src);
+        return src ? [src] : [];
     }, [galleryImage, product.image_path]);
 
     return (

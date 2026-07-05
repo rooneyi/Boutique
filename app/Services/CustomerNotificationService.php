@@ -6,8 +6,8 @@ use App\Models\Customer;
 use App\Models\CustomerNotificationRead;
 use App\Models\Product;
 use App\Models\StoreNotification;
+use App\Support\PublicStorage;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 
 class CustomerNotificationService
 {
@@ -112,9 +112,7 @@ class CustomerNotificationService
                 'name' => $product->name,
                 'price' => (float) $product->price,
                 'category' => $product->category?->name ?? '',
-                'image_path' => $product->image
-                    ? Storage::disk('public')->url($product->image)
-                    : null,
+                'image_path' => PublicStorage::url($product->image),
             ] : null,
         ];
     }

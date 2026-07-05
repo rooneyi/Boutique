@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Vendor;
 use Illuminate\Support\Facades\DB;
 
@@ -37,22 +38,28 @@ class OrderService
             // Créer les items de commande et décrémenter le stock
             foreach ($data->items as $item) {
                 $product = Product::find($item['product_id']);
-                
-                // Vérifier le stock disponible
-                if ($product->stock < $item['quantity']) {
+                $variantId = isset($item['variant_id']) ? (int) $item['variant_id'] : null;
+                $variant = $variantId
+                    ? ProductVariant::query()->where('product_id', $product->id)->find($variantId)
+                    : null;
+
+                if ($variant) {
+                    if ($variant->stock < $item['quantity']) {
+                        throw new \Exception("Stock insuffisant pour {$product->name}");
+                    }
+                } elseif ($product->stock < $item['quantity']) {
                     throw new \Exception("Stock insuffisant pour {$product->name}");
                 }
 
-                // Créer l'item de commande
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
+                    'variant_id' => $variant?->id,
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
                 ]);
 
-                // Décrémenter le stock
-                $this->productService->decreaseStock($product, $item['quantity']);
+                $this->productService->decreaseStock($product, $item['quantity'], $variant?->id);
             }
 
             return $order->load('items');
@@ -91,6 +98,7 @@ class OrderService
     public function updateOrderStatus(Order $order, string $status): Order
     {
         $order->update(['status' => $status]);
+
         return $order;
     }
 }

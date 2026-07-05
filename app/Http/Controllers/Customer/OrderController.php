@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Data\OrderData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\CreateOrderRequest;
 use App\Models\Order;
 use App\Models\Product;
-use App\Data\OrderData;
 use App\Services\OrderService;
+use App\Support\PublicStorage;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -104,9 +104,7 @@ class OrderController extends Controller
             'product_name' => $item->product?->name ?? '—',
             'quantity' => $item->quantity,
             'line_total' => (float) ($item->price * $item->quantity),
-            'image_path' => $item->product?->image
-                ? Storage::disk('public')->url($item->product->image)
-                : null,
+            'image_path' => PublicStorage::url($item->product?->image),
         ])->all();
 
         $subtotal = array_sum(array_column($items, 'line_total'));

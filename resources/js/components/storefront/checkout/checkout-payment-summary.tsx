@@ -1,11 +1,12 @@
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 type Props = {
     subtotal: number;
     shipping: number;
+    total: number;
     processing: boolean;
+    paymentConfirmed: boolean;
     onBack: () => void;
 };
 
@@ -13,7 +14,14 @@ function formatMoney(amount: number): string {
     return `${amount.toFixed(2)}$`;
 }
 
-export function CheckoutPaymentSummary({ subtotal, shipping, processing, onBack }: Props) {
+export function CheckoutPaymentSummary({
+    subtotal,
+    shipping,
+    total,
+    processing,
+    paymentConfirmed,
+    onBack,
+}: Props) {
     return (
         <aside className="flex h-fit min-h-[531px] w-full shrink-0 flex-col justify-between border-[0.5px] border-black bg-white px-6 py-7 sm:px-9 lg:sticky lg:top-28 lg:w-[471px]">
             <div className="font-poppins flex flex-col gap-[77px] text-xl text-black">
@@ -26,19 +34,9 @@ export function CheckoutPaymentSummary({ subtotal, shipping, processing, onBack 
                         <span>Frais de livraison</span>
                         <span>{shipping <= 0 ? 'Gratuit' : formatMoney(shipping)}</span>
                     </div>
-                    <div className="flex items-center justify-between gap-4">
-                        <span className="uppercase">Coupons</span>
-                        <button
-                            type="button"
-                            className="font-semibold uppercase underline"
-                            onClick={() =>
-                                toast.message('Bientôt disponible', {
-                                    description: 'Les codes promo seront activés prochainement.',
-                                })
-                            }
-                        >
-                            Ajouter
-                        </button>
+                    <div className="flex items-center justify-between gap-4 border-t border-black/10 pt-[18px]">
+                        <span className="font-semibold uppercase">Total</span>
+                        <span className="font-semibold">{formatMoney(total)}</span>
                     </div>
                 </div>
 
@@ -62,11 +60,17 @@ export function CheckoutPaymentSummary({ subtotal, shipping, processing, onBack 
             </div>
 
             <div className="mt-8 flex flex-col gap-3">
+                {!paymentConfirmed ? (
+                    <p className="font-poppins text-center text-sm text-[#6b7280]">
+                        Choisissez un opérateur et confirmez le paiement pour valider votre commande.
+                    </p>
+                ) : null}
                 <Button
                     type="submit"
-                    disabled={processing}
+                    disabled={processing || !paymentConfirmed}
                     className={cn(
                         'font-poppins h-auto w-full rounded-[32px] border-[0.5px] border-black bg-black py-3.5 text-xl font-semibold text-white hover:bg-neutral-800',
+                        !paymentConfirmed && 'opacity-50',
                     )}
                 >
                     Valider la commande

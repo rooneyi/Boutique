@@ -3,7 +3,6 @@
 namespace App\Support;
 
 use App\Models\Product;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class StorefrontCurated
@@ -38,9 +37,7 @@ class StorefrontCurated
             'description' => $description !== ''
                 ? Str::limit($description, 80)
                 : 'Découvrez ce modèle PCJ.',
-            'image_path' => $product->image
-                ? Storage::disk('public')->url($product->image)
-                : null,
+            'image_path' => PublicStorage::url($product->image),
         ];
     }
 }

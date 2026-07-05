@@ -1,5 +1,4 @@
 import { Link } from '@inertiajs/react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { route } from '@/lib/route';
 import { cn } from '@/lib/utils';
@@ -26,20 +25,6 @@ export function CartSummaryPanel({ subtotal, shipping, total }: Props) {
                     <div className="flex items-center justify-between gap-4">
                         <span>Frais de livraison</span>
                         <span>{shipping <= 0 ? 'Gratuit' : formatMoney(shipping)}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-4">
-                        <span className="uppercase">Coupons</span>
-                        <button
-                            type="button"
-                            className="font-semibold uppercase underline"
-                            onClick={() =>
-                                toast.message('Bientôt disponible', {
-                                    description: 'Les codes promo seront activés prochainement.',
-                                })
-                            }
-                        >
-                            Ajouter
-                        </button>
                     </div>
                 </div>
 

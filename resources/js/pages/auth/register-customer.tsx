@@ -3,6 +3,7 @@ import GoogleIcon from '@/components/icons/google-icon';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { Spinner } from '@/components/ui/spinner';
 import {
     AUTH_BTN_GOOGLE,
@@ -81,15 +82,12 @@ export default function RegisterCustomer() {
                                     </div>
 
                                     <div className="space-y-1">
-                                        <Input
+                                        <PhoneInput
                                             id="phone"
                                             name="phone"
-                                            type="tel"
-                                            placeholder="Téléphone"
                                             required
                                             disabled={processing}
-                                            className={AUTH_INPUT_UNDERLINE}
-                                            autoComplete="tel"
+                                            placeholder="0XX XXX XX XX"
                                         />
                                         <InputError message={errors.phone} />
                                     </div>

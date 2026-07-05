@@ -69,25 +69,43 @@ export default function CustomerOrderShow() {
                 <HomeHeader user={auth?.user} canRegister={canRegister} />
 
                 <main className={SF_PAGE_MAIN}>
-                    <section className="mx-auto flex max-w-[1440px] flex-col items-center gap-4 px-4 py-8 text-center sm:px-8 sm:py-10">
-                        <CheckCircle2
-                            className="size-14 text-[#068130] sm:size-[78px]"
-                            strokeWidth={1.25}
-                            aria-hidden
-                        />
-                        <h1 className={cn(SF_PAGE_TITLE, 'max-w-2xl text-[clamp(1.5rem,5vw,2.25rem)]')}>
-                            Commande enregistrée avec succès !
-                        </h1>
-                        <div className="max-w-xl text-sm leading-relaxed text-black sm:text-base">
-                            <p>Merci pour votre confiance.</p>
-                            <p>
-                                Nous avons bien reçu votre commande et nous vous contacterons
-                                bientôt.
-                            </p>
+                    <section className="mx-auto w-full max-w-[1440px] px-4 py-8 sm:px-8 sm:py-10">
+                        <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
+                            <div className="flex flex-1 flex-col items-center gap-4 text-center lg:items-start lg:pt-6 lg:text-left">
+                                <CheckCircle2
+                                    className="size-14 text-[#068130] sm:size-[78px]"
+                                    strokeWidth={1.25}
+                                    aria-hidden
+                                />
+                                <h1
+                                    className={cn(
+                                        SF_PAGE_TITLE,
+                                        'max-w-2xl text-[clamp(1.5rem,5vw,2.25rem)]',
+                                    )}
+                                >
+                                    Commande enregistrée avec succès !
+                                </h1>
+                                <div className="max-w-xl text-sm leading-relaxed text-black sm:text-base">
+                                    <p>Merci pour votre confiance.</p>
+                                    <p>
+                                        Nous avons bien reçu votre commande et nous vous contacterons
+                                        bientôt.
+                                    </p>
+                                </div>
+                                <p className="text-sm text-[rgba(91,94,100,0.62)]">
+                                    Commande #{order.id} · {order.vendor.shop_name}
+                                </p>
+                            </div>
+
+                            <div className="flex w-full shrink-0 justify-center lg:w-auto lg:justify-end">
+                                <OrderConfirmationPanel
+                                    order={order}
+                                    whatsappPhone={whatsappPhone}
+                                    supportPhone={supportPhone}
+                                    supportEmail={supportEmail}
+                                />
+                            </div>
                         </div>
-                        <p className="text-sm text-[rgba(91,94,100,0.62)]">
-                            Commande #{order.id} · {order.vendor.shop_name}
-                        </p>
                     </section>
 
                     <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 pb-16 sm:gap-8 sm:px-8">
@@ -115,15 +133,6 @@ export default function CustomerOrderShow() {
                             district={order.shipping_district}
                             note={order.customer_note}
                         />
-
-                        <div className="flex justify-center pt-2">
-                            <OrderConfirmationPanel
-                                order={order}
-                                whatsappPhone={whatsappPhone}
-                                supportPhone={supportPhone}
-                                supportEmail={supportEmail}
-                            />
-                        </div>
                     </section>
                 </main>
 

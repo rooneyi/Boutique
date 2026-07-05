@@ -1,4 +1,4 @@
-import { MessageCircle } from 'lucide-react';
+import { Check, MessageCircle } from 'lucide-react';
 import InputError from '@/components/input-error';
 import type {
     CheckoutFormData,
@@ -11,8 +11,10 @@ import { cn } from '@/lib/utils';
 
 type Props = {
     data: CheckoutFormData;
-    errors: Partial<Record<keyof CheckoutFormData | 'cart', string>>;
+    errors: Partial<Record<keyof CheckoutFormData | 'cart' | 'payment_confirmed', string>>;
+    paymentConfirmed: boolean;
     setData: <K extends keyof CheckoutFormData>(key: K, value: CheckoutFormData[K]) => void;
+    onSelectProvider: (provider: PaymentProvider) => void;
     onWhatsApp: () => void;
 };
 
@@ -28,10 +30,22 @@ const PAYMENT_OPTIONS: {
     { provider: 'card', method: 'mobile_money', label: 'carte de crédit', image: CHECKOUT_PAYMENT_ASSETS.card },
 ];
 
-export function CheckoutPaymentStep({ data, errors, setData, onWhatsApp }: Props) {
+export function CheckoutPaymentStep({
+    data,
+    errors,
+    paymentConfirmed,
+    setData,
+    onSelectProvider,
+    onWhatsApp,
+}: Props) {
     function selectPayment(method: PaymentMethod, provider: PaymentProvider) {
+        if (!provider) {
+            return;
+        }
+
         setData('payment_method', method);
         setData('payment_provider', provider);
+        onSelectProvider(provider);
     }
 
     const selectedKey = `${data.payment_method}:${data.payment_provider ?? ''}`;
@@ -67,6 +81,12 @@ export function CheckoutPaymentStep({ data, errors, setData, onWhatsApp }: Props
                             <span className="font-poppins text-xl font-medium uppercase text-black">
                                 {option.label}
                             </span>
+                            {selected && paymentConfirmed ? (
+                                <span className="ml-auto flex items-center gap-1 font-poppins text-sm font-medium text-[#08be3f]">
+                                    <Check className="size-4" aria-hidden />
+                                    Confirmé
+                                </span>
+                            ) : null}
                         </button>
                     );
                 })}
@@ -89,6 +109,7 @@ export function CheckoutPaymentStep({ data, errors, setData, onWhatsApp }: Props
                 </Button>
             </div>
 
+            <InputError message={errors.payment_confirmed} />
             <InputError message={errors.cart} />
         </div>
     );

@@ -15,6 +15,9 @@ use App\Services\OrderService;
 use App\Services\ProductVariantService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -37,20 +40,14 @@ class DatabaseSeeder extends Seeder
             ['shop_name' => 'PCJ'],
         );
 
-        $categories = collect([
-            'Robes',
-            'Pantalons',
-            'Hauts',
-            'Chaussures',
-            'Accessoires',
-        ])->mapWithKeys(fn (string $name) => [$name => Category::firstOrCreate(['name' => $name])]);
+        $categories = collect(['Pull', 'T-shirt', 'Casquette'])
+            ->mapWithKeys(fn (string $name) => [$name => Category::firstOrCreate(['name' => $name])]);
 
-        $orderIds = Order::query()->where('vendor_id', $store->id)->pluck('id');
-        if ($orderIds->isNotEmpty()) {
-            OrderItem::query()->whereIn('order_id', $orderIds)->delete();
-        }
-        Order::query()->where('vendor_id', $store->id)->delete();
-        Product::query()->where('vendor_id', $store->id)->delete();
+        OrderItem::query()->delete();
+        Order::query()->delete();
+        DB::table('product_favorites')->delete();
+        ProductReview::query()->delete();
+        Product::query()->delete();
 
         $customerUsers = [
             ['email' => 'sophie@client.test', 'name' => 'Sophie Dupont'],
@@ -72,53 +69,127 @@ class DatabaseSeeder extends Seeder
             return Customer::firstOrCreate(['user_id' => $user->id]);
         });
 
-        $robe = $categories['Robes']->id;
-        $haut = $categories['Hauts']->id;
-        $pantalon = $categories['Pantalons']->id;
-        $chaussure = $categories['Chaussures']->id;
+        $pull = $categories['Pull']->id;
+        $tshirt = $categories['T-shirt']->id;
+        $casquette = $categories['Casquette']->id;
 
         $catalog = [
-            ['name' => 'Robe midi lin', 'description' => 'Robe fluide, coupe droite.', 'price' => 89.9, 'stock' => 24, 'category_id' => $robe, 'status' => 'IN_STOCK'],
-            ['name' => 'Chemise coton bio', 'description' => 'Chemise blanche col classique.', 'price' => 49.5, 'stock' => 5, 'category_id' => $haut, 'status' => 'LOW_STOCK'],
-            ['name' => 'Jean slim indigo', 'description' => 'Denim stretch confortable.', 'price' => 79.0, 'stock' => 0, 'category_id' => $pantalon, 'status' => 'OUT_OF_STOCK'],
-            ['name' => 'Sneakers urbaines', 'description' => 'Semelle amortissante.', 'price' => 119.0, 'stock' => 15, 'category_id' => $chaussure, 'status' => 'IN_STOCK'],
-            ['name' => 'T-shirt oversize', 'description' => 'Coton peigné.', 'price' => 29.9, 'stock' => 80, 'category_id' => $haut, 'status' => 'IN_STOCK'],
-            ['name' => 'Ceinture cuir', 'description' => 'Boucle argentée.', 'price' => 45.0, 'stock' => 3, 'category_id' => $categories['Accessoires']->id, 'status' => 'LOW_STOCK'],
+            [
+                'name' => 'T-shirt PCJ Vert Forêt',
+                'description' => 'T-shirt oversize en coton, logo PCJ jaune sur fond vert forêt.',
+                'price' => 35.0,
+                'category_id' => $tshirt,
+                'status' => 'IN_STOCK',
+                'image' => 'media/tshirt/product-1.jpeg',
+                'variants' => [
+                    ['color' => 'Vert', 'color_hex' => '#1B4332', 'size' => 'M', 'sku' => 'PCJ-TEE-VERT-M', 'stock' => 25],
+                    ['color' => 'Vert', 'color_hex' => '#1B4332', 'size' => 'L', 'sku' => 'PCJ-TEE-VERT-L', 'stock' => 20],
+                    ['color' => 'Vert', 'color_hex' => '#1B4332', 'size' => 'XL', 'sku' => 'PCJ-TEE-VERT-XL', 'stock' => 15],
+                ],
+            ],
+            [
+                'name' => 'T-shirt PCJ Oversize Noir',
+                'description' => 'Coupe oversize confortable, logo PCJ contrasté, coton peigné.',
+                'price' => 32.0,
+                'category_id' => $tshirt,
+                'status' => 'IN_STOCK',
+                'image' => 'media/tshirt/product-2.jpeg',
+                'variants' => [
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'PCJ-TEE-NOIR-M', 'stock' => 30],
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'L', 'sku' => 'PCJ-TEE-NOIR-L', 'stock' => 28],
+                ],
+            ],
+            [
+                'name' => 'T-shirt PCJ Logo Jaune',
+                'description' => 'Logo PCJ mis en avant, tissu épais et doux au toucher.',
+                'price' => 34.0,
+                'category_id' => $tshirt,
+                'status' => 'IN_STOCK',
+                'image' => 'media/tshirt/product-3.jpeg',
+                'variants' => [
+                    ['color' => 'Vert', 'color_hex' => '#2D6A4F', 'size' => 'S', 'sku' => 'PCJ-TEE-LOGO-S', 'stock' => 12],
+                    ['color' => 'Vert', 'color_hex' => '#2D6A4F', 'size' => 'M', 'sku' => 'PCJ-TEE-LOGO-M', 'stock' => 18],
+                    ['color' => 'Vert', 'color_hex' => '#2D6A4F', 'size' => 'L', 'sku' => 'PCJ-TEE-LOGO-L', 'stock' => 14],
+                ],
+            ],
+            [
+                'name' => 'T-shirt PCJ Essentiel',
+                'description' => 'Le basique PCJ : coupe moderne, finitions soignées, style au quotidien.',
+                'price' => 29.9,
+                'category_id' => $tshirt,
+                'status' => 'IN_STOCK',
+                'image' => 'media/tshirt/product-4.jpeg',
+                'variants' => [
+                    ['color' => 'Noir', 'color_hex' => '#1A1A1A', 'size' => 'M', 'sku' => 'PCJ-TEE-ESS-M', 'stock' => 40],
+                    ['color' => 'Noir', 'color_hex' => '#1A1A1A', 'size' => 'L', 'sku' => 'PCJ-TEE-ESS-L', 'stock' => 35],
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'PCJ-TEE-ESS-BLANC-M', 'stock' => 8],
+                ],
+            ],
+            [
+                'name' => 'Pull PCJ Maille',
+                'description' => 'Pull léger en maille, logo PCJ brodé.',
+                'price' => 55.0,
+                'category_id' => $pull,
+                'status' => 'IN_STOCK',
+                'image' => 'media/tshirt/category-pull.jpeg',
+                'variants' => [
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'PCJ-PULL-NOIR-M', 'stock' => 15],
+                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'L', 'sku' => 'PCJ-PULL-NOIR-L', 'stock' => 12],
+                ],
+            ],
+            [
+                'name' => 'Pull PCJ Oversize',
+                'description' => 'Coupe relax, confort optimal pour la mi-saison.',
+                'price' => 59.0,
+                'category_id' => $pull,
+                'status' => 'LOW_STOCK',
+                'image' => 'media/tshirt/product-5.jpeg',
+                'variants' => [
+                    ['color' => 'Gris', 'color_hex' => '#6B6B6B', 'size' => 'L', 'sku' => 'PCJ-PULL-GRIS-L', 'stock' => 4],
+                    ['color' => 'Gris', 'color_hex' => '#6B6B6B', 'size' => 'XL', 'sku' => 'PCJ-PULL-GRIS-XL', 'stock' => 3],
+                ],
+            ],
+            [
+                'name' => 'Casquette PCJ Trucker',
+                'description' => 'Casquette trucker verte, logo PCJ jaune brodé sur le devant.',
+                'price' => 25.0,
+                'category_id' => $casquette,
+                'status' => 'IN_STOCK',
+                'image' => 'media/casquette/product-1.jpeg',
+                'variants' => [
+                    ['color' => 'Vert', 'color_hex' => '#2D6A4F', 'size' => 'TU', 'sku' => 'PCJ-CAP-VERT-TU', 'stock' => 50],
+                ],
+            ],
+            [
+                'name' => 'Casquette PCJ Classic',
+                'description' => 'Casquette ajustable, mesh arrière, finition premium.',
+                'price' => 22.0,
+                'category_id' => $casquette,
+                'status' => 'IN_STOCK',
+                'image' => 'media/casquette/product-1.jpeg',
+                'variants' => [
+                    ['color' => 'Vert', 'color_hex' => '#1B4332', 'size' => 'TU', 'sku' => 'PCJ-CAP-CLASSIC-TU', 'stock' => 35],
+                ],
+            ],
         ];
 
         $variantService = app(ProductVariantService::class);
+        $created = [];
 
         foreach ($catalog as $row) {
-            $product = Product::create(array_merge($row, ['vendor_id' => $store->id, 'stock' => 0]));
-            $variantService->syncVariants($product, match ($product->name) {
-                'Robe midi lin' => [
-                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'ROBE-NOIR-M', 'stock' => 8],
-                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'L', 'sku' => 'ROBE-NOIR-L', 'stock' => 6],
-                    ['color' => 'Bleu', 'color_hex' => '#0059DD', 'size' => 'M', 'sku' => 'ROBE-BLEU-M', 'stock' => 10],
-                ],
-                'Chemise coton bio' => [
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'S', 'sku' => 'CHEM-BLANC-S', 'stock' => 2],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'CHEM-BLANC-M', 'stock' => 3],
-                ],
-                'Sneakers urbaines' => [
-                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => '40', 'sku' => 'SNK-NOIR-40', 'stock' => 5],
-                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => '42', 'sku' => 'SNK-NOIR-42', 'stock' => 10],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => '42', 'sku' => 'SNK-BLANC-42', 'stock' => 0],
-                ],
-                'T-shirt oversize' => [
-                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'M', 'sku' => 'TEE-NOIR-M', 'stock' => 40],
-                    ['color' => 'Noir', 'color_hex' => '#000000', 'size' => 'L', 'sku' => 'TEE-NOIR-L', 'stock' => 40],
-                ],
-                default => [
-                    ['color' => 'Gris', 'color_hex' => '#BFBFBF', 'size' => 'M', 'sku' => 'SKU-'.$product->id.'-M', 'stock' => max(0, (int) $row['stock'])],
-                ],
-            });
-        }
+            $variants = $row['variants'];
+            $image = $row['image'];
+            unset($row['variants'], $row['image']);
 
-        $pRobe = Product::where('vendor_id', $store->id)->where('name', 'Robe midi lin')->first();
-        $pChemise = Product::where('vendor_id', $store->id)->where('name', 'Chemise coton bio')->first();
-        $pSneakers = Product::where('vendor_id', $store->id)->where('name', 'Sneakers urbaines')->first();
-        $pTee = Product::where('vendor_id', $store->id)->where('name', 'T-shirt oversize')->first();
+            $product = Product::create(array_merge($row, [
+                'vendor_id' => $store->id,
+                'stock' => 0,
+            ]));
+
+            $variantService->syncVariants($product, $variants);
+            $this->attachProductImage($product, $image);
+            $created[$product->name] = $product;
+        }
 
         $orderService = app(OrderService::class);
 
@@ -126,14 +197,21 @@ class DatabaseSeeder extends Seeder
         $marc = $customers[1];
         $lea = $customers[2];
 
+        $teeVert = $created['T-shirt PCJ Vert Forêt'];
+        $teeNoir = $created['T-shirt PCJ Oversize Noir'];
+        $teeLogo = $created['T-shirt PCJ Logo Jaune'];
+        $teeEss = $created['T-shirt PCJ Essentiel'];
+        $pullMaille = $created['Pull PCJ Maille'];
+        $capTrucker = $created['Casquette PCJ Trucker'];
+
         $orderService->createOrder($sophie, OrderData::from([
             'customer_id' => $sophie->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $pRobe->id, 'quantity' => 1, 'price' => (float) $pRobe->price],
-                ['product_id' => $pChemise->id, 'quantity' => 2, 'price' => (float) $pChemise->price],
+                ['product_id' => $teeVert->id, 'quantity' => 1, 'price' => (float) $teeVert->price],
+                ['product_id' => $teeNoir->id, 'quantity' => 2, 'price' => (float) $teeNoir->price],
             ],
-            'total' => (float) $pRobe->price + 2 * (float) $pChemise->price,
+            'total' => (float) $teeVert->price + 2 * (float) $teeNoir->price,
             'status' => 'PAID',
         ]));
 
@@ -141,9 +219,9 @@ class DatabaseSeeder extends Seeder
             'customer_id' => $marc->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $pRobe->id, 'quantity' => 1, 'price' => (float) $pRobe->price],
+                ['product_id' => $teeLogo->id, 'quantity' => 1, 'price' => (float) $teeLogo->price],
             ],
-            'total' => (float) $pRobe->price,
+            'total' => (float) $teeLogo->price,
             'status' => 'PAID',
         ]));
 
@@ -151,10 +229,10 @@ class DatabaseSeeder extends Seeder
             'customer_id' => $lea->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $pSneakers->id, 'quantity' => 1, 'price' => (float) $pSneakers->price],
-                ['product_id' => $pTee->id, 'quantity' => 3, 'price' => (float) $pTee->price],
+                ['product_id' => $capTrucker->id, 'quantity' => 1, 'price' => (float) $capTrucker->price],
+                ['product_id' => $teeEss->id, 'quantity' => 3, 'price' => (float) $teeEss->price],
             ],
-            'total' => (float) $pSneakers->price + 3 * (float) $pTee->price,
+            'total' => (float) $capTrucker->price + 3 * (float) $teeEss->price,
             'status' => 'PENDING',
         ]));
 
@@ -162,29 +240,44 @@ class DatabaseSeeder extends Seeder
             'customer_id' => $sophie->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $pTee->id, 'quantity' => 2, 'price' => (float) $pTee->price],
+                ['product_id' => $teeEss->id, 'quantity' => 2, 'price' => (float) $teeEss->price],
             ],
-            'total' => 2 * (float) $pTee->price,
+            'total' => 2 * (float) $teeEss->price,
             'status' => 'PAID',
         ]));
 
         ProductReview::query()->updateOrCreate(
-            ['customer_id' => $sophie->id, 'product_id' => $pRobe->id],
-            ['rating' => 5, 'comment' => 'Qualité au rendez-vous, coupe parfaite.'],
+            ['customer_id' => $sophie->id, 'product_id' => $teeVert->id],
+            ['rating' => 5, 'comment' => 'Qualité au rendez-vous, le logo PCJ ressort super bien.'],
         );
         ProductReview::query()->updateOrCreate(
-            ['customer_id' => $marc->id, 'product_id' => $pRobe->id],
-            ['rating' => 4, 'comment' => 'Très jolie robe, livraison rapide.'],
+            ['customer_id' => $marc->id, 'product_id' => $teeLogo->id],
+            ['rating' => 4, 'comment' => 'Très beau t-shirt, coupe oversize parfaite.'],
         );
         ProductReview::query()->updateOrCreate(
-            ['customer_id' => $lea->id, 'product_id' => $pSneakers->id],
-            ['rating' => 5, 'comment' => 'Confortables au quotidien.'],
+            ['customer_id' => $lea->id, 'product_id' => $capTrucker->id],
+            ['rating' => 5, 'comment' => 'Casquette confortable, logo bien brodé.'],
         );
 
         $sophie->favoriteProducts()->syncWithoutDetaching([
-            $pRobe->id,
-            $pSneakers->id,
+            $teeVert->id,
+            $teeNoir->id,
+            $pullMaille->id,
         ]);
-        $marc->favoriteProducts()->syncWithoutDetaching([$pTee->id]);
+        $marc->favoriteProducts()->syncWithoutDetaching([$teeEss->id]);
+    }
+
+    private function attachProductImage(Product $product, string $mediaPath): void
+    {
+        $source = resource_path($mediaPath);
+
+        if (! File::exists($source)) {
+            return;
+        }
+
+        $destPath = 'products/'.pathinfo($mediaPath, PATHINFO_FILENAME).'-'.$product->id.'.jpeg';
+
+        Storage::disk('public')->put($destPath, File::get($source));
+        $product->update(['image' => $destPath]);
     }
 }

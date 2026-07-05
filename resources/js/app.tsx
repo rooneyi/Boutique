@@ -51,6 +51,8 @@ createInertiaApp({
             case name === 'customer/orders/show':
             case name === 'customer/contact':
             case name === 'customer/about':
+            case name === 'customer/delivery':
+            case name === 'customer/refund-policy':
             case name === 'customer/profile/edit':
             case name === 'customer/profile/security':
                 return storefrontLayout();

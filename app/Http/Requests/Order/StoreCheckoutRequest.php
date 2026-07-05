@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Rules\ValidPhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,7 @@ class StoreCheckoutRequest extends FormRequest
         return [
             'delivery_method' => ['required', Rule::in(['home_delivery', 'store_pickup'])],
             'shipping_full_name' => ['required', 'string', 'max:255'],
-            'shipping_whatsapp' => ['required', 'string', 'max:50'],
+            'shipping_whatsapp' => ['required', 'string', new ValidPhoneNumber],
             'shipping_address' => [$isPickup ? 'nullable' : 'required', 'string', 'max:500'],
             'shipping_city' => [$isPickup ? 'nullable' : 'required', 'string', 'max:120'],
             'shipping_district' => [$isPickup ? 'nullable' : 'required', 'string', 'max:120'],

@@ -14,7 +14,7 @@ const CATEGORIES = [
     },
     {
         title: 'T-Shirt',
-        category: 'T-Shirt',
+        category: 'T-shirt',
         image: HOME_ASSETS.categoryTshirt,
         cta: 'VOIR LES T-SHIRTS',
         height: 'h-[min(570px,70vh)]',

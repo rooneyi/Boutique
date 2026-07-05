@@ -1,11 +1,10 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { Spinner } from '@/components/ui/spinner';
 import {
     AUTH_BTN_PRIMARY,
-    AUTH_INPUT_UNDERLINE,
     AUTH_LINK_MUTED,
     AUTH_LINK_RED,
 } from '@/lib/auth-ui-styles';
@@ -46,16 +45,13 @@ export default function ForgotPasswordPhone({ status }: Props) {
                         <>
                             <div className="flex w-full flex-col items-end gap-10 pb-2">
                                 <div className="w-full space-y-1">
-                                    <Input
+                                    <PhoneInput
                                         id="phone"
-                                        type="tel"
                                         name="phone"
                                         required
                                         autoFocus
-                                        autoComplete="tel"
-                                        placeholder="Numéro de téléphone"
                                         disabled={processing}
-                                        className={AUTH_INPUT_UNDERLINE}
+                                        placeholder="0XX XXX XX XX"
                                     />
                                     <InputError message={errors.phone} />
                                 </div>

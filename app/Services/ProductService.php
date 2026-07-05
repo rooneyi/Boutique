@@ -88,8 +88,28 @@ class ProductService
         return Product::where('vendor_id', $vendor->id)->paginate(20);
     }
 
-    public function decreaseStock(Product $product, int $quantity): bool
+    public function decreaseStock(Product $product, int $quantity, ?int $variantId = null): bool
     {
+        $product->load('variants');
+
+        if ($variantId !== null) {
+            $variant = $product->variants->firstWhere('id', $variantId);
+            if (! $variant || $variant->stock < $quantity) {
+                throw new \InvalidArgumentException("Stock insuffisant pour la déclinaison du produit « {$product->name} ».");
+            }
+
+            $variant->update(['stock' => max(0, $variant->stock - $quantity)]);
+            $this->variantService->refreshProductStockFromVariants($product);
+
+            return true;
+        }
+
+        if ($product->variants->isNotEmpty()) {
+            $this->decreaseVariantStocksDistributed($product, $quantity);
+
+            return true;
+        }
+
         $ok = $product->update([
             'stock' => max(0, $product->stock - $quantity),
         ]);
@@ -97,6 +117,62 @@ class ProductService
         $this->syncProductStockStatus($product);
 
         return $ok;
+    }
+
+    /**
+     * Aligne les stocks variantes sur le total produit après des ventes sans variant_id.
+     */
+    public function reconcileVariantStocksToProduct(Product $product): void
+    {
+        $product->load('variants');
+
+        if ($product->variants->isEmpty()) {
+            return;
+        }
+
+        $variantSum = (int) $product->variants->sum('stock');
+        $productTotal = (int) $product->stock;
+
+        if ($variantSum <= $productTotal) {
+            return;
+        }
+
+        $excess = $variantSum - $productTotal;
+
+        foreach ($product->variants->sortByDesc('stock') as $variant) {
+            if ($excess <= 0) {
+                break;
+            }
+
+            $reduce = min($excess, $variant->stock);
+            $variant->update(['stock' => $variant->stock - $reduce]);
+            $excess -= $reduce;
+        }
+    }
+
+    private function decreaseVariantStocksDistributed(Product $product, int $quantity): void
+    {
+        $remaining = $quantity;
+
+        foreach ($product->variants->sortByDesc('stock') as $variant) {
+            if ($remaining <= 0) {
+                break;
+            }
+
+            if ($variant->stock <= 0) {
+                continue;
+            }
+
+            $take = min($remaining, $variant->stock);
+            $variant->update(['stock' => max(0, $variant->stock - $take)]);
+            $remaining -= $take;
+        }
+
+        if ($remaining > 0) {
+            throw new \InvalidArgumentException("Stock insuffisant pour « {$product->name} ».");
+        }
+
+        $this->variantService->refreshProductStockFromVariants($product);
     }
 
     public function getStockStatus(Product $product): string

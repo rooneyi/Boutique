@@ -1,5 +1,4 @@
 import {
-    Gift,
     Headphones,
     LogIn,
     LogOut,
@@ -33,12 +32,6 @@ export function AccountMenuNav({ onNavigate, compact = false }: Props) {
                 label="Mes commandes"
                 href={route('customer.orders.index')}
                 onClick={onNavigate}
-                className={itemClass}
-            />
-            <AccountDrawerMenuItem
-                icon={Gift}
-                label="Mes coupons"
-                onClick={() => handlePlaceholder('Mes coupons')}
                 className={itemClass}
             />
             <AccountDrawerMenuItem

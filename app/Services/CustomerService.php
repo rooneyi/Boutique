@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Data\CustomerRegisterData;
 use App\Models\Customer;
 use App\Models\User;
+use App\Support\PhoneNumber;
 use Illuminate\Support\Facades\DB;
 
 class CustomerService
@@ -21,7 +22,7 @@ class CustomerService
 
             Customer::create([
                 'user_id' => $user->id,
-                'phone' => $data->phone,
+                'phone' => PhoneNumber::normalizeE164($data->phone),
                 'birth_date' => $data->birthDate,
             ]);
 

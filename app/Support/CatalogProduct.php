@@ -4,7 +4,6 @@ namespace App\Support;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Illuminate\Support\Facades\Storage;
 
 class CatalogProduct
 {
@@ -37,9 +36,7 @@ class CatalogProduct
             'price' => (float) $product->price,
             'quantity' => $product->stock,
             'category' => $product->category?->name ?? '',
-            'image_path' => $product->image
-                ? Storage::disk('public')->url($product->image)
-                : null,
+            'image_path' => PublicStorage::url($product->image),
             'vendor' => [
                 'shop_name' => $product->vendor->shop_name,
             ],
@@ -63,9 +60,7 @@ class CatalogProduct
             'id' => $product->id,
             'name' => $product->name,
             'price' => (float) $product->price,
-            'image_path' => $product->image
-                ? Storage::disk('public')->url($product->image)
-                : null,
+            'image_path' => PublicStorage::url($product->image),
             'rating_avg' => $product->reviews_avg_rating !== null
                 ? round((float) $product->reviews_avg_rating, 1)
                 : null,

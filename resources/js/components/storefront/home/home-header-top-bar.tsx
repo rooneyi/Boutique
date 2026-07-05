@@ -1,9 +1,18 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { AccountGuestPanel } from '@/components/storefront/account/account-guest-panel';
 import { HEADER_ASSETS, HEADER_SOCIAL_LINKS } from '@/lib/header-assets';
 import { route } from '@/lib/route';
 import { cn } from '@/lib/utils';
+
+type AuthUser = {
+    role?: 'ADMIN' | 'VENDOR' | 'CUSTOMER';
+    avatar_url?: string | null;
+};
+
+type PageProps = {
+    auth?: { user?: AuthUser | null };
+};
 
 type Props = {
     isAdmin?: boolean;
@@ -21,6 +30,8 @@ export function HomeHeaderTopBar({
     accountActive = false,
     isLoggedIn = false,
 }: Props) {
+    const { auth } = usePage<PageProps>().props;
+    const avatarUrl = isLoggedIn ? auth?.user?.avatar_url : null;
     const accountAnchorRef = useRef<HTMLDivElement>(null);
     const showGuestPanel = accountActive && !isLoggedIn;
 
@@ -75,13 +86,23 @@ export function HomeHeaderTopBar({
                                 aria-expanded={showGuestPanel}
                                 aria-haspopup={!isLoggedIn ? 'dialog' : undefined}
                             >
-                                <img
-                                    src={HEADER_ASSETS.iconUser}
-                                    alt=""
-                                    width={24}
-                                    height={24}
-                                    className="size-6 shrink-0"
-                                />
+                                {avatarUrl ? (
+                                    <img
+                                        src={avatarUrl}
+                                        alt=""
+                                        width={24}
+                                        height={24}
+                                        className="size-6 shrink-0 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <img
+                                        src={HEADER_ASSETS.iconUser}
+                                        alt=""
+                                        width={24}
+                                        height={24}
+                                        className="size-6 shrink-0"
+                                    />
+                                )}
                                 <span className="font-poppins text-sm font-normal leading-normal text-white">
                                     {isLoggedIn ? 'Mon compte' : 'Se connecter'}
                                 </span>
