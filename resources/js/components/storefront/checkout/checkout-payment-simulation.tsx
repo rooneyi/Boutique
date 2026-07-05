@@ -102,6 +102,7 @@ export function CheckoutPaymentSimulation({
     const [pin, setPin] = useState('');
     const [mobilePhone, setMobilePhone] = useState(phone);
     const [mobileError, setMobileError] = useState<string | null>(null);
+    const [pinError, setPinError] = useState<string | null>(null);
     const [cardNumber, setCardNumber] = useState('');
     const [cardExpiry, setCardExpiry] = useState('');
     const [cardCvv, setCardCvv] = useState('');
@@ -115,10 +116,12 @@ export function CheckoutPaymentSimulation({
         isMobileMoney && (provider === 'airtel' || provider === 'orange' || provider === 'mpesa')
             ? isValidMobileMoneyPhone(mobilePhone, provider)
             : false;
+    const pinValid = pin.length === 4;
 
     useEffect(() => {
         setMobilePhone(phone);
         setMobileError(null);
+        setPinError(null);
         setStep('redirect');
         setPin('');
     }, [provider, phone]);
@@ -136,8 +139,13 @@ export function CheckoutPaymentSimulation({
             );
             return;
         }
+        if (!isCard && !pinValid) {
+            setPinError('Indiquez votre code PIN à 4 chiffres pour confirmer le paiement.');
+            return;
+        }
         setCardError(null);
         setMobileError(null);
+        setPinError(null);
         onConfirm(isMobileMoney ? mobilePhone : phone);
     }
 
@@ -279,13 +287,23 @@ export function CheckoutPaymentSimulation({
                                 inputMode="numeric"
                                 maxLength={4}
                                 value={pin}
-                                onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                onChange={(e) => {
+                                    setPinError(null);
+                                    setPin(e.target.value.replace(/\D/g, '').slice(0, 4));
+                                }}
                                 placeholder="••••"
-                                className="font-poppins w-full rounded-[12px] border border-black/10 bg-white px-4 py-3 text-center text-lg tracking-[0.4em] text-black"
+                                className={cn(
+                                    'font-poppins w-full rounded-[12px] border bg-white px-4 py-3 text-center text-lg tracking-[0.4em] text-black',
+                                    pinError ? 'border-red-500' : 'border-black/10',
+                                )}
                             />
-                            <p className="font-poppins text-xs text-[#6b7280]">
-                                Validez la transaction sur votre téléphone, puis confirmez ci-dessous.
-                            </p>
+                            {pinError ? (
+                                <p className="font-poppins text-sm text-red-600">{pinError}</p>
+                            ) : (
+                                <p className="font-poppins text-xs text-[#6b7280]">
+                                    Validez la transaction sur votre téléphone, puis confirmez ci-dessous.
+                                </p>
+                            )}
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -376,7 +394,10 @@ export function CheckoutPaymentSimulation({
                             )}
                             style={{ backgroundColor: meta.accent }}
                             onClick={handleConfirm}
-                            disabled={(isCard && !cardValid) || (isMobileMoney && !mobileValid)}
+                            disabled={
+                                (isCard && !cardValid) ||
+                                (isMobileMoney && (!mobileValid || !pinValid))
+                            }
                         >
                             J&apos;ai confirmé le paiement
                         </Button>

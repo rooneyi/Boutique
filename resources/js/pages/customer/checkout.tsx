@@ -166,12 +166,9 @@ export default function CustomerCheckout() {
             data.payment_method === 'mobile_money' &&
             data.payment_provider &&
             ['airtel', 'orange', 'mpesa'].includes(data.payment_provider) &&
-            !isValidFullPhone(data.payment_phone)
+            !isValidMobileMoneyPhone(data.payment_phone, data.payment_provider)
         ) {
-            setError(
-                'payment_phone',
-                'Indiquez le numéro Mobile Money utilisé pour le paiement.',
-            );
+            setError('payment_phone', mobileMoneyPhoneError(data.payment_provider));
             return;
         }
 
