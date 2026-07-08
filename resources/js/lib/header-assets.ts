@@ -24,7 +24,7 @@ export const HEADER_ASSETS = {
 } as const;
 
 export const HEADER_SOCIAL_LINKS = [
-    { href: 'https://instagram.com', label: 'Instagram', icon: HEADER_ASSETS.social.instagram },
-    { href: 'https://www.tiktok.com', label: 'TikTok', icon: HEADER_ASSETS.social.tiktok },
-    { href: 'https://facebook.com', label: 'Facebook', icon: HEADER_ASSETS.social.facebook },
+    { href: 'https://www.instagram.com/pose_comme_jamais_?igsh=MTdybnIzOXVtOWZoNA==', label: 'Instagram', icon: HEADER_ASSETS.social.instagram },
+    { href: 'https://vt.tiktok.com/ZSCTBoGmA/', label: 'TikTok', icon: HEADER_ASSETS.social.tiktok },
+    { href: 'https://www.facebook.com/share/1BfxX4MEwy/?mibextid=wwXIfr', label: 'Facebook', icon: HEADER_ASSETS.social.facebook },
 ] as const;

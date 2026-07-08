@@ -32,9 +32,9 @@ function FacebookIcon({ className }: { className?: string }) {
 }
 
 const FOOTER_SOCIAL = [
-    { href: 'https://instagram.com', label: 'Instagram', Icon: InstagramIcon },
-    { href: 'https://www.tiktok.com', label: 'TikTok', Icon: TikTokIcon },
-    { href: 'https://facebook.com', label: 'Facebook', Icon: FacebookIcon },
+    { href: 'https://www.instagram.com/pose_comme_jamais_?igsh=MTdybnIzOXVtOWZoNA==', label: 'Instagram', Icon: InstagramIcon },
+    { href: 'https://vt.tiktok.com/ZSCTBoGmA/', label: 'TikTok', Icon: TikTokIcon },
+    { href: 'https://www.facebook.com/share/1BfxX4MEwy/?mibextid=wwXIfr', label: 'Facebook', Icon: FacebookIcon },
 ] as const;
 
 const FOOTER_NAV = [

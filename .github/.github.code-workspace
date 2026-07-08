@@ -1,0 +1,43 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../app"
+		},
+		{
+			"path": "../bootstrap"
+		},
+		{
+			"path": "../config"
+		},
+		{
+			"path": "../database"
+		},
+		{
+			"path": "../docs"
+		},
+		{
+			"path": "../node_modules"
+		},
+		{
+			"path": "../public"
+		},
+		{
+			"path": "../resources"
+		},
+		{
+			"path": "../routes"
+		},
+		{
+			"path": "../storage"
+		},
+		{
+			"path": "../tests"
+		},
+		{
+			"path": "../vendor"
+		}
+	]
+}
