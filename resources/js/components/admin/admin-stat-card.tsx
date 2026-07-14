@@ -1,6 +1,5 @@
 import { LucideIcon } from 'lucide-react';
-import { AdminCard, AdminCardContent, AdminCardHeader } from '@/components/admin/admin-card';
-import { ADMIN_H4, ADMIN_MUTED } from '@/lib/admin-ui-styles';
+import { ADMIN_MUTED } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -13,24 +12,26 @@ type Props = {
 
 export function AdminStatCard({ label, value, hint, icon: Icon, accent }: Props) {
     return (
-        <AdminCard className="transition-shadow hover:shadow-md">
-            <AdminCardHeader className="flex flex-row items-center justify-between space-y-0">
-                <h4 className={ADMIN_H4}>{label}</h4>
-                <span className="flex size-11 items-center justify-center rounded-full border border-[#0059DD]/20 bg-[#0059DD]/10">
-                    <Icon className="size-5 text-[#0059DD]" strokeWidth={1.25} />
-                </span>
-            </AdminCardHeader>
-            <AdminCardContent className="!py-5">
-                <p
-                    className={cn(
-                        'font-poppins text-2xl font-semibold tracking-tight sm:text-3xl',
-                        accent ? 'text-[#0059DD]' : 'text-black',
-                    )}
-                >
-                    {value}
+        <div className="flex h-full min-h-[7.5rem] flex-col rounded-sm border border-neutral-100 bg-white p-4 shadow-sm sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+                <p className="font-poppins text-xs font-semibold uppercase tracking-wide text-[#747474]">
+                    {label}
                 </p>
-                {hint ? <p className={cn(ADMIN_MUTED, 'mt-2 text-sm')}>{hint}</p> : null}
-            </AdminCardContent>
-        </AdminCard>
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[#0059DD]/20 bg-[#0059DD]/10">
+                    <Icon className="size-4 text-[#0059DD]" strokeWidth={1.5} />
+                </span>
+            </div>
+            <p
+                className={cn(
+                    'mt-3 font-poppins text-2xl font-semibold tracking-tight tabular-nums sm:text-[1.75rem]',
+                    accent ? 'text-[#0059DD]' : 'text-black',
+                )}
+            >
+                {value}
+            </p>
+            {hint ? (
+                <p className={cn(ADMIN_MUTED, 'mt-auto pt-2 text-xs leading-snug')}>{hint}</p>
+            ) : null}
+        </div>
     );
 }

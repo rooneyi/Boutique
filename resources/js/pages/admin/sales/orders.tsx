@@ -151,20 +151,22 @@ export default function AdminSalesOrders({ orders }: Props) {
                     }
                 />
 
-                <AdminCard>
-                    <AdminCardHeader>
-                        <h3 className={ADMIN_H3}>Historique des commandes</h3>
-                        <AdminCardDescription>
+                <AdminCard className="!p-0 overflow-hidden">
+                    <AdminCardHeader className="mb-0 px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
+                        <h3 className={cn(ADMIN_H3, 'text-xl sm:text-2xl lg:text-2xl')}>
+                            Historique des commandes
+                        </h3>
+                        <AdminCardDescription className="text-sm">
                             {orders.data.length} commande(s) · produits vendus et statuts
                         </AdminCardDescription>
                     </AdminCardHeader>
                     <AdminCardContent>
                         {orders.data.length === 0 ? (
-                            <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>
+                            <p className={cn(ADMIN_MUTED, 'px-5 py-12 text-center sm:px-6')}>
                                 Aucune commande pour le moment.
                             </p>
                         ) : (
-                            <AdminDataTable>
+                            <AdminDataTable className="!mx-0 border-x-0 border-b-0 !rounded-none">
                                 <TableHeader>
                                     <TableRow className={ADMIN_TABLE_HEADER_ROW}>
                                         <TableHead className={ADMIN_TABLE_HEAD}>#</TableHead>

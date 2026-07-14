@@ -36,7 +36,6 @@ type CustomerRow = {
     name: string;
     email: string;
     phone: string | null;
-    birth_date: string | null;
     avatar_url: string | null;
     orders_count: number;
     favorites_count: number;
@@ -78,7 +77,7 @@ export default function AdminSalesCustomers({ customers }: Props) {
             <div className={ADMIN_PAGE_SECTION}>
                 <AdminPageHeader
                     title="Clients"
-                    description="Profils clients et critères : contact, naissance, achats et engagement."
+                    description="Profils clients : contact, inscription, achats et engagement."
                     actions={
                         <Link href={route('admin.dashboard')} className={ADMIN_BTN_SM_OUTLINE}>
                             Tableau de bord
@@ -86,21 +85,23 @@ export default function AdminSalesCustomers({ customers }: Props) {
                     }
                 />
 
-                <AdminCard>
-                    <AdminCardHeader>
-                        <h3 className={ADMIN_H3}>Liste des clients</h3>
-                        <AdminCardDescription>
+                <AdminCard className="!p-0 overflow-hidden">
+                    <AdminCardHeader className="mb-0 px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
+                        <h3 className={cn(ADMIN_H3, 'text-xl sm:text-2xl lg:text-2xl')}>
+                            Liste des clients
+                        </h3>
+                        <AdminCardDescription className="text-sm">
                             {customers.length} client(s) · cliquez « Voir » ou le nom pour le profil
                             et les adresses
                         </AdminCardDescription>
                     </AdminCardHeader>
                     <AdminCardContent>
                         {customers.length === 0 ? (
-                            <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>
+                            <p className={cn(ADMIN_MUTED, 'px-5 py-12 text-center sm:px-6')}>
                                 Aucun client pour le moment.
                             </p>
                         ) : (
-                            <AdminDataTable>
+                            <AdminDataTable className="!mx-0 border-x-0 border-b-0 !rounded-none">
                                 <TableHeader>
                                     <TableRow className={ADMIN_TABLE_HEADER_ROW}>
                                         <TableHead className={ADMIN_TABLE_HEAD}>Client</TableHead>
@@ -112,7 +113,7 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                         <TableHead
                                             className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
                                         >
-                                            Naissance
+                                            Inscription
                                         </TableHead>
                                         <TableHead
                                             className={cn(ADMIN_TABLE_HEAD, 'text-right')}
@@ -179,8 +180,8 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                             <TableCell
                                                 className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}
                                             >
-                                                {c.birth_date
-                                                    ? new Date(c.birth_date).toLocaleDateString(
+                                                {c.member_since
+                                                    ? new Date(c.member_since).toLocaleDateString(
                                                           'fr-FR',
                                                       )
                                                     : '—'}
