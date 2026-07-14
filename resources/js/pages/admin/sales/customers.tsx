@@ -25,6 +25,7 @@ import {
     ADMIN_MOBILE_META,
     ADMIN_MUTED,
     ADMIN_PAGE_SECTION,
+    ADMIN_TABLE_COL_ACTION,
     ADMIN_TABLE_COL_LG,
     ADMIN_TABLE_COL_MD,
 } from '@/lib/admin-ui-styles';
@@ -132,19 +133,20 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                         >
                                             Dernière commande
                                         </TableHead>
-                                        <TableHead className={ADMIN_TABLE_HEAD} />
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_ACTION)}
+                                        >
+                                            <span className="sr-only">Actions</span>
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {customers.map((c) => (
-                                        <TableRow
-                                            key={c.id}
-                                            className={cn(ADMIN_TABLE_ROW, 'hover:bg-neutral-50')}
-                                        >
+                                        <TableRow key={c.id} className={ADMIN_TABLE_ROW}>
                                             <TableCell className={ADMIN_TABLE_CELL}>
                                                 <Link
                                                     href={route('admin.sales.customers.show', c.id)}
-                                                    className="flex min-w-0 items-center gap-3 font-medium text-neutral-900 hover:text-[#0059DD] hover:underline"
+                                                    className="flex min-w-0 items-center gap-3 font-medium text-neutral-900 hover:text-[#0059DD]"
                                                 >
                                                     <CustomerAvatar
                                                         name={c.name}
@@ -206,10 +208,18 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                                       )
                                                     : '—'}
                                             </TableCell>
-                                            <TableCell className={ADMIN_TABLE_CELL}>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    ADMIN_TABLE_COL_ACTION,
+                                                )}
+                                            >
                                                 <Link
                                                     href={route('admin.sales.customers.show', c.id)}
-                                                    className={ADMIN_BTN_SM_OUTLINE}
+                                                    className={cn(
+                                                        ADMIN_BTN_SM_OUTLINE,
+                                                        'inline-flex justify-center',
+                                                    )}
                                                 >
                                                     Voir
                                                 </Link>

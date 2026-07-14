@@ -26,6 +26,7 @@ import {
     ADMIN_MOBILE_META,
     ADMIN_MUTED,
     ADMIN_PAGE_SECTION,
+    ADMIN_TABLE_COL_ACTION,
     ADMIN_TABLE_COL_MD,
 } from '@/lib/admin-ui-styles';
 import { cn } from '@/lib/utils';
@@ -124,15 +125,16 @@ export default function AdminUsers({ users }: Props) {
                                         >
                                             Inscription
                                         </TableHead>
-                                        <TableHead className={ADMIN_TABLE_HEAD} />
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_ACTION)}
+                                        >
+                                            <span className="sr-only">Actions</span>
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {users.data.map((user) => (
-                                        <TableRow
-                                            key={user.id}
-                                            className={cn(ADMIN_TABLE_ROW, 'hover:bg-neutral-50')}
-                                        >
+                                        <TableRow key={user.id} className={ADMIN_TABLE_ROW}>
                                             <TableCell
                                                 className={cn(
                                                     ADMIN_TABLE_CELL,
@@ -144,7 +146,7 @@ export default function AdminUsers({ users }: Props) {
                                                         'admin.sales.customers.show',
                                                         user.id,
                                                     )}
-                                                    className="hover:text-[#0059DD] hover:underline"
+                                                    className="hover:text-[#0059DD]"
                                                 >
                                                     {user.name}
                                                 </Link>
@@ -219,13 +221,21 @@ export default function AdminUsers({ users }: Props) {
                                             >
                                                 {formatDate(user.created_at)}
                                             </TableCell>
-                                            <TableCell className={ADMIN_TABLE_CELL}>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    ADMIN_TABLE_COL_ACTION,
+                                                )}
+                                            >
                                                 <Link
                                                     href={route(
                                                         'admin.sales.customers.show',
                                                         user.id,
                                                     )}
-                                                    className={ADMIN_BTN_SM_OUTLINE}
+                                                    className={cn(
+                                                        ADMIN_BTN_SM_OUTLINE,
+                                                        'inline-flex justify-center',
+                                                    )}
                                                 >
                                                     Voir
                                                 </Link>

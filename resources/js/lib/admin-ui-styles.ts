@@ -68,12 +68,15 @@ export const ADMIN_FILTER_PILL_ACTIVE =
     'font-poppins inline-flex items-center justify-center rounded-[32px] border border-black bg-black px-4 py-2.5 text-sm font-semibold text-white';
 
 export const ADMIN_TABLE_WRAPPER =
-    '-mx-4 overflow-x-auto rounded-sm border border-neutral-100 bg-white sm:mx-0 [scrollbar-width:thin]';
+    '-mx-4 overflow-x-auto rounded-sm border border-neutral-100 bg-white sm:mx-0 [scrollbar-gutter:stable] [scrollbar-width:thin]';
 
 export const ADMIN_TABLE_MIN_WIDTH = 'min-w-[36rem]';
 
 export const ADMIN_TABLE_INNER =
     'min-w-[36rem] [&_[data-slot=table-head]]:h-10 [&_[data-slot=table-head]]:px-3 [&_[data-slot=table-head]]:font-medium sm:[&_[data-slot=table-head]]:h-11 sm:[&_[data-slot=table-head]]:px-4 [&_[data-slot=table-head]]:text-[#8a8a8a] [&_[data-slot=table-cell]]:px-3 [&_[data-slot=table-cell]]:py-3 sm:[&_[data-slot=table-cell]]:px-4 sm:[&_[data-slot=table-cell]]:py-3.5 [&_[data-slot=table-row]]:border-neutral-100/80 [&_[data-slot=table-row]]:hover:bg-neutral-50/50';
+
+/** Colonne action stable (bouton Voir) — évite le décalage horizontal */
+export const ADMIN_TABLE_COL_ACTION = 'w-[5.5rem] whitespace-nowrap text-right';
 
 /** Masquer une colonne sur mobile / tablette */
 export const ADMIN_TABLE_COL_MD = 'hidden md:table-cell';

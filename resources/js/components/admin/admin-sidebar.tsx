@@ -7,10 +7,9 @@ import {
     Settings,
     ShoppingCart,
     Tag,
-    Users,
     X,
 } from 'lucide-react';
-import { ADMIN_MAIN_NAV, ADMIN_STOCK_NAV } from '@/lib/admin-nav';
+import { ADMIN_MAIN_NAV, ADMIN_SALES_NAV, ADMIN_STOCK_NAV } from '@/lib/admin-nav';
 import { route } from '@/lib/route';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +19,6 @@ const NAV_ICONS: Record<string, React.ElementType> = {
     products: Package,
     categories: Tag,
     sales: ShoppingCart,
-    customers: Users,
 };
 
 type Props = {
@@ -32,6 +30,8 @@ type Props = {
 
 export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
     const isProductsSection = path.startsWith('/admin/products');
+    const isSalesSection =
+        path.startsWith('/admin/sales') || path.startsWith('/admin/users/customers');
 
     return (
         <>
@@ -113,6 +113,31 @@ export function AdminSidebar({ path, user, mobileOpen, onClose }: Props) {
                                         {item.key === 'products' && isProductsSection && (
                                             <ul className="ml-9 mt-0.5 space-y-0.5 border-l border-white/15 pl-3">
                                                 {ADMIN_STOCK_NAV.map((sub) => {
+                                                    const subActive = sub.match(path);
+                                                    return (
+                                                        <li key={sub.href}>
+                                                            <Link
+                                                                href={sub.href}
+                                                                onClick={onClose}
+                                                                className={cn(
+                                                                    'block rounded-md px-2 py-1.5 font-poppins text-xs transition-colors',
+                                                                    subActive
+                                                                        ? 'font-semibold text-[#60a5fa]'
+                                                                        : 'font-medium text-white/45 hover:text-white/80',
+                                                                )}
+                                                            >
+                                                                {sub.label}
+                                                            </Link>
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                        )}
+
+                                        {/* Sous-nav Ventes */}
+                                        {item.key === 'sales' && isSalesSection && (
+                                            <ul className="ml-9 mt-0.5 space-y-0.5 border-l border-white/15 pl-3">
+                                                {ADMIN_SALES_NAV.map((sub) => {
                                                     const subActive = sub.match(path);
                                                     return (
                                                         <li key={sub.href}>

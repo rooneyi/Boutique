@@ -56,11 +56,11 @@ const MAIN_NAV: NavItem[] = [
         match: (path) => path.startsWith('/admin/products'),
     },
     {
-        label: 'Clients',
-        href: route('admin.sales.customers.index'),
-        icon: Users,
+        label: 'Ventes',
+        href: route('admin.sales.orders.index'),
+        icon: ShoppingBag,
         match: (path) =>
-            path.startsWith('/admin/sales/customers') || path.startsWith('/admin/users/customers'),
+            path.startsWith('/admin/sales') || path.startsWith('/admin/users/customers'),
     },
 ];
 
@@ -88,6 +88,22 @@ const STOCK_NAV: NavItem[] = [
         href: route('admin.products.out-of-stock'),
         icon: ShoppingBag,
         match: (path) => path.endsWith('/out-of-stock'),
+    },
+];
+
+const SALES_NAV: NavItem[] = [
+    {
+        label: 'Commandes',
+        href: route('admin.sales.orders.index'),
+        icon: ShoppingBag,
+        match: (path) => path.startsWith('/admin/sales/orders'),
+    },
+    {
+        label: 'Clients',
+        href: route('admin.sales.customers.index'),
+        icon: Users,
+        match: (path) =>
+            path.startsWith('/admin/sales/customers') || path.startsWith('/admin/users/customers'),
     },
 ];
 
@@ -135,6 +151,8 @@ export function AdminHeader() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const closeMobile = () => setMobileOpen(false);
     const showStockSubnav = path.startsWith('/admin/products');
+    const showSalesSubnav =
+        path.startsWith('/admin/sales') || path.startsWith('/admin/users/customers');
 
     return (
         <header className="sticky top-0 z-50 bg-white">
@@ -234,6 +252,21 @@ export function AdminHeader() {
                 </div>
             )}
 
+            {showSalesSubnav && (
+                <div className="hidden border-b border-neutral-100 bg-[#f0f0f0] md:block">
+                    <div
+                        className={cn(
+                            ADMIN_SHELL_MAX,
+                            'flex flex-wrap items-center gap-6 px-4 py-3 sm:px-8 lg:px-[100px]',
+                        )}
+                    >
+                        {SALES_NAV.map((item) => (
+                            <SubNavLink key={item.href} item={item} path={path} />
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {mobileOpen && (
                 <div className="fixed inset-0 z-[60] lg:hidden">
                     <button
@@ -274,6 +307,28 @@ export function AdminHeader() {
                                         Stocks
                                     </p>
                                     {STOCK_NAV.map((item) => (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className={cn(
+                                                'font-poppins py-2 text-base',
+                                                item.match(path)
+                                                    ? 'font-semibold text-[#0059DD]'
+                                                    : 'text-black',
+                                            )}
+                                            onClick={closeMobile}
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    ))}
+                                </>
+                            )}
+                            {showSalesSubnav && (
+                                <>
+                                    <p className="mt-4 font-poppins text-xs font-semibold uppercase tracking-wider text-[#747474]">
+                                        Ventes
+                                    </p>
+                                    {SALES_NAV.map((item) => (
                                         <Link
                                             key={item.href}
                                             href={item.href}

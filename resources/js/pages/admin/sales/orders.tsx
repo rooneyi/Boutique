@@ -240,14 +240,14 @@ export default function AdminSalesOrders({ orders }: Props) {
                                                 className={cn(
                                                     ADMIN_TABLE_CELL,
                                                     ADMIN_TABLE_COL_LG,
-                                                    'min-w-[180px]',
+                                                    'max-w-[220px]',
                                                 )}
                                             >
-                                                <p className="font-medium text-neutral-900">
+                                                <p className="truncate font-medium text-neutral-900">
                                                     {order.delivery.method_label}
                                                 </p>
                                                 {order.delivery.method === 'home_delivery' ? (
-                                                    <p className="mt-0.5 text-xs text-neutral-500">
+                                                    <p className="mt-0.5 truncate text-xs text-neutral-500">
                                                         {[
                                                             order.delivery.address,
                                                             order.delivery.city,
@@ -258,7 +258,7 @@ export default function AdminSalesOrders({ orders }: Props) {
                                                     </p>
                                                 ) : null}
                                                 {order.delivery.whatsapp ? (
-                                                    <p className="mt-0.5 text-xs text-neutral-500">
+                                                    <p className="mt-0.5 truncate text-xs text-neutral-500">
                                                         WhatsApp {order.delivery.whatsapp}
                                                     </p>
                                                 ) : null}

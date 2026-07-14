@@ -1,6 +1,6 @@
 import { route } from '@/lib/route';
 
-export type AdminNavKey = 'dashboard' | 'analytics' | 'products' | 'categories' | 'sales' | 'customers';
+export type AdminNavKey = 'dashboard' | 'analytics' | 'products' | 'categories' | 'sales';
 
 export const ADMIN_MAIN_NAV: {
     key: AdminNavKey;
@@ -38,14 +38,8 @@ export const ADMIN_MAIN_NAV: {
         key: 'sales',
         label: 'Ventes',
         href: route('admin.sales.orders.index'),
-        match: (path) => path.startsWith('/admin/sales'),
-    },
-    {
-        key: 'customers',
-        label: 'Clients',
-        href: route('admin.sales.customers.index'),
         match: (path) =>
-            path.startsWith('/admin/sales/customers') || path.startsWith('/admin/users/customers'),
+            path.startsWith('/admin/sales') || path.startsWith('/admin/users/customers'),
     },
 ];
 
@@ -54,6 +48,21 @@ export const ADMIN_STOCK_NAV = [
     { label: 'En stock', href: route('admin.products.in-stock'), match: (p: string) => p.endsWith('/in-stock') },
     { label: 'Faibles stocks', href: route('admin.products.low-stock'), match: (p: string) => p.endsWith('/low-stock') },
     { label: 'Ruptures', href: route('admin.products.out-of-stock'), match: (p: string) => p.endsWith('/out-of-stock') },
+] as const;
+
+/** Sous-navigation Ventes : commandes + fiches clients / livraison */
+export const ADMIN_SALES_NAV = [
+    {
+        label: 'Commandes',
+        href: route('admin.sales.orders.index'),
+        match: (p: string) => p.startsWith('/admin/sales/orders'),
+    },
+    {
+        label: 'Clients',
+        href: route('admin.sales.customers.index'),
+        match: (p: string) =>
+            p.startsWith('/admin/sales/customers') || p.startsWith('/admin/users/customers'),
+    },
 ] as const;
 
 export function resolveAdminNavKey(path: string): AdminNavKey {
