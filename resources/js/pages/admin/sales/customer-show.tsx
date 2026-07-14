@@ -33,6 +33,10 @@ type OrderItem = {
     product_name: string;
     quantity: number;
     line_total: number;
+    image_path: string | null;
+    color: string | null;
+    color_hex: string | null;
+    size: string | null;
 };
 
 type OrderRow = {
@@ -159,6 +163,9 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                                                 <TableHead className={ADMIN_TABLE_HEAD}>
                                                     Produit
                                                 </TableHead>
+                                                <TableHead className={ADMIN_TABLE_HEAD}>
+                                                    Couleur
+                                                </TableHead>
                                                 <TableHead
                                                     className={cn(ADMIN_TABLE_HEAD, 'text-right')}
                                                 >
@@ -178,7 +185,47 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                                                     className={ADMIN_TABLE_ROW}
                                                 >
                                                     <TableCell className={ADMIN_TABLE_CELL}>
-                                                        {it.product_name}
+                                                        <div className="flex min-w-0 items-center gap-3">
+                                                            <div className="size-12 shrink-0 overflow-hidden rounded-sm border border-neutral-200 bg-neutral-50">
+                                                                {it.image_path ? (
+                                                                    <img
+                                                                        src={it.image_path}
+                                                                        alt=""
+                                                                        className="size-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="size-full bg-neutral-100" />
+                                                                )}
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <p className="font-medium text-neutral-900">
+                                                                    {it.product_name}
+                                                                </p>
+                                                                {it.size ? (
+                                                                    <p className="text-xs text-neutral-500">
+                                                                        Taille {it.size}
+                                                                    </p>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className={ADMIN_TABLE_CELL}>
+                                                        {it.color ? (
+                                                            <span className="inline-flex items-center gap-2">
+                                                                <span
+                                                                    className="inline-block size-3.5 rounded-full border border-neutral-300"
+                                                                    style={{
+                                                                        backgroundColor:
+                                                                            it.color_hex ||
+                                                                            '#d4d4d4',
+                                                                    }}
+                                                                    aria-hidden
+                                                                />
+                                                                {it.color}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-neutral-400">—</span>
+                                                        )}
                                                     </TableCell>
                                                     <TableCell
                                                         className={cn(

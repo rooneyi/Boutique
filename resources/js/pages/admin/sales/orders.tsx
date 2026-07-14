@@ -35,6 +35,10 @@ type OrderItem = {
     product_name: string;
     quantity: number;
     line_total: number;
+    image_path: string | null;
+    color: string | null;
+    color_hex: string | null;
+    size: string | null;
 };
 
 type Order = {
@@ -67,6 +71,41 @@ function statusLabel(status: string): string {
         default:
             return status;
     }
+}
+
+function OrderItemThumb({ item }: { item: OrderItem }) {
+    return (
+        <div className="flex min-w-0 items-center gap-2.5">
+            <div className="size-10 shrink-0 overflow-hidden rounded-sm border border-neutral-200 bg-neutral-50">
+                {item.image_path ? (
+                    <img
+                        src={item.image_path}
+                        alt=""
+                        className="size-full object-cover"
+                    />
+                ) : (
+                    <div className="size-full bg-neutral-100" />
+                )}
+            </div>
+            <div className="min-w-0">
+                <p className="truncate font-medium text-neutral-900">{item.product_name}</p>
+                <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-neutral-500">
+                    <span>×{item.quantity}</span>
+                    {item.color ? (
+                        <span className="inline-flex items-center gap-1">
+                            <span
+                                className="inline-block size-2.5 rounded-full border border-neutral-300"
+                                style={{ backgroundColor: item.color_hex || '#d4d4d4' }}
+                                aria-hidden
+                            />
+                            {item.color}
+                        </span>
+                    ) : null}
+                    {item.size ? <span>· {item.size}</span> : null}
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default function AdminSalesOrders({ orders }: Props) {
@@ -169,12 +208,17 @@ export default function AdminSalesOrders({ orders }: Props) {
                                                 className={cn(
                                                     ADMIN_TABLE_CELL,
                                                     ADMIN_TABLE_COL_LG,
-                                                    'max-w-xs',
+                                                    'min-w-[220px]',
                                                 )}
                                             >
-                                                {order.items
-                                                    .map((i) => `${i.product_name} ×${i.quantity}`)
-                                                    .join(', ')}
+                                                <div className="flex flex-col gap-2">
+                                                    {order.items.map((item, idx) => (
+                                                        <OrderItemThumb
+                                                            key={`${order.id}-${idx}`}
+                                                            item={item}
+                                                        />
+                                                    ))}
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     ))}

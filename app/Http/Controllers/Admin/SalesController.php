@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Support\PublicStorage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -13,7 +15,7 @@ class SalesController extends Controller
     public function orders(): Response
     {
         $orders = Order::query()
-            ->with(['customer.user', 'items.product'])
+            ->with(['customer.user', 'items.product', 'items.variant'])
             ->latest()
             ->paginate(15);
 
@@ -24,11 +26,7 @@ class SalesController extends Controller
                 'total' => (float) $order->total,
                 'status' => $order->status,
                 'created_at' => $order->created_at?->toIso8601String() ?? '',
-                'items' => $order->items->map(fn ($item) => [
-                    'product_name' => $item->product?->name ?? '—',
-                    'quantity' => $item->quantity,
-                    'line_total' => (float) ($item->price * $item->quantity),
-                ])->all(),
+                'items' => $order->items->map(fn (OrderItem $item) => $this->orderItemPayload($item))->all(),
             ];
         });
 
@@ -68,7 +66,7 @@ class SalesController extends Controller
     {
         $orders = Order::query()
             ->where('customer_id', $customer->id)
-            ->with(['items.product'])
+            ->with(['items.product', 'items.variant'])
             ->latest()
             ->get()
             ->map(function (Order $order) {
@@ -77,11 +75,7 @@ class SalesController extends Controller
                     'total' => (float) $order->total,
                     'status' => $order->status,
                     'created_at' => $order->created_at?->toIso8601String() ?? '',
-                    'items' => $order->items->map(fn ($item) => [
-                        'product_name' => $item->product?->name ?? '—',
-                        'quantity' => $item->quantity,
-                        'line_total' => (float) ($item->price * $item->quantity),
-                    ])->all(),
+                    'items' => $order->items->map(fn (OrderItem $item) => $this->orderItemPayload($item))->all(),
                 ];
             })
             ->all();
@@ -101,5 +95,26 @@ class SalesController extends Controller
             ],
             'orders' => $orders,
         ]);
+    }
+
+    /**
+     * @return array{product_name: string, quantity: int, line_total: float, image_path: ?string, color: ?string, color_hex: ?string, size: ?string}
+     */
+    private function orderItemPayload(OrderItem $item): array
+    {
+        $variant = $item->variant;
+        $product = $item->product;
+
+        $imagePath = $variant?->image ?: $product?->image;
+
+        return [
+            'product_name' => $product?->name ?? '—',
+            'quantity' => $item->quantity,
+            'line_total' => (float) ($item->price * $item->quantity),
+            'image_path' => PublicStorage::url($imagePath),
+            'color' => $variant?->color,
+            'color_hex' => $variant?->color_hex,
+            'size' => $variant?->size,
+        ];
     }
 }
