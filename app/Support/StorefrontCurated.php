@@ -15,6 +15,7 @@ class StorefrontCurated
         return Product::query()
             ->where('status', '!=', 'DISCONTINUED')
             ->when($excludeProductId !== null, fn ($q) => $q->where('id', '!=', $excludeProductId))
+            ->withCount('reviews')
             ->orderByDesc('reviews_count')
             ->orderByDesc('created_at')
             ->limit($limit)
