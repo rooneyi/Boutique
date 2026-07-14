@@ -74,20 +74,19 @@ class DatabaseSeeder extends Seeder
         $tshirt = $categories['T-shirt']->id;
         $casquette = $categories['Casquette']->id;
 
-        // Catalogue réel PCJ — images dans resources/media (prêt déploiement)
+        // Catalogue réel PCJ — même nom = variants couleur (filtre couleur + image par couleur)
         $catalog = [
             [
-                'name' => 'T-shirt PCJ Beige Logo',
-                'description' => 'T-shirt beige coupe relax, logo PCJ circulaire noir au centre. Coton doux, style affiché.',
+                'name' => 'T-shirt PCJ Officiel',
+                'description' => 'T-shirt officiel PCJ, grand logo circulaire. Disponible en plusieurs couleurs.',
                 'price' => 11.0,
                 'category_id' => $tshirt,
                 'status' => 'IN_STOCK',
-                'image' => 'media/tshirt/product-1.jpeg',
+                'image' => 'media/tshirt/product-3.jpeg',
                 'variants' => [
-                    ['color' => 'Beige', 'color_hex' => '#C4A882', 'size' => 'S', 'sku' => 'PCJ-TEE-BEIGE-S', 'stock' => 15],
-                    ['color' => 'Beige', 'color_hex' => '#C4A882', 'size' => 'M', 'sku' => 'PCJ-TEE-BEIGE-M', 'stock' => 25],
-                    ['color' => 'Beige', 'color_hex' => '#C4A882', 'size' => 'L', 'sku' => 'PCJ-TEE-BEIGE-L', 'stock' => 20],
-                    ['color' => 'Beige', 'color_hex' => '#C4A882', 'size' => 'XL', 'sku' => 'PCJ-TEE-BEIGE-XL', 'stock' => 12],
+                    ...self::colorSizes('Beige', '#C4A882', 'PCJ-TEE-OFF-BEIGE', [15, 25, 20, 12], 'media/tshirt/product-1.jpeg'),
+                    ...self::colorSizes('Blanc', '#FFFFFF', 'PCJ-TEE-OFF-BLANC', [20, 32, 26, 16], 'media/tshirt/product-3.jpeg'),
+                    ...self::colorSizes('Bleu', '#1E5AFF', 'PCJ-TEE-OFF-BLEU', [14, 24, 20, 12], 'media/tshirt/product-5.jpeg'),
                 ],
             ],
             [
@@ -97,81 +96,19 @@ class DatabaseSeeder extends Seeder
                 'category_id' => $tshirt,
                 'status' => 'IN_STOCK',
                 'image' => 'media/tshirt/product-2.jpeg',
-                'variants' => [
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'S', 'sku' => 'PCJ-TEE-MIN-S', 'stock' => 18],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'PCJ-TEE-MIN-M', 'stock' => 30],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'L', 'sku' => 'PCJ-TEE-MIN-L', 'stock' => 28],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'XL', 'sku' => 'PCJ-TEE-MIN-XL', 'stock' => 14],
-                ],
+                'variants' => self::colorSizes('Blanc', '#FFFFFF', 'PCJ-TEE-MIN', [18, 30, 28, 14], 'media/tshirt/product-2.jpeg'),
             ],
             [
-                'name' => 'T-shirt PCJ Officiel',
-                'description' => 'T-shirt blanc officiel PCJ, grand logo circulaire noir. La pièce signature de la marque.',
-                'price' => 11.0,
-                'category_id' => $tshirt,
-                'status' => 'IN_STOCK',
-                'image' => 'media/tshirt/product-3.jpeg',
-                'variants' => [
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'S', 'sku' => 'PCJ-TEE-BLANC-S', 'stock' => 20],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'PCJ-TEE-BLANC-M', 'stock' => 32],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'L', 'sku' => 'PCJ-TEE-BLANC-L', 'stock' => 26],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'XL', 'sku' => 'PCJ-TEE-BLANC-XL', 'stock' => 16],
-                ],
-            ],
-            [
-                'name' => 'T-shirt Posé Comme Jamais Jaune',
-                'description' => 'T-shirt jaune vif, message POSÉ COMME JAMAIS en blanc. Attitude affirmée.',
+                'name' => 'T-shirt Posé Comme Jamais',
+                'description' => 'T-shirt Posé Comme Jamais — message signature, plusieurs coloris.',
                 'price' => 11.0,
                 'category_id' => $tshirt,
                 'status' => 'IN_STOCK',
                 'image' => 'media/tshirt/product-4.jpeg',
                 'variants' => [
-                    ['color' => 'Jaune', 'color_hex' => '#F5C518', 'size' => 'S', 'sku' => 'PCJ-TEE-JAUNE-S', 'stock' => 12],
-                    ['color' => 'Jaune', 'color_hex' => '#F5C518', 'size' => 'M', 'sku' => 'PCJ-TEE-JAUNE-M', 'stock' => 22],
-                    ['color' => 'Jaune', 'color_hex' => '#F5C518', 'size' => 'L', 'sku' => 'PCJ-TEE-JAUNE-L', 'stock' => 18],
-                    ['color' => 'Jaune', 'color_hex' => '#F5C518', 'size' => 'XL', 'sku' => 'PCJ-TEE-JAUNE-XL', 'stock' => 10],
-                ],
-            ],
-            [
-                'name' => 'T-shirt PCJ Bleu Logo',
-                'description' => 'T-shirt bleu électrique, logo PCJ blanc circulaire. Couleur forte, look street.',
-                'price' => 11.0,
-                'category_id' => $tshirt,
-                'status' => 'IN_STOCK',
-                'image' => 'media/tshirt/product-5.jpeg',
-                'variants' => [
-                    ['color' => 'Bleu', 'color_hex' => '#1E5AFF', 'size' => 'S', 'sku' => 'PCJ-TEE-BLEU-S', 'stock' => 14],
-                    ['color' => 'Bleu', 'color_hex' => '#1E5AFF', 'size' => 'M', 'sku' => 'PCJ-TEE-BLEU-M', 'stock' => 24],
-                    ['color' => 'Bleu', 'color_hex' => '#1E5AFF', 'size' => 'L', 'sku' => 'PCJ-TEE-BLEU-L', 'stock' => 20],
-                    ['color' => 'Bleu', 'color_hex' => '#1E5AFF', 'size' => 'XL', 'sku' => 'PCJ-TEE-BLEU-XL', 'stock' => 12],
-                ],
-            ],
-            [
-                'name' => 'T-shirt Posé Comme Jamais Blanc Or',
-                'description' => 'T-shirt blanc, typo POSÉ COMME JAMAIS dorée. Pièce signature sobre et chic.',
-                'price' => 11.0,
-                'category_id' => $tshirt,
-                'status' => 'IN_STOCK',
-                'image' => 'media/tshirt/product-6.jpeg',
-                'variants' => [
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'S', 'sku' => 'PCJ-TEE-OR-S', 'stock' => 16],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'PCJ-TEE-OR-M', 'stock' => 28],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'L', 'sku' => 'PCJ-TEE-OR-L', 'stock' => 22],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'XL', 'sku' => 'PCJ-TEE-OR-XL', 'stock' => 14],
-                ],
-            ],
-            [
-                'name' => 'T-shirt Posé Comme Jamais Rose',
-                'description' => 'T-shirt rose pâle, message POSÉ COMME JAMAIS en contour noir. Doux et affirmé.',
-                'price' => 11.0,
-                'category_id' => $tshirt,
-                'status' => 'IN_STOCK',
-                'image' => 'media/tshirt/product-7.jpeg',
-                'variants' => [
-                    ['color' => 'Rose', 'color_hex' => '#F2C4C4', 'size' => 'S', 'sku' => 'PCJ-TEE-ROSE-S', 'stock' => 15],
-                    ['color' => 'Rose', 'color_hex' => '#F2C4C4', 'size' => 'M', 'sku' => 'PCJ-TEE-ROSE-M', 'stock' => 26],
-                    ['color' => 'Rose', 'color_hex' => '#F2C4C4', 'size' => 'L', 'sku' => 'PCJ-TEE-ROSE-L', 'stock' => 20],
-                    ['color' => 'Rose', 'color_hex' => '#F2C4C4', 'size' => 'XL', 'sku' => 'PCJ-TEE-ROSE-XL', 'stock' => 12],
+                    ...self::colorSizes('Jaune', '#F5C518', 'PCJ-TEE-PCJ-JAUNE', [12, 22, 18, 10], 'media/tshirt/product-4.jpeg'),
+                    ...self::colorSizes('Blanc', '#FFFFFF', 'PCJ-TEE-PCJ-BLANC', [16, 28, 22, 14], 'media/tshirt/product-6.jpeg'),
+                    ...self::colorSizes('Rose', '#F2C4C4', 'PCJ-TEE-PCJ-ROSE', [15, 26, 20, 12], 'media/tshirt/product-7.jpeg'),
                 ],
             ],
             [
@@ -182,7 +119,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'IN_STOCK',
                 'image' => 'media/casquette/product-1.jpeg',
                 'variants' => [
-                    ['color' => 'Vert', 'color_hex' => '#3D5A3D', 'size' => 'TU', 'sku' => 'PCJ-CAP-VERT-TU', 'stock' => 40],
+                    ['color' => 'Vert', 'color_hex' => '#3D5A3D', 'size' => 'TU', 'sku' => 'PCJ-CAP-VERT-TU', 'stock' => 40, 'image' => 'media/casquette/product-1.jpeg'],
                 ],
             ],
             [
@@ -193,29 +130,19 @@ class DatabaseSeeder extends Seeder
                 'status' => 'IN_STOCK',
                 'image' => 'media/casquette/product-2.jpeg',
                 'variants' => [
-                    ['color' => 'Gris', 'color_hex' => '#4A4A4A', 'size' => 'TU', 'sku' => 'PCJ-CAP-ESS-TU', 'stock' => 45],
+                    ['color' => 'Gris', 'color_hex' => '#4A4A4A', 'size' => 'TU', 'sku' => 'PCJ-CAP-ESS-TU', 'stock' => 45, 'image' => 'media/casquette/product-2.jpeg'],
                 ],
             ],
             [
                 'name' => 'Casquette PCJ',
-                'description' => 'Casquette trucker blanc et bleu, message POSÉ COMME JAMAIS. Style street affirmé.',
+                'description' => 'Casquette trucker Posé Comme Jamais. Plusieurs coloris.',
                 'price' => 5.0,
                 'category_id' => $casquette,
                 'status' => 'IN_STOCK',
                 'image' => 'media/casquette/product-3.jpeg',
                 'variants' => [
-                    ['color' => 'Bleu', 'color_hex' => '#1E4DFF', 'size' => 'TU', 'sku' => 'PCJ-CAP-BLEU-TU', 'stock' => 40],
-                ],
-            ],
-            [
-                'name' => 'Casquette PCJ Bleu',
-                'description' => 'Casquette trucker bleu roi, typo POSÉ COMME JAMAIS dorée. Look net et marqué.',
-                'price' => 5.0,
-                'category_id' => $casquette,
-                'status' => 'IN_STOCK',
-                'image' => 'media/casquette/product-4.jpeg',
-                'variants' => [
-                    ['color' => 'Bleu', 'color_hex' => '#1A3DFF', 'size' => 'TU', 'sku' => 'PCJ-CAP-BLEU-OR-TU', 'stock' => 40],
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'TU', 'sku' => 'PCJ-CAP-PCJ-BLANC-TU', 'stock' => 40, 'image' => 'media/casquette/product-3.jpeg'],
+                    ['color' => 'Bleu', 'color_hex' => '#1A3DFF', 'size' => 'TU', 'sku' => 'PCJ-CAP-PCJ-BLEU-TU', 'stock' => 40, 'image' => 'media/casquette/product-4.jpeg'],
                 ],
             ],
             [
@@ -225,12 +152,7 @@ class DatabaseSeeder extends Seeder
                 'category_id' => $pack,
                 'status' => 'IN_STOCK',
                 'image' => 'media/tshirt/product-8.jpeg',
-                'variants' => [
-                    ['color' => 'Gris', 'color_hex' => '#B8B8B8', 'size' => 'S', 'sku' => 'PCJ-PACK-GRIS-S', 'stock' => 10],
-                    ['color' => 'Gris', 'color_hex' => '#B8B8B8', 'size' => 'M', 'sku' => 'PCJ-PACK-GRIS-M', 'stock' => 18],
-                    ['color' => 'Gris', 'color_hex' => '#B8B8B8', 'size' => 'L', 'sku' => 'PCJ-PACK-GRIS-L', 'stock' => 15],
-                    ['color' => 'Gris', 'color_hex' => '#B8B8B8', 'size' => 'XL', 'sku' => 'PCJ-PACK-GRIS-XL', 'stock' => 10],
-                ],
+                'variants' => self::colorSizes('Gris', '#B8B8B8', 'PCJ-PACK-GRIS', [10, 18, 15, 10], 'media/tshirt/product-8.jpeg'),
             ],
             [
                 'name' => 'Pack Casquette & T-shirt PCJ',
@@ -239,12 +161,7 @@ class DatabaseSeeder extends Seeder
                 'category_id' => $pack,
                 'status' => 'IN_STOCK',
                 'image' => 'media/tshirt/product-9.jpeg',
-                'variants' => [
-                    ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'S', 'sku' => 'PCJ-PACK-CREME-S', 'stock' => 10],
-                    ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'M', 'sku' => 'PCJ-PACK-CREME-M', 'stock' => 18],
-                    ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'L', 'sku' => 'PCJ-PACK-CREME-L', 'stock' => 15],
-                    ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'XL', 'sku' => 'PCJ-PACK-CREME-XL', 'stock' => 10],
-                ],
+                'variants' => self::colorSizes('Crème', '#F5F0E6', 'PCJ-PACK-CREME', [10, 18, 15, 10], 'media/tshirt/product-9.jpeg'),
             ],
             [
                 'name' => 'Pack Casquette & T-shirt PCJ Essentiel',
@@ -253,12 +170,7 @@ class DatabaseSeeder extends Seeder
                 'category_id' => $pack,
                 'status' => 'IN_STOCK',
                 'image' => 'media/tshirt/product-10.jpeg',
-                'variants' => [
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'S', 'sku' => 'PCJ-PACK-ESS-S', 'stock' => 10],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'PCJ-PACK-ESS-M', 'stock' => 18],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'L', 'sku' => 'PCJ-PACK-ESS-L', 'stock' => 15],
-                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'XL', 'sku' => 'PCJ-PACK-ESS-XL', 'stock' => 10],
-                ],
+                'variants' => self::colorSizes('Blanc', '#FFFFFF', 'PCJ-PACK-ESS', [10, 18, 15, 10], 'media/tshirt/product-10.jpeg'),
             ],
             [
                 'name' => 'Pull First Generation',
@@ -267,12 +179,7 @@ class DatabaseSeeder extends Seeder
                 'category_id' => $pull,
                 'status' => 'IN_STOCK',
                 'image' => 'media/pull/product-1.jpeg',
-                'variants' => [
-                    ['color' => 'Orange', 'color_hex' => '#C45C26', 'size' => 'S', 'sku' => 'PCJ-PULL-FG-S', 'stock' => 12],
-                    ['color' => 'Orange', 'color_hex' => '#C45C26', 'size' => 'M', 'sku' => 'PCJ-PULL-FG-M', 'stock' => 20],
-                    ['color' => 'Orange', 'color_hex' => '#C45C26', 'size' => 'L', 'sku' => 'PCJ-PULL-FG-L', 'stock' => 16],
-                    ['color' => 'Orange', 'color_hex' => '#C45C26', 'size' => 'XL', 'sku' => 'PCJ-PULL-FG-XL', 'stock' => 10],
-                ],
+                'variants' => self::colorSizes('Orange', '#C45C26', 'PCJ-PULL-FG', [12, 20, 16, 10], 'media/pull/product-1.jpeg'),
             ],
         ];
 
@@ -289,6 +196,14 @@ class DatabaseSeeder extends Seeder
                 'stock' => 0,
             ]));
 
+            $variants = array_map(function (array $variant) use ($product) {
+                if (! empty($variant['image']) && is_string($variant['image'])) {
+                    $variant['image'] = $this->storeMediaPath($variant['image'], 'products/variants/'.$product->id);
+                }
+
+                return $variant;
+            }, $variants);
+
             $variantService->syncVariants($product, $variants);
             $this->attachProductImage($product, $image);
             $created[$product->name] = $product;
@@ -300,21 +215,19 @@ class DatabaseSeeder extends Seeder
         $marc = $customers[1];
         $lea = $customers[2];
 
-        $teeBeige = $created['T-shirt PCJ Beige Logo'];
+        $teeOfficiel = $created['T-shirt PCJ Officiel'];
         $teeMinimal = $created['T-shirt PCJ Blanc Minimal'];
-        $teeBlanc = $created['T-shirt PCJ Officiel'];
-        $teeJaune = $created['T-shirt Posé Comme Jamais Jaune'];
-        $teeRose = $created['T-shirt Posé Comme Jamais Rose'];
+        $teePose = $created['T-shirt Posé Comme Jamais'];
         $capTrucker = $created['Casquette PCJ Trucker'];
 
         $orderService->createOrder($sophie, OrderData::from([
             'customer_id' => $sophie->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $teeBeige->id, 'quantity' => 1, 'price' => (float) $teeBeige->price],
-                ['product_id' => $teeBlanc->id, 'quantity' => 2, 'price' => (float) $teeBlanc->price],
+                ['product_id' => $teeOfficiel->id, 'quantity' => 1, 'price' => (float) $teeOfficiel->price],
+                ['product_id' => $teeOfficiel->id, 'quantity' => 2, 'price' => (float) $teeOfficiel->price],
             ],
-            'total' => (float) $teeBeige->price + 2 * (float) $teeBlanc->price,
+            'total' => 3 * (float) $teeOfficiel->price,
             'status' => 'PAID',
         ]));
 
@@ -322,9 +235,9 @@ class DatabaseSeeder extends Seeder
             'customer_id' => $marc->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $teeJaune->id, 'quantity' => 1, 'price' => (float) $teeJaune->price],
+                ['product_id' => $teePose->id, 'quantity' => 1, 'price' => (float) $teePose->price],
             ],
-            'total' => (float) $teeJaune->price,
+            'total' => (float) $teePose->price,
             'status' => 'PAID',
         ]));
 
@@ -333,9 +246,9 @@ class DatabaseSeeder extends Seeder
             'vendor_id' => $store->id,
             'items' => [
                 ['product_id' => $capTrucker->id, 'quantity' => 1, 'price' => (float) $capTrucker->price],
-                ['product_id' => $teeRose->id, 'quantity' => 2, 'price' => (float) $teeRose->price],
+                ['product_id' => $teePose->id, 'quantity' => 2, 'price' => (float) $teePose->price],
             ],
-            'total' => (float) $capTrucker->price + 2 * (float) $teeRose->price,
+            'total' => (float) $capTrucker->price + 2 * (float) $teePose->price,
             'status' => 'PENDING',
         ]));
 
@@ -350,11 +263,11 @@ class DatabaseSeeder extends Seeder
         ]));
 
         ProductReview::query()->updateOrCreate(
-            ['customer_id' => $sophie->id, 'product_id' => $teeBeige->id],
+            ['customer_id' => $sophie->id, 'product_id' => $teeOfficiel->id],
             ['rating' => 5, 'comment' => 'Qualité au rendez-vous, le logo PCJ ressort super bien.'],
         );
         ProductReview::query()->updateOrCreate(
-            ['customer_id' => $marc->id, 'product_id' => $teeJaune->id],
+            ['customer_id' => $marc->id, 'product_id' => $teePose->id],
             ['rating' => 4, 'comment' => 'Couleur vive, message qui claque. Coupe top.'],
         );
         ProductReview::query()->updateOrCreate(
@@ -363,25 +276,63 @@ class DatabaseSeeder extends Seeder
         );
 
         $sophie->favoriteProducts()->syncWithoutDetaching([
-            $teeBeige->id,
-            $teeBlanc->id,
-            $teeRose->id,
+            $teeOfficiel->id,
+            $teePose->id,
+            $teeMinimal->id,
         ]);
-        $marc->favoriteProducts()->syncWithoutDetaching([$teeJaune->id]);
+        $marc->favoriteProducts()->syncWithoutDetaching([$teePose->id]);
     }
 
-    private function attachProductImage(Product $product, string $mediaPath): void
+    /**
+     * @param  list<int>  $stocks  stocks S, M, L, XL
+     * @return list<array{color: string, color_hex: string, size: string, sku: string, stock: int, image: string}>
+     */
+    private static function colorSizes(string $color, string $hex, string $skuPrefix, array $stocks, string $image): array
+    {
+        $sizes = ['S', 'M', 'L', 'XL'];
+
+        return array_map(
+            fn (string $size, int $i) => [
+                'color' => $color,
+                'color_hex' => $hex,
+                'size' => $size,
+                'sku' => $skuPrefix.'-'.$size,
+                'stock' => $stocks[$i] ?? 10,
+                'image' => $image,
+            ],
+            $sizes,
+            array_keys($sizes),
+        );
+    }
+
+    private function storeMediaPath(string $mediaPath, string $destDir): ?string
     {
         $source = resource_path($mediaPath);
 
         if (! File::exists($source)) {
-            return;
+            return null;
         }
 
         $extension = strtolower(pathinfo($mediaPath, PATHINFO_EXTENSION) ?: 'jpeg');
-        $destPath = 'products/'.pathinfo($mediaPath, PATHINFO_FILENAME).'-'.$product->id.'.'.$extension;
+        $destPath = trim($destDir, '/').'/'.pathinfo($mediaPath, PATHINFO_FILENAME).'.'.$extension;
 
         Storage::disk('public')->put($destPath, File::get($source));
-        $product->update(['image' => $destPath]);
+
+        return $destPath;
+    }
+
+    private function attachProductImage(Product $product, string $mediaPath): void
+    {
+        $destPath = $this->storeMediaPath($mediaPath, 'products');
+
+        if ($destPath === null) {
+            return;
+        }
+
+        // Un fichier unique par produit pour éviter les collisions au reseed
+        $extension = pathinfo($destPath, PATHINFO_EXTENSION);
+        $uniquePath = 'products/'.pathinfo($mediaPath, PATHINFO_FILENAME).'-'.$product->id.'.'.$extension;
+        Storage::disk('public')->put($uniquePath, Storage::disk('public')->get($destPath));
+        $product->update(['image' => $uniquePath]);
     }
 }

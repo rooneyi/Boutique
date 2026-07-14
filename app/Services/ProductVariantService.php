@@ -10,7 +10,7 @@ use Illuminate\Http\UploadedFile;
 class ProductVariantService
 {
     /**
-     * @param  list<array{color: string, color_hex?: ?string, size: string, sku?: ?string, stock: int, image?: ?UploadedFile}>  $rows
+     * @param  list<array{color: string, color_hex?: ?string, size: string, sku?: ?string, stock: int, image?: UploadedFile|string|null}>  $rows
      */
     public function syncVariants(Product $product, array $rows): void
     {
@@ -20,6 +20,8 @@ class ProductVariantService
             $imagePath = null;
             if (! empty($row['image']) && $row['image'] instanceof UploadedFile) {
                 $imagePath = $row['image']->store('products/variants', 'public');
+            } elseif (! empty($row['image']) && is_string($row['image'])) {
+                $imagePath = $row['image'];
             }
 
             ProductVariant::create([

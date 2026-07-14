@@ -56,7 +56,10 @@ class ProductController extends Controller
 
         $colorFilter = $request->string('color')->trim()->toString();
         if ($colorFilter !== '') {
-            $query->whereHas('variants', fn ($q) => $q->where('color', $colorFilter));
+            $query->whereHas(
+                'variants',
+                fn ($q) => $q->whereRaw('LOWER(color) = ?', [mb_strtolower($colorFilter)]),
+            );
         }
 
         $priceFilterActive = $request->filled('min_price') || $request->filled('max_price');
@@ -95,6 +98,7 @@ class ProductController extends Controller
         $products->through(fn (Product $product) => CatalogProduct::cardPayload(
             $product,
             isset($favoriteIdSet[$product->id]),
+            $colorFilter !== '' ? $colorFilter : null,
         ));
 
         $categories = Category::query()
