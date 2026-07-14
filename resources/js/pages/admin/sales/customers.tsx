@@ -89,8 +89,8 @@ export default function AdminSalesCustomers({ customers }: Props) {
                     <AdminCardHeader>
                         <h3 className={ADMIN_H3}>Liste des clients</h3>
                         <AdminCardDescription>
-                            {customers.length} client(s) · cliquez une ligne pour voir le profil
-                            complet
+                            {customers.length} client(s) · cliquez « Voir » ou le nom pour le profil
+                            et les adresses
                         </AdminCardDescription>
                     </AdminCardHeader>
                     <AdminCardContent>
@@ -132,15 +132,19 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                         >
                                             Dernière commande
                                         </TableHead>
+                                        <TableHead className={ADMIN_TABLE_HEAD} />
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {customers.map((c) => (
-                                        <TableRow key={c.id} className={ADMIN_TABLE_ROW}>
+                                        <TableRow
+                                            key={c.id}
+                                            className={cn(ADMIN_TABLE_ROW, 'hover:bg-neutral-50')}
+                                        >
                                             <TableCell className={ADMIN_TABLE_CELL}>
                                                 <Link
                                                     href={route('admin.sales.customers.show', c.id)}
-                                                    className="flex min-w-0 items-center gap-3 font-medium text-neutral-900 hover:underline"
+                                                    className="flex min-w-0 items-center gap-3 font-medium text-neutral-900 hover:text-[#0059DD] hover:underline"
                                                 >
                                                     <CustomerAvatar
                                                         name={c.name}
@@ -201,6 +205,14 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                                           'fr-FR',
                                                       )
                                                     : '—'}
+                                            </TableCell>
+                                            <TableCell className={ADMIN_TABLE_CELL}>
+                                                <Link
+                                                    href={route('admin.sales.customers.show', c.id)}
+                                                    className={ADMIN_BTN_SM_OUTLINE}
+                                                >
+                                                    Voir
+                                                </Link>
                                             </TableCell>
                                         </TableRow>
                                     ))}

@@ -57,9 +57,10 @@ const MAIN_NAV: NavItem[] = [
     },
     {
         label: 'Clients',
-        href: route('admin.customers.index'),
+        href: route('admin.sales.customers.index'),
         icon: Users,
-        match: (path) => path.startsWith('/admin/users/customers'),
+        match: (path) =>
+            path.startsWith('/admin/sales/customers') || path.startsWith('/admin/users/customers'),
     },
 ];
 

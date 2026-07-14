@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     AdminDataTable,
     TableBody,
@@ -19,7 +19,9 @@ import {
     AdminCardHeader,
 } from '@/components/admin/admin-card';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
+import { route } from '@/lib/route';
 import {
+    ADMIN_BTN_SM_OUTLINE,
     ADMIN_H3,
     ADMIN_MOBILE_META,
     ADMIN_MUTED,
@@ -62,7 +64,8 @@ function segmentLabel(segment: CustomerRow['segment']): string {
 
 export default function AdminUsers({ users }: Props) {
     const title = 'Clients';
-    const description = 'Liste globale des clients — fidèles, actifs et inactifs.';
+    const description =
+        'Liste globale des clients — cliquez un client pour voir l’adresse de livraison et ses commandes.';
 
     const formatDate = (date: string) => new Date(date).toLocaleDateString('fr-FR');
 
@@ -77,101 +80,159 @@ export default function AdminUsers({ users }: Props) {
                     <AdminCardHeader>
                         <h3 className={ADMIN_H3}>{title}</h3>
                         <AdminCardDescription>
-                            {users.data.length} compte(s) affiché(s)
+                            {users.data.length} compte(s) · cliquez « Voir » ou le nom pour la fiche
                         </AdminCardDescription>
                     </AdminCardHeader>
                     <AdminCardContent>
                         {users.data.length > 0 ? (
                             <AdminDataTable>
-                                    <TableHeader>
-                                        <TableRow className={ADMIN_TABLE_HEADER_ROW}>
-                                            <TableHead className={ADMIN_TABLE_HEAD}>Nom</TableHead>
-                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
-                                                Email
-                                            </TableHead>
-                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
-                                                Téléphone
-                                            </TableHead>
-                                            <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
-                                                Commandes
-                                            </TableHead>
-                                            <TableHead
+                                <TableHeader>
+                                    <TableRow className={ADMIN_TABLE_HEADER_ROW}>
+                                        <TableHead className={ADMIN_TABLE_HEAD}>Nom</TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
+                                        >
+                                            Email
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
+                                        >
+                                            Téléphone
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, 'text-right')}
+                                        >
+                                            Commandes
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(
+                                                ADMIN_TABLE_HEAD,
+                                                ADMIN_TABLE_COL_MD,
+                                                'text-right',
+                                            )}
+                                        >
+                                            Total
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
+                                        >
+                                            Dernière cmd.
+                                        </TableHead>
+                                        <TableHead className={ADMIN_TABLE_HEAD}>Profil</TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
+                                        >
+                                            Inscription
+                                        </TableHead>
+                                        <TableHead className={ADMIN_TABLE_HEAD} />
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {users.data.map((user) => (
+                                        <TableRow
+                                            key={user.id}
+                                            className={cn(ADMIN_TABLE_ROW, 'hover:bg-neutral-50')}
+                                        >
+                                            <TableCell
                                                 className={cn(
-                                                    ADMIN_TABLE_HEAD,
+                                                    ADMIN_TABLE_CELL,
+                                                    'font-medium text-neutral-900',
+                                                )}
+                                            >
+                                                <Link
+                                                    href={route(
+                                                        'admin.sales.customers.show',
+                                                        user.id,
+                                                    )}
+                                                    className="hover:text-[#0059DD] hover:underline"
+                                                >
+                                                    {user.name}
+                                                </Link>
+                                                <span className={ADMIN_MOBILE_META}>
+                                                    {user.email}
+                                                </span>
+                                                <span className={ADMIN_MOBILE_META}>
+                                                    {user.phone || 'Tél. non renseigné'}
+                                                </span>
+                                                <span className={ADMIN_MOBILE_META}>
+                                                    {user.orders_count} cmd. · $
+                                                    {Number(user.total_spent).toFixed(2)}
+                                                    {user.last_order_at
+                                                        ? ` · ${formatDate(user.last_order_at)}`
+                                                        : ''}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    ADMIN_TABLE_COL_MD,
+                                                )}
+                                            >
+                                                {user.email}
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    ADMIN_TABLE_COL_MD,
+                                                )}
+                                            >
+                                                {user.phone || '—'}
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(ADMIN_TABLE_CELL, 'text-right')}
+                                            >
+                                                {user.orders_count}
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
                                                     ADMIN_TABLE_COL_MD,
                                                     'text-right',
                                                 )}
                                             >
-                                                Total
-                                            </TableHead>
-                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
-                                                Dernière cmd.
-                                            </TableHead>
-                                            <TableHead className={ADMIN_TABLE_HEAD}>Profil</TableHead>
-                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
-                                                Inscription
-                                            </TableHead>
+                                                {`$${Number(user.total_spent).toFixed(2)}`}
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    ADMIN_TABLE_COL_MD,
+                                                )}
+                                            >
+                                                {user.last_order_at
+                                                    ? formatDate(user.last_order_at)
+                                                    : '—'}
+                                            </TableCell>
+                                            <TableCell>
+                                                <AdminBadge
+                                                    variant={customerSegmentBadgeVariant(
+                                                        user.segment,
+                                                    )}
+                                                >
+                                                    {segmentLabel(user.segment)}
+                                                </AdminBadge>
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    ADMIN_TABLE_COL_MD,
+                                                )}
+                                            >
+                                                {formatDate(user.created_at)}
+                                            </TableCell>
+                                            <TableCell className={ADMIN_TABLE_CELL}>
+                                                <Link
+                                                    href={route(
+                                                        'admin.sales.customers.show',
+                                                        user.id,
+                                                    )}
+                                                    className={ADMIN_BTN_SM_OUTLINE}
+                                                >
+                                                    Voir
+                                                </Link>
+                                            </TableCell>
                                         </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {users.data.map((user) => (
-                                                  <TableRow key={user.id} className={ADMIN_TABLE_ROW}>
-                                                      <TableCell
-                                                          className={cn(ADMIN_TABLE_CELL, 'font-medium text-neutral-900')}
-                                                      >
-                                                          {user.name}
-                                                          <span className={ADMIN_MOBILE_META}>{user.email}</span>
-                                                          <span className={ADMIN_MOBILE_META}>
-                                                              {user.phone || 'Tél. non renseigné'}
-                                                          </span>
-                                                          <span className={ADMIN_MOBILE_META}>
-                                                              {user.orders_count} cmd. · $
-                                                              {Number(user.total_spent).toFixed(2)}
-                                                              {user.last_order_at
-                                                                  ? ` · ${formatDate(user.last_order_at)}`
-                                                                  : ''}
-                                                          </span>
-                                                      </TableCell>
-                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
-                                                          {user.email}
-                                                      </TableCell>
-                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
-                                                          {user.phone || '—'}
-                                                      </TableCell>
-                                                      <TableCell
-                                                          className={cn(ADMIN_TABLE_CELL, 'text-right')}
-                                                      >
-                                                          {user.orders_count}
-                                                      </TableCell>
-                                                      <TableCell
-                                                          className={cn(
-                                                              ADMIN_TABLE_CELL,
-                                                              ADMIN_TABLE_COL_MD,
-                                                              'text-right',
-                                                          )}
-                                                      >
-                                                          {`$${Number(user.total_spent).toFixed(2)}`}
-                                                      </TableCell>
-                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
-                                                          {user.last_order_at
-                                                              ? formatDate(user.last_order_at)
-                                                              : '—'}
-                                                      </TableCell>
-                                                      <TableCell>
-                                                          <AdminBadge
-                                                              variant={customerSegmentBadgeVariant(
-                                                                  user.segment,
-                                                              )}
-                                                          >
-                                                              {segmentLabel(user.segment)}
-                                                          </AdminBadge>
-                                                      </TableCell>
-                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
-                                                          {formatDate(user.created_at)}
-                                                      </TableCell>
-                                                  </TableRow>
-                                        ))}
-                                    </TableBody>
+                                    ))}
+                                </TableBody>
                             </AdminDataTable>
                         ) : (
                             <p className={cn(ADMIN_MUTED, 'py-12 text-center')}>

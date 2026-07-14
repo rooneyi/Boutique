@@ -43,8 +43,9 @@ export const ADMIN_MAIN_NAV: {
     {
         key: 'customers',
         label: 'Clients',
-        href: route('admin.customers.index'),
-        match: (path) => path.startsWith('/admin/users/customers'),
+        href: route('admin.sales.customers.index'),
+        match: (path) =>
+            path.startsWith('/admin/sales/customers') || path.startsWith('/admin/users/customers'),
     },
 ];
 

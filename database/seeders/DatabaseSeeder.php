@@ -50,9 +50,24 @@ class DatabaseSeeder extends Seeder
         Product::query()->delete();
 
         $customerUsers = [
-            ['email' => 'sophie@client.test', 'name' => 'Sophie Dupont'],
-            ['email' => 'marc@client.test', 'name' => 'Marc Lefèvre'],
-            ['email' => 'lea@client.test', 'name' => 'Léa Garnier'],
+            [
+                'email' => 'sophie@client.test',
+                'name' => 'Sophie Dupont',
+                'phone' => '+243 81 234 5678',
+                'birth_date' => '1994-03-12',
+            ],
+            [
+                'email' => 'marc@client.test',
+                'name' => 'Marc Lefèvre',
+                'phone' => '+243 97 112 3344',
+                'birth_date' => '1989-11-02',
+            ],
+            [
+                'email' => 'lea@client.test',
+                'name' => 'Léa Garnier',
+                'phone' => '+243 85 556 7788',
+                'birth_date' => '1998-07-21',
+            ],
         ];
 
         $customers = collect($customerUsers)->map(function (array $row) use ($now) {
@@ -66,7 +81,13 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            return Customer::firstOrCreate(['user_id' => $user->id]);
+            return Customer::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'phone' => $row['phone'],
+                    'birth_date' => $row['birth_date'],
+                ],
+            );
         });
 
         $pack = $categories['Pack']->id;
@@ -219,47 +240,146 @@ class DatabaseSeeder extends Seeder
         $teeMinimal = $created['T-shirt PCJ Blanc Minimal'];
         $teePose = $created['T-shirt Posé Comme Jamais'];
         $capTrucker = $created['Casquette PCJ Trucker'];
+        $pull = $created['Pull First Generation'];
 
+        $variantId = static function (Product $product, ?string $color = null, ?string $size = null): ?int {
+            $query = $product->variants()->getQuery();
+
+            if ($color !== null) {
+                $query->where('color', $color);
+            }
+
+            if ($size !== null) {
+                $query->where('size', $size);
+            }
+
+            return $query->value('id');
+        };
+
+        // Sophie — livraison à domicile (Gombe)
         $orderService->createOrder($sophie, OrderData::from([
             'customer_id' => $sophie->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $teeOfficiel->id, 'quantity' => 1, 'price' => (float) $teeOfficiel->price],
-                ['product_id' => $teeOfficiel->id, 'quantity' => 2, 'price' => (float) $teeOfficiel->price],
+                [
+                    'product_id' => $teeOfficiel->id,
+                    'variant_id' => $variantId($teeOfficiel, 'Beige', 'M'),
+                    'quantity' => 1,
+                    'price' => (float) $teeOfficiel->price,
+                ],
+                [
+                    'product_id' => $teeOfficiel->id,
+                    'variant_id' => $variantId($teeOfficiel, 'Blanc', 'L'),
+                    'quantity' => 2,
+                    'price' => (float) $teeOfficiel->price,
+                ],
             ],
             'total' => 3 * (float) $teeOfficiel->price,
             'status' => 'PAID',
+            'delivery_method' => 'home_delivery',
+            'shipping_full_name' => 'Sophie Dupont',
+            'shipping_whatsapp' => '+243 81 234 5678',
+            'shipping_address' => '12 Avenue du Commerce',
+            'shipping_city' => 'Kinshasa',
+            'shipping_district' => 'Gombe',
+            'payment_method' => 'mobile_money',
         ]));
 
+        // Marc — retrait en boutique
         $orderService->createOrder($marc, OrderData::from([
             'customer_id' => $marc->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $teePose->id, 'quantity' => 1, 'price' => (float) $teePose->price],
+                [
+                    'product_id' => $teePose->id,
+                    'variant_id' => $variantId($teePose, 'Jaune', 'L'),
+                    'quantity' => 1,
+                    'price' => (float) $teePose->price,
+                ],
             ],
             'total' => (float) $teePose->price,
             'status' => 'PAID',
+            'delivery_method' => 'store_pickup',
+            'shipping_full_name' => 'Marc Lefèvre',
+            'shipping_whatsapp' => '+243 97 112 3344',
+            'shipping_address' => 'Retrait en boutique',
+            'shipping_city' => null,
+            'shipping_district' => null,
+            'payment_method' => 'cash',
         ]));
 
+        // Léa — livraison à domicile (Limete), en attente
         $orderService->createOrder($lea, OrderData::from([
             'customer_id' => $lea->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $capTrucker->id, 'quantity' => 1, 'price' => (float) $capTrucker->price],
-                ['product_id' => $teePose->id, 'quantity' => 2, 'price' => (float) $teePose->price],
+                [
+                    'product_id' => $capTrucker->id,
+                    'variant_id' => $variantId($capTrucker, 'Vert', 'TU'),
+                    'quantity' => 1,
+                    'price' => (float) $capTrucker->price,
+                ],
+                [
+                    'product_id' => $teePose->id,
+                    'variant_id' => $variantId($teePose, 'Rose', 'S'),
+                    'quantity' => 2,
+                    'price' => (float) $teePose->price,
+                ],
             ],
             'total' => (float) $capTrucker->price + 2 * (float) $teePose->price,
             'status' => 'PENDING',
+            'delivery_method' => 'home_delivery',
+            'shipping_full_name' => 'Léa Garnier',
+            'shipping_whatsapp' => '+243 85 556 7788',
+            'shipping_address' => '45 Boulevard Lumumba',
+            'shipping_city' => 'Kinshasa',
+            'shipping_district' => 'Limete',
+            'payment_method' => 'mobile_money',
+            'customer_note' => 'Appeler avant d\'arriver, portail vert.',
         ]));
 
+        // Sophie — 2e commande, retrait en boutique
         $orderService->createOrder($sophie, OrderData::from([
             'customer_id' => $sophie->id,
             'vendor_id' => $store->id,
             'items' => [
-                ['product_id' => $teeMinimal->id, 'quantity' => 2, 'price' => (float) $teeMinimal->price],
+                [
+                    'product_id' => $teeMinimal->id,
+                    'variant_id' => $variantId($teeMinimal, 'Blanc', 'M'),
+                    'quantity' => 2,
+                    'price' => (float) $teeMinimal->price,
+                ],
             ],
             'total' => 2 * (float) $teeMinimal->price,
             'status' => 'PAID',
+            'delivery_method' => 'store_pickup',
+            'shipping_full_name' => 'Sophie Dupont',
+            'shipping_whatsapp' => '+243 81 234 5678',
+            'shipping_address' => 'Retrait en boutique',
+            'payment_method' => 'cash',
+        ]));
+
+        // Marc — livraison à domicile (Ngaliema)
+        $orderService->createOrder($marc, OrderData::from([
+            'customer_id' => $marc->id,
+            'vendor_id' => $store->id,
+            'items' => [
+                [
+                    'product_id' => $pull->id,
+                    'variant_id' => $variantId($pull, 'Orange', 'L'),
+                    'quantity' => 1,
+                    'price' => (float) $pull->price,
+                ],
+            ],
+            'total' => (float) $pull->price,
+            'status' => 'PAID',
+            'delivery_method' => 'home_delivery',
+            'shipping_full_name' => 'Marc Lefèvre',
+            'shipping_whatsapp' => '+243 97 112 3344',
+            'shipping_address' => '8 Avenue de la Liberation',
+            'shipping_city' => 'Kinshasa',
+            'shipping_district' => 'Ngaliema',
+            'payment_method' => 'card',
         ]));
 
         ProductReview::query()->updateOrCreate(
