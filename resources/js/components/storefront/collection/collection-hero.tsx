@@ -5,7 +5,7 @@ const COLLECTION_HERO_GRADIENT =
     'linear-gradient(90deg, #c07f12 10.25%, #c07f12 36.47%, #915e07 41%, #292d32 41%, #292d32 102.51%)';
 
 const HERO_TITLE_CLASS =
-    'font-[Impact,Haettenschweiler,Arial_Narrow_Bold,sans-serif] font-normal uppercase leading-tight tracking-tight text-white';
+    'font-poppins font-black uppercase leading-[1.05] tracking-tight text-white';
 
 export function CollectionHero() {
     return (
@@ -17,7 +17,8 @@ export function CollectionHero() {
             >
                 <div className="w-full max-w-[370px] space-y-4 text-white">
                     <h1 className={`${HERO_TITLE_CLASS} text-[36px]`}>
-                        GARDONS NOTRE ATTITUDE
+                        <span className="block">Gardons notre</span>
+                        <span className="block">attitude</span>
                     </h1>
                     <p className="font-poppins text-[13px] leading-normal text-white/95">
                         Des pièces pensées pour exprimer qui vous êtes. Explorez la collection PCJ
@@ -34,26 +35,29 @@ export function CollectionHero() {
             </div>
 
             {/* Desktop — Figma 147:3749 */}
-            <div className="hidden w-full px-4 sm:px-8 lg:block lg:px-[62px]">
+            <div className="hidden w-full lg:block">
                 <div
-                    className="mx-auto flex h-[575px] max-w-[1440px] items-center justify-between pl-[65px] pr-[48px]"
+                    className="mx-auto flex h-[575px] w-full max-w-[1440px] overflow-hidden"
                     style={{ background: COLLECTION_HERO_GRADIENT }}
                 >
-                    <div className="relative h-[575px] w-[382px] shrink-0 overflow-hidden">
+                    <div className="relative flex h-full w-[min(42%,520px)] shrink-0 items-end justify-center pl-[65px]">
                         <img
                             src={HOME_ASSETS.collectionHero}
                             alt=""
-                            className="absolute left-[-17%] top-[-30%] h-[137%] w-[148%] max-w-none object-cover"
+                            className="h-full w-auto max-w-full object-contain object-bottom"
                         />
                     </div>
-                    <div className="flex max-w-[657px] flex-col gap-4 text-white">
-                        <h1 className={`${HERO_TITLE_CLASS} text-[64px]`}>
-                            GARDONS NOTRE ATTITUDE
-                        </h1>
-                        <p className="font-poppins text-xl leading-normal text-white/95">
-                            Des pièces pensées pour exprimer qui vous êtes. Explorez la collection
-                            PCJ et trouvez le style qui vous correspond.
-                        </p>
+                    <div className="flex min-w-0 flex-1 items-center pr-[48px] pl-10 xl:pl-16">
+                        <div className="flex w-full max-w-[657px] flex-col gap-4 text-white">
+                            <h1 className={`${HERO_TITLE_CLASS} text-[64px]`}>
+                                <span className="block">Gardons notre</span>
+                                <span className="block">attitude</span>
+                            </h1>
+                            <p className="font-poppins text-xl leading-normal text-white/95">
+                                Des pièces pensées pour exprimer qui vous êtes. Explorez la
+                                collection PCJ et trouvez le style qui vous correspond.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
