@@ -141,6 +141,7 @@ class CheckoutController extends Controller
                 'items' => $items,
                 'total' => $total,
                 'status' => 'PENDING',
+                'delivery_method' => $validated['delivery_method'],
                 'shipping_full_name' => $validated['shipping_full_name'],
                 'shipping_whatsapp' => $validated['shipping_whatsapp'],
                 'shipping_address' => $validated['shipping_address'],

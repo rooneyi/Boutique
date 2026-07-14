@@ -26,6 +26,7 @@ class OrderService
                 'vendor_id' => $data->vendor_id,
                 'total' => $data->total,
                 'status' => $data->status,
+                'delivery_method' => $data->delivery_method,
                 'shipping_full_name' => $data->shipping_full_name,
                 'shipping_whatsapp' => $data->shipping_whatsapp,
                 'shipping_address' => $data->shipping_address,

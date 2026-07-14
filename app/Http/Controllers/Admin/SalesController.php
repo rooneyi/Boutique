@@ -26,6 +26,7 @@ class SalesController extends Controller
                 'total' => (float) $order->total,
                 'status' => $order->status,
                 'created_at' => $order->created_at?->toIso8601String() ?? '',
+                'delivery' => $this->deliveryPayload($order),
                 'items' => $order->items->map(fn (OrderItem $item) => $this->orderItemPayload($item))->all(),
             ];
         });
@@ -84,11 +85,7 @@ class SalesController extends Controller
                 'total' => (float) $order->total,
                 'status' => $order->status,
                 'created_at' => $order->created_at?->toIso8601String() ?? '',
-                'shipping_full_name' => $order->shipping_full_name,
-                'shipping_whatsapp' => $order->shipping_whatsapp,
-                'shipping_address' => $order->shipping_address,
-                'shipping_city' => $order->shipping_city,
-                'shipping_district' => $order->shipping_district,
+                'delivery' => $this->deliveryPayload($order),
                 'payment_method' => $order->payment_method,
                 'items' => $order->items->map(fn (OrderItem $item) => $this->orderItemPayload($item))->all(),
             ];
@@ -99,7 +96,10 @@ class SalesController extends Controller
         $lastOrderAt = $ordersPayload[0]['created_at'] ?? null;
 
         $lastDelivery = $orders->first(
-            fn (Order $order) => filled($order->shipping_address) || filled($order->shipping_city),
+            fn (Order $order) => filled($order->shipping_whatsapp)
+                || filled($order->shipping_address)
+                || filled($order->shipping_city)
+                || filled($order->delivery_method),
         );
 
         $topCategories = OrderItem::query()
@@ -133,17 +133,47 @@ class SalesController extends Controller
                 'reviews_count' => (int) $customer->product_reviews_count,
                 'total_spent' => $totalSpent,
                 'last_order_at' => $lastOrderAt,
-                'last_delivery' => $lastDelivery === null ? null : [
-                    'full_name' => $lastDelivery->shipping_full_name,
-                    'whatsapp' => $lastDelivery->shipping_whatsapp,
-                    'address' => $lastDelivery->shipping_address,
-                    'city' => $lastDelivery->shipping_city,
-                    'district' => $lastDelivery->shipping_district,
-                ],
+                'last_delivery' => $lastDelivery === null ? null : $this->deliveryPayload($lastDelivery),
                 'top_categories' => $topCategories,
             ],
             'orders' => $ordersPayload,
         ]);
+    }
+
+    /**
+     * @return array{
+     *     method: ?string,
+     *     method_label: string,
+     *     full_name: ?string,
+     *     whatsapp: ?string,
+     *     address: ?string,
+     *     city: ?string,
+     *     district: ?string
+     * }
+     */
+    private function deliveryPayload(Order $order): array
+    {
+        $method = $order->delivery_method;
+
+        if ($method === null || $method === '') {
+            $method = filled($order->shipping_address) && $order->shipping_address !== 'Retrait en boutique'
+                ? 'home_delivery'
+                : (filled($order->shipping_whatsapp) ? 'store_pickup' : null);
+        }
+
+        return [
+            'method' => $method,
+            'method_label' => match ($method) {
+                'home_delivery' => 'Livraison à domicile',
+                'store_pickup' => 'Retrait en boutique',
+                default => 'Non renseigné',
+            },
+            'full_name' => $order->shipping_full_name,
+            'whatsapp' => $order->shipping_whatsapp,
+            'address' => $order->shipping_address,
+            'city' => $order->shipping_city,
+            'district' => $order->shipping_district,
+        ];
     }
 
     /**

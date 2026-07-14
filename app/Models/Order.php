@@ -16,6 +16,7 @@ class Order extends Model
         'vendor_id',
         'total',
         'status',
+        'delivery_method',
         'shipping_full_name',
         'shipping_whatsapp',
         'shipping_address',

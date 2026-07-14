@@ -41,12 +41,23 @@ type OrderItem = {
     size: string | null;
 };
 
+type Delivery = {
+    method: string | null;
+    method_label: string;
+    full_name: string | null;
+    whatsapp: string | null;
+    address: string | null;
+    city: string | null;
+    district: string | null;
+};
+
 type Order = {
     id: number;
     customer_name: string;
     total: number;
     status: string;
     created_at: string;
+    delivery: Delivery;
     items: OrderItem[];
 };
 
@@ -71,6 +82,22 @@ function statusLabel(status: string): string {
         default:
             return status;
     }
+}
+
+function deliverySummary(delivery: Delivery): string {
+    if (delivery.method === 'store_pickup') {
+        return delivery.method_label;
+    }
+
+    const place = [delivery.address, delivery.city, delivery.district]
+        .filter(Boolean)
+        .join(', ');
+
+    if (delivery.method === 'home_delivery') {
+        return place ? `${delivery.method_label} · ${place}` : delivery.method_label;
+    }
+
+    return place || delivery.method_label;
 }
 
 function OrderItemThumb({ item }: { item: OrderItem }) {
@@ -154,6 +181,11 @@ export default function AdminSalesOrders({ orders }: Props) {
                                         <TableHead
                                             className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_LG)}
                                         >
+                                            Livraison
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_LG)}
+                                        >
                                             Articles
                                         </TableHead>
                                     </TableRow>
@@ -203,6 +235,36 @@ export default function AdminSalesOrders({ orders }: Props) {
                                                 >
                                                     {statusLabel(order.status)}
                                                 </AdminBadge>
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(
+                                                    ADMIN_TABLE_CELL,
+                                                    ADMIN_TABLE_COL_LG,
+                                                    'min-w-[180px]',
+                                                )}
+                                            >
+                                                <p className="font-medium text-neutral-900">
+                                                    {order.delivery.method_label}
+                                                </p>
+                                                {order.delivery.method === 'home_delivery' ? (
+                                                    <p className="mt-0.5 text-xs text-neutral-500">
+                                                        {[
+                                                            order.delivery.address,
+                                                            order.delivery.city,
+                                                            order.delivery.district,
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .join(' · ') || 'Adresse à confirmer'}
+                                                    </p>
+                                                ) : null}
+                                                {order.delivery.whatsapp ? (
+                                                    <p className="mt-0.5 text-xs text-neutral-500">
+                                                        WhatsApp {order.delivery.whatsapp}
+                                                    </p>
+                                                ) : null}
+                                                <span className={ADMIN_MOBILE_META}>
+                                                    {deliverySummary(order.delivery)}
+                                                </span>
                                             </TableCell>
                                             <TableCell
                                                 className={cn(

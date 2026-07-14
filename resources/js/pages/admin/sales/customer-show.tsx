@@ -39,21 +39,25 @@ type OrderItem = {
     size: string | null;
 };
 
-type OrderRow = {
-    id: number;
-    total: number;
-    status: string;
-    created_at: string;
-    items: OrderItem[];
-};
-
 type DeliveryInfo = {
+    method: string | null;
+    method_label: string;
     full_name: string | null;
     whatsapp: string | null;
     address: string | null;
     city: string | null;
     district: string | null;
 } | null;
+
+type OrderRow = {
+    id: number;
+    total: number;
+    status: string;
+    created_at: string;
+    delivery: NonNullable<DeliveryInfo>;
+    payment_method: string | null;
+    items: OrderItem[];
+};
 
 type CategoryPref = {
     name: string;
@@ -184,9 +188,13 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                         {customer.last_delivery ? (
                             <div className="mt-8 border-t border-neutral-100 pt-6">
                                 <p className="mb-4 text-xs font-medium uppercase tracking-wide text-neutral-500">
-                                    Dernière adresse de livraison
+                                    Dernière livraison / retrait
                                 </p>
-                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                    <ProfileField
+                                        label="Mode"
+                                        value={customer.last_delivery.method_label}
+                                    />
                                     <ProfileField
                                         label="Nom livraison"
                                         value={customer.last_delivery.full_name || '—'}
@@ -195,19 +203,23 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                                         label="WhatsApp"
                                         value={customer.last_delivery.whatsapp || '—'}
                                     />
-                                    <ProfileField
-                                        label="Adresse"
-                                        value={customer.last_delivery.address || '—'}
-                                    />
-                                    <ProfileField
-                                        label="Ville / Quartier"
-                                        value={[
-                                            customer.last_delivery.city,
-                                            customer.last_delivery.district,
-                                        ]
-                                            .filter(Boolean)
-                                            .join(' · ') || '—'}
-                                    />
+                                    {customer.last_delivery.method !== 'store_pickup' ? (
+                                        <>
+                                            <ProfileField
+                                                label="Adresse"
+                                                value={customer.last_delivery.address || '—'}
+                                            />
+                                            <ProfileField
+                                                label="Ville / Quartier"
+                                                value={[
+                                                    customer.last_delivery.city,
+                                                    customer.last_delivery.district,
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(' · ') || '—'}
+                                            />
+                                        </>
+                                    ) : null}
                                 </div>
                             </div>
                         ) : null}
@@ -303,6 +315,28 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                                         <span className="font-poppins font-semibold text-neutral-900">
                                             {`$${Number(order.total).toFixed(2)}`}
                                         </span>
+                                    </div>
+                                    <div className="border-b border-neutral-100 px-4 py-3 text-sm text-neutral-700">
+                                        <span className="font-medium text-neutral-900">
+                                            {order.delivery.method_label}
+                                        </span>
+                                        {order.delivery.method === 'home_delivery' ? (
+                                            <span className="text-neutral-500">
+                                                {' · '}
+                                                {[
+                                                    order.delivery.address,
+                                                    order.delivery.city,
+                                                    order.delivery.district,
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(' · ') || 'Adresse à confirmer'}
+                                            </span>
+                                        ) : null}
+                                        {order.delivery.whatsapp ? (
+                                            <span className="text-neutral-500">
+                                                {' · '}WhatsApp {order.delivery.whatsapp}
+                                            </span>
+                                        ) : null}
                                     </div>
                                     <AdminDataTable>
                                         <TableHeader>
