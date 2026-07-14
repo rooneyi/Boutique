@@ -5,6 +5,7 @@ import aboutModels from '../../media/about-models.jpg';
 import brandCta from '../../media/brand-cta.jpg';
 import categoryCap from '../../media/casquette/category-cap.jpeg';
 import categoryPack from '../../media/tshirt/category-pack.jpeg';
+import categoryPull from '../../media/tshirt/category-pull.jpeg';
 import categoryTshirt from '../../media/tshirt/category-tshirt.jpeg';
 import heroModel from '../../media/hero-model.png';
 import logoPcj from '../../media/logo_pcj.png';
@@ -24,6 +25,7 @@ export const HOME_ASSETS = {
     collectionHero,
     heroModel,
     categoryPack,
+    categoryPull,
     categoryTshirt,
     categoryCap,
     aboutModels,

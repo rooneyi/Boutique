@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
             ['shop_name' => 'PCJ'],
         );
 
-        $categories = collect(['Pack', 'T-shirt', 'Casquette'])
+        $categories = collect(['Pack', 'Pull', 'T-shirt', 'Casquette'])
             ->mapWithKeys(fn (string $name) => [$name => Category::firstOrCreate(['name' => $name])]);
 
         OrderItem::query()->delete();
@@ -48,7 +48,6 @@ class DatabaseSeeder extends Seeder
         DB::table('product_favorites')->delete();
         ProductReview::query()->delete();
         Product::query()->delete();
-        Category::query()->where('name', 'Pull')->delete();
 
         $customerUsers = [
             ['email' => 'sophie@client.test', 'name' => 'Sophie Dupont'],
@@ -71,6 +70,7 @@ class DatabaseSeeder extends Seeder
         });
 
         $pack = $categories['Pack']->id;
+        $pull = $categories['Pull']->id;
         $tshirt = $categories['T-shirt']->id;
         $casquette = $categories['Casquette']->id;
 
@@ -244,6 +244,34 @@ class DatabaseSeeder extends Seeder
                     ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'M', 'sku' => 'PCJ-PACK-CREME-M', 'stock' => 18],
                     ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'L', 'sku' => 'PCJ-PACK-CREME-L', 'stock' => 15],
                     ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'XL', 'sku' => 'PCJ-PACK-CREME-XL', 'stock' => 10],
+                ],
+            ],
+            [
+                'name' => 'Pack Casquette & T-shirt PCJ Essentiel',
+                'description' => 'Duo blanc Essentiel : casquette logo PCJ + t-shirt Osé Comme Jamais DR Congo. Look net et affirmé.',
+                'price' => 16.0,
+                'category_id' => $pack,
+                'status' => 'IN_STOCK',
+                'image' => 'media/tshirt/product-10.jpeg',
+                'variants' => [
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'S', 'sku' => 'PCJ-PACK-ESS-S', 'stock' => 10],
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'M', 'sku' => 'PCJ-PACK-ESS-M', 'stock' => 18],
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'L', 'sku' => 'PCJ-PACK-ESS-L', 'stock' => 15],
+                    ['color' => 'Blanc', 'color_hex' => '#FFFFFF', 'size' => 'XL', 'sku' => 'PCJ-PACK-ESS-XL', 'stock' => 10],
+                ],
+            ],
+            [
+                'name' => 'Pull First Generation',
+                'description' => 'Hoodie orange brique Posé Comme Jamais, première génération. Poche kangourou, look street iconique.',
+                'price' => 21.0,
+                'category_id' => $pull,
+                'status' => 'IN_STOCK',
+                'image' => 'media/pull/product-1.jpeg',
+                'variants' => [
+                    ['color' => 'Orange', 'color_hex' => '#C45C26', 'size' => 'S', 'sku' => 'PCJ-PULL-FG-S', 'stock' => 12],
+                    ['color' => 'Orange', 'color_hex' => '#C45C26', 'size' => 'M', 'sku' => 'PCJ-PULL-FG-M', 'stock' => 20],
+                    ['color' => 'Orange', 'color_hex' => '#C45C26', 'size' => 'L', 'sku' => 'PCJ-PULL-FG-L', 'stock' => 16],
+                    ['color' => 'Orange', 'color_hex' => '#C45C26', 'size' => 'XL', 'sku' => 'PCJ-PULL-FG-XL', 'stock' => 10],
                 ],
             ],
         ];

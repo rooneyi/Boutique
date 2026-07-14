@@ -5,28 +5,22 @@ import { SF_PILL_BTN_LIGHT, SF_SECTION_SUBTITLE, SF_SECTION_TITLE } from '@/lib/
 
 const CATEGORIES = [
     {
-        title: 'Pack',
-        category: 'Pack',
-        image: HOME_ASSETS.categoryPack,
-        cta: 'VOIR LES PACKS',
-        height: 'h-[390px]',
-        width: 'w-full max-w-[320px]',
+        title: 'Pull',
+        category: 'Pull',
+        image: HOME_ASSETS.categoryPull,
+        cta: 'VOIR LES PULLS',
     },
     {
         title: 'T-Shirt',
         category: 'T-shirt',
         image: HOME_ASSETS.categoryTshirt,
         cta: 'VOIR LES T-SHIRTS',
-        height: 'h-[min(570px,70vh)]',
-        width: 'w-full max-w-[400px]',
     },
     {
         title: 'Casquette',
         category: 'Casquette',
         image: HOME_ASSETS.categoryCap,
         cta: 'VOIR LES CASQUETTES',
-        height: 'h-[390px]',
-        width: 'w-full max-w-[320px]',
     },
 ] as const;
 
@@ -42,7 +36,7 @@ export function HomeCategories() {
                 <div className="space-y-1 p-5 text-center">
                     <h2 className={SF_SECTION_TITLE}>Catégories</h2>
                     <p className={SF_SECTION_SUBTITLE}>
-                        Explorez nos packs, t-shirts et casquettes — des essentiels pour votre style au quotidien.
+                        Explorez nos pulls, t-shirts et casquettes — des essentiels pour votre style au quotidien.
                     </p>
                 </div>
 
