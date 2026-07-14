@@ -62,7 +62,7 @@ class ProductImageSeeder extends Seeder
 
         if ($folder === 'tshirt' && str_contains($name, 't-shirt')) {
             return $files
-                ->filter(fn (string $path) => preg_match('/product-[1-7]\.jpeg$/', $path) === 1)
+                ->filter(fn (string $path) => preg_match('/product-[1-9]\.jpeg$/', $path) === 1)
                 ->values();
         }
 

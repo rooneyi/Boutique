@@ -4,7 +4,7 @@ import wearLook2 from '../../media/wear-look-2.jpg';
 import aboutModels from '../../media/about-models.jpg';
 import brandCta from '../../media/brand-cta.jpg';
 import categoryCap from '../../media/casquette/category-cap.jpeg';
-import categoryPull from '../../media/tshirt/category-pull.jpeg';
+import categoryPack from '../../media/tshirt/category-pack.jpeg';
 import categoryTshirt from '../../media/tshirt/category-tshirt.jpeg';
 import heroModel from '../../media/hero-model.png';
 import logoPcj from '../../media/logo_pcj.png';
@@ -23,7 +23,7 @@ export const HOME_ASSETS = {
     logoDark: logoPcjNoir,
     collectionHero,
     heroModel,
-    categoryPull,
+    categoryPack,
     categoryTshirt,
     categoryCap,
     aboutModels,

@@ -197,6 +197,28 @@ class DatabaseSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'Casquette PCJ',
+                'description' => 'Casquette trucker blanc et bleu, message POSÉ COMME JAMAIS. Style street affirmé.',
+                'price' => 5.0,
+                'category_id' => $casquette,
+                'status' => 'IN_STOCK',
+                'image' => 'media/casquette/product-3.jpeg',
+                'variants' => [
+                    ['color' => 'Bleu', 'color_hex' => '#1E4DFF', 'size' => 'TU', 'sku' => 'PCJ-CAP-BLEU-TU', 'stock' => 40],
+                ],
+            ],
+            [
+                'name' => 'Casquette PCJ Bleu',
+                'description' => 'Casquette trucker bleu roi, typo POSÉ COMME JAMAIS dorée. Look net et marqué.',
+                'price' => 5.0,
+                'category_id' => $casquette,
+                'status' => 'IN_STOCK',
+                'image' => 'media/casquette/product-4.jpeg',
+                'variants' => [
+                    ['color' => 'Bleu', 'color_hex' => '#1A3DFF', 'size' => 'TU', 'sku' => 'PCJ-CAP-BLEU-OR-TU', 'stock' => 40],
+                ],
+            ],
+            [
                 'name' => 'Pack Casquette & T-shirt',
                 'description' => 'Ensemble PCJ : casquette Essentiel + t-shirt Posé Comme Jamais. Le duo complet à prix pack.',
                 'price' => 16.0,
@@ -208,6 +230,20 @@ class DatabaseSeeder extends Seeder
                     ['color' => 'Gris', 'color_hex' => '#B8B8B8', 'size' => 'M', 'sku' => 'PCJ-PACK-GRIS-M', 'stock' => 18],
                     ['color' => 'Gris', 'color_hex' => '#B8B8B8', 'size' => 'L', 'sku' => 'PCJ-PACK-GRIS-L', 'stock' => 15],
                     ['color' => 'Gris', 'color_hex' => '#B8B8B8', 'size' => 'XL', 'sku' => 'PCJ-PACK-GRIS-XL', 'stock' => 10],
+                ],
+            ],
+            [
+                'name' => 'Pack Casquette & T-shirt PCJ',
+                'description' => 'Duo PCJ : casquette blanc/bleu + t-shirt crème Posé Comme Jamais dégradé. Style complet.',
+                'price' => 16.0,
+                'category_id' => $pack,
+                'status' => 'IN_STOCK',
+                'image' => 'media/tshirt/product-9.jpeg',
+                'variants' => [
+                    ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'S', 'sku' => 'PCJ-PACK-CREME-S', 'stock' => 10],
+                    ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'M', 'sku' => 'PCJ-PACK-CREME-M', 'stock' => 18],
+                    ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'L', 'sku' => 'PCJ-PACK-CREME-L', 'stock' => 15],
+                    ['color' => 'Crème', 'color_hex' => '#F5F0E6', 'size' => 'XL', 'sku' => 'PCJ-PACK-CREME-XL', 'stock' => 10],
                 ],
             ],
         ];

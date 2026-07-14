@@ -7,7 +7,7 @@ const CATEGORIES = [
     {
         title: 'Pack',
         category: 'Pack',
-        image: HOME_ASSETS.categoryPull,
+        image: HOME_ASSETS.categoryPack,
         cta: 'VOIR LES PACKS',
         height: 'h-[390px]',
         width: 'w-full max-w-[320px]',
