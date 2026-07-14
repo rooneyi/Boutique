@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { Clock, ShoppingCart, Wallet } from 'lucide-react';
+import { Clock, Heart, MessageSquare, ShoppingCart, Wallet } from 'lucide-react';
 import { AdminBadge, orderStatusBadgeVariant } from '@/components/admin/admin-badge';
 import {
     AdminCard,
@@ -47,14 +47,36 @@ type OrderRow = {
     items: OrderItem[];
 };
 
+type DeliveryInfo = {
+    full_name: string | null;
+    whatsapp: string | null;
+    address: string | null;
+    city: string | null;
+    district: string | null;
+} | null;
+
+type CategoryPref = {
+    name: string;
+    quantity: number;
+};
+
 type Props = {
     customer: {
         id: number;
         name: string;
         email: string;
+        phone: string | null;
+        birth_date: string | null;
+        avatar_url: string | null;
+        email_verified: boolean;
+        member_since: string | null;
         orders_count: number;
+        favorites_count: number;
+        reviews_count: number;
         total_spent: number;
         last_order_at: string | null;
+        last_delivery: DeliveryInfo;
+        top_categories: CategoryPref[];
     };
     orders: OrderRow[];
 };
@@ -76,18 +98,55 @@ function statusLabel(status: string): string {
     }
 }
 
+function ProfileField({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">{label}</p>
+            <p className="font-poppins text-sm font-medium text-neutral-900">{value}</p>
+        </div>
+    );
+}
+
 export default function AdminSalesCustomerShow({ customer, orders }: Props) {
+    const initials = customer.name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? '')
+        .join('');
+
     return (
         <>
             <Head title={`Client · ${customer.name}`} />
 
             <div className={ADMIN_PAGE_SECTION}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                    <div>
-                        <h1 className="font-poppins text-3xl font-bold tracking-tight text-black">
-                            {customer.name}
-                        </h1>
-                        <p className={cn(ADMIN_MUTED, 'mt-1 text-base')}>{customer.email}</p>
+                    <div className="flex items-start gap-4">
+                        <div className="size-16 shrink-0 overflow-hidden rounded-full border border-neutral-200 bg-neutral-100">
+                            {customer.avatar_url ? (
+                                <img
+                                    src={customer.avatar_url}
+                                    alt=""
+                                    className="size-full object-cover"
+                                />
+                            ) : (
+                                <div className="flex size-full items-center justify-center text-lg font-semibold text-neutral-600">
+                                    {initials || '?'}
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <h1 className="font-poppins text-3xl font-bold tracking-tight text-black">
+                                {customer.name}
+                            </h1>
+                            <p className={cn(ADMIN_MUTED, 'mt-1 text-base')}>{customer.email}</p>
+                            <p className="mt-1 text-sm text-neutral-500">
+                                {customer.email_verified ? 'Email vérifié' : 'Email non vérifié'}
+                                {customer.member_since
+                                    ? ` · Membre depuis ${new Date(customer.member_since).toLocaleDateString('fr-FR')}`
+                                    : ''}
+                            </p>
+                        </div>
                     </div>
                     <Link
                         href={route('admin.sales.customers.index')}
@@ -97,7 +156,83 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                     </Link>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-3">
+                <AdminCard>
+                    <AdminCardHeader>
+                        <h3 className={ADMIN_H3}>Profil client</h3>
+                        <AdminCardDescription>
+                            Critères d&apos;identité et de contact renseignés par le client
+                        </AdminCardDescription>
+                    </AdminCardHeader>
+                    <AdminCardContent>
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            <ProfileField label="Nom" value={customer.name} />
+                            <ProfileField label="Email" value={customer.email || '—'} />
+                            <ProfileField
+                                label="Téléphone"
+                                value={customer.phone || 'Non renseigné'}
+                            />
+                            <ProfileField
+                                label="Date de naissance"
+                                value={
+                                    customer.birth_date
+                                        ? new Date(customer.birth_date).toLocaleDateString('fr-FR')
+                                        : 'Non renseignée'
+                                }
+                            />
+                        </div>
+
+                        {customer.last_delivery ? (
+                            <div className="mt-8 border-t border-neutral-100 pt-6">
+                                <p className="mb-4 text-xs font-medium uppercase tracking-wide text-neutral-500">
+                                    Dernière adresse de livraison
+                                </p>
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                                    <ProfileField
+                                        label="Nom livraison"
+                                        value={customer.last_delivery.full_name || '—'}
+                                    />
+                                    <ProfileField
+                                        label="WhatsApp"
+                                        value={customer.last_delivery.whatsapp || '—'}
+                                    />
+                                    <ProfileField
+                                        label="Adresse"
+                                        value={customer.last_delivery.address || '—'}
+                                    />
+                                    <ProfileField
+                                        label="Ville / Quartier"
+                                        value={[
+                                            customer.last_delivery.city,
+                                            customer.last_delivery.district,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(' · ') || '—'}
+                                    />
+                                </div>
+                            </div>
+                        ) : null}
+
+                        {customer.top_categories.length > 0 ? (
+                            <div className="mt-8 border-t border-neutral-100 pt-6">
+                                <p className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-500">
+                                    Catégories préférées (achats)
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    {customer.top_categories.map((cat) => (
+                                        <span
+                                            key={cat.name}
+                                            className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm text-neutral-800"
+                                        >
+                                            {cat.name} · {cat.quantity} art.
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : null}
+                    </AdminCardContent>
+                </AdminCard>
+
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                     <AdminStatCard
                         label="Commandes"
                         value={customer.orders_count}
@@ -110,6 +245,18 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                         hint="Montant cumulé"
                         icon={Wallet}
                         accent
+                    />
+                    <AdminStatCard
+                        label="Favoris"
+                        value={customer.favorites_count}
+                        hint="Produits en favoris"
+                        icon={Heart}
+                    />
+                    <AdminStatCard
+                        label="Avis"
+                        value={customer.reviews_count}
+                        hint="Avis laissés"
+                        icon={MessageSquare}
                     />
                     <AdminStatCard
                         label="Dernière commande"
@@ -224,7 +371,9 @@ export default function AdminSalesCustomerShow({ customer, orders }: Props) {
                                                                 {it.color}
                                                             </span>
                                                         ) : (
-                                                            <span className="text-neutral-400">—</span>
+                                                            <span className="text-neutral-400">
+                                                                —
+                                                            </span>
                                                         )}
                                                     </TableCell>
                                                     <TableCell

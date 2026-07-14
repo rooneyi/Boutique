@@ -308,6 +308,7 @@ class AdminService
                     'id' => $c->id,
                     'name' => $c->user?->name ?? '—',
                     'email' => $c->user?->email ?? '',
+                    'phone' => $c->phone,
                     'orders_count' => $ordersCount,
                     'total_spent' => (float) ($c->total_spent ?? 0),
                     'last_order_at' => $c->last_order_at,

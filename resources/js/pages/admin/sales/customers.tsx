@@ -34,14 +34,40 @@ type CustomerRow = {
     id: number;
     name: string;
     email: string;
+    phone: string | null;
+    birth_date: string | null;
+    avatar_url: string | null;
     orders_count: number;
+    favorites_count: number;
     total_spent: number;
     last_order_at: string | null;
+    member_since: string | null;
 };
 
 type Props = {
     customers: CustomerRow[];
 };
+
+function CustomerAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | null }) {
+    const initials = name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? '')
+        .join('');
+
+    return (
+        <div className="size-9 shrink-0 overflow-hidden rounded-full border border-neutral-200 bg-neutral-100">
+            {avatarUrl ? (
+                <img src={avatarUrl} alt="" className="size-full object-cover" />
+            ) : (
+                <div className="flex size-full items-center justify-center text-xs font-semibold text-neutral-600">
+                    {initials || '?'}
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function AdminSalesCustomers({ customers }: Props) {
     return (
@@ -51,7 +77,7 @@ export default function AdminSalesCustomers({ customers }: Props) {
             <div className={ADMIN_PAGE_SECTION}>
                 <AdminPageHeader
                     title="Clients"
-                    description="Vue globale des clients et de leur historique d'achat."
+                    description="Profils clients et critères : contact, naissance, achats et engagement."
                     actions={
                         <Link href={route('admin.dashboard')} className={ADMIN_BTN_SM_OUTLINE}>
                             Tableau de bord
@@ -63,7 +89,8 @@ export default function AdminSalesCustomers({ customers }: Props) {
                     <AdminCardHeader>
                         <h3 className={ADMIN_H3}>Liste des clients</h3>
                         <AdminCardDescription>
-                            {customers.length} client(s) · basé sur l&apos;historique des commandes
+                            {customers.length} client(s) · cliquez une ligne pour voir le profil
+                            complet
                         </AdminCardDescription>
                     </AdminCardHeader>
                     <AdminCardContent>
@@ -79,7 +106,12 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                         <TableHead
                                             className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
                                         >
-                                            Email
+                                            Contact
+                                        </TableHead>
+                                        <TableHead
+                                            className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}
+                                        >
+                                            Naissance
                                         </TableHead>
                                         <TableHead
                                             className={cn(ADMIN_TABLE_HEAD, 'text-right')}
@@ -105,26 +137,47 @@ export default function AdminSalesCustomers({ customers }: Props) {
                                 <TableBody>
                                     {customers.map((c) => (
                                         <TableRow key={c.id} className={ADMIN_TABLE_ROW}>
-                                            <TableCell
-                                                className={cn(
-                                                    ADMIN_TABLE_CELL,
-                                                    'font-medium text-neutral-900',
-                                                )}
-                                            >
-                                                {c.name}
-                                                <span className={ADMIN_MOBILE_META}>{c.email}</span>
-                                                <span className={ADMIN_MOBILE_META}>
-                                                    {c.orders_count} cmd. · $
-                                                    {Number(c.total_spent).toFixed(2)}
-                                                    {c.last_order_at
-                                                        ? ` · ${new Date(c.last_order_at).toLocaleDateString('fr-FR')}`
-                                                        : ''}
-                                                </span>
+                                            <TableCell className={ADMIN_TABLE_CELL}>
+                                                <Link
+                                                    href={route('admin.sales.customers.show', c.id)}
+                                                    className="flex min-w-0 items-center gap-3 font-medium text-neutral-900 hover:underline"
+                                                >
+                                                    <CustomerAvatar
+                                                        name={c.name}
+                                                        avatarUrl={c.avatar_url}
+                                                    />
+                                                    <span className="min-w-0">
+                                                        <span className="block truncate">
+                                                            {c.name}
+                                                        </span>
+                                                        <span className={ADMIN_MOBILE_META}>
+                                                            {c.phone || c.email}
+                                                        </span>
+                                                        <span className={ADMIN_MOBILE_META}>
+                                                            {c.orders_count} cmd. · $
+                                                            {Number(c.total_spent).toFixed(2)}
+                                                        </span>
+                                                    </span>
+                                                </Link>
                                             </TableCell>
                                             <TableCell
                                                 className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}
                                             >
-                                                {c.email}
+                                                <div className="min-w-0">
+                                                    <p className="truncate">{c.email}</p>
+                                                    <p className={cn(ADMIN_MUTED, 'truncate text-xs')}>
+                                                        {c.phone || 'Tél. non renseigné'}
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell
+                                                className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}
+                                            >
+                                                {c.birth_date
+                                                    ? new Date(c.birth_date).toLocaleDateString(
+                                                          'fr-FR',
+                                                      )
+                                                    : '—'}
                                             </TableCell>
                                             <TableCell
                                                 className={cn(ADMIN_TABLE_CELL, 'text-right')}

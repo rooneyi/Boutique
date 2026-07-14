@@ -32,6 +32,7 @@ type CustomerRow = {
     id: number;
     name: string;
     email: string;
+    phone: string | null;
     created_at: string;
     orders_count: number;
     total_spent: number;
@@ -88,6 +89,9 @@ export default function AdminUsers({ users }: Props) {
                                             <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
                                                 Email
                                             </TableHead>
+                                            <TableHead className={cn(ADMIN_TABLE_HEAD, ADMIN_TABLE_COL_MD)}>
+                                                Téléphone
+                                            </TableHead>
                                             <TableHead className={cn(ADMIN_TABLE_HEAD, 'text-right')}>
                                                 Commandes
                                             </TableHead>
@@ -118,6 +122,9 @@ export default function AdminUsers({ users }: Props) {
                                                           {user.name}
                                                           <span className={ADMIN_MOBILE_META}>{user.email}</span>
                                                           <span className={ADMIN_MOBILE_META}>
+                                                              {user.phone || 'Tél. non renseigné'}
+                                                          </span>
+                                                          <span className={ADMIN_MOBILE_META}>
                                                               {user.orders_count} cmd. · $
                                                               {Number(user.total_spent).toFixed(2)}
                                                               {user.last_order_at
@@ -127,6 +134,9 @@ export default function AdminUsers({ users }: Props) {
                                                       </TableCell>
                                                       <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
                                                           {user.email}
+                                                      </TableCell>
+                                                      <TableCell className={cn(ADMIN_TABLE_CELL, ADMIN_TABLE_COL_MD)}>
+                                                          {user.phone || '—'}
                                                       </TableCell>
                                                       <TableCell
                                                           className={cn(ADMIN_TABLE_CELL, 'text-right')}
