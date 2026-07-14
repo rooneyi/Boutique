@@ -1,5 +1,4 @@
 import { Head, usePage } from '@inertiajs/react';
-import { AboutHero } from '@/components/storefront/about/about-hero';
 import { FlashToaster } from '@/components/flash-toaster';
 import { HomeAbout } from '@/components/storefront/home/home-about';
 import { HomeBenefits } from '@/components/storefront/home/home-benefits';
@@ -31,7 +30,6 @@ export default function About() {
                     activeNav="about"
                 />
                 <main>
-                    <AboutHero />
                     <HomeAbout />
                     <HomeBenefits />
                     <HomeBrandCta />
