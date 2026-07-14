@@ -6,7 +6,7 @@ import { SF_HERO_CTA } from '@/lib/storefront-ui-styles';
 export function HomeHero() {
     return (
         <section className="relative flex h-[min(640px,92dvh)] flex-col items-center justify-end overflow-hidden bg-gradient-to-b from-[#303030] via-[#4a4a4a] via-[50%] to-[#1d1d1d] lg:h-[929px]">
-            <p className="relative z-20 mb-4 shrink-0 px-4 text-center font-poppins text-2xl font-extrabold leading-[65px] text-white lg:text-[36px]">
+            <p className="relative z-0 mb-4 shrink-0 px-4 text-center font-poppins text-2xl font-extrabold leading-[65px] text-white lg:text-[36px]">
                 Gardons notre attitude
             </p>
 
